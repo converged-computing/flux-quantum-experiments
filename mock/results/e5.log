@@ -1,0 +1,88 @@
+[10:09:57] cluster has 128 cores, competing stream is 1 jobs of 1s = 1 core seconds
+[10:09:57] WARNING the stream is not oversubscribed, so drain time will just be BG_SECS. Raise BG_JOBS above 128
+[10:09:57] config recorded in results/e5.meta
+[10:09:57] e5 occupies 121 of 128 cores, leaving 7 spare, pair needs 9
+[10:09:57] ordinary work lives 15s
+[10:10:01] e5 coscheduled depth=14 load=94 size=8 trial=1 scout=ƒ4sZCa5Avj main=495813289574400
+[10:10:17] e5 baseline depth=14 load=94 size=8 trial=1 main=ƒ4sgS47xfh
+[10:10:43] e5 coscheduled depth=14 load=94 size=8 trial=2 scout=ƒ4ssaYen95 main=496512899481600
+[10:10:59] e5 baseline depth=14 load=94 size=8 trial=2 main=ƒ4szpLVRGB
+[10:11:24] e5 coscheduled depth=14 load=94 size=8 trial=3 scout=ƒ4tByyjgR5 main=497213549576192
+[10:11:41] e5 baseline depth=14 load=94 size=8 trial=3 main=ƒ4tKE3tBdy
+[10:12:06] e5 coscheduled depth=14 load=94 size=8 trial=4 scout=ƒ4tWNG791Z main=497913411141632
+[10:12:23] e5 baseline depth=14 load=94 size=8 trial=4 main=ƒ4tdem6U1D
+[10:12:48] e5 coscheduled depth=14 load=94 size=8 trial=5 scout=ƒ4tpoS1CT1 main=498615151755264
+[10:13:04] e5 baseline depth=14 load=94 size=8 trial=5 main=ƒ4tx3abfWw
+[10:13:30] e5 baseline depth=14 load=94 size=8 trial=6 main=ƒ4u9A9wQrT
+[10:13:55] e5 coscheduled depth=14 load=94 size=8 trial=6 scout=ƒ4uLKLVtw9 main=499738688356352
+[10:14:11] e5 baseline depth=14 load=94 size=8 trial=7 main=ƒ4uTa8A43h
+[10:14:37] e5 coscheduled depth=14 load=94 size=8 trial=7 scout=ƒ4uek9e8Rm main=500440244420608
+[10:14:53] e5 baseline depth=14 load=94 size=8 trial=8 main=ƒ4un1J47V9
+[10:15:19] e5 coscheduled depth=14 load=94 size=8 trial=8 scout=ƒ4uyC7Vobu main=501142404464640
+[10:15:35] e5 baseline depth=14 load=94 size=8 trial=9 main=ƒ4v6SoE1b5
+[10:16:01] e5 coscheduled depth=14 load=94 size=8 trial=9 scout=ƒ4vHdYDjro main=501844480622592
+[10:16:17] e5 baseline depth=14 load=94 size=8 trial=10 main=ƒ4vQtwTbjd
+[10:16:42] e5 coscheduled depth=14 load=94 size=8 trial=10 scout=ƒ4vc4JPznj main=502545952800768
+[10:16:55] ordinary work lives 30s
+[10:16:59] e5 coscheduled depth=14 load=94 size=8 trial=1 scout=ƒ4vjP9nBi7 main=502824689467392
+[10:17:15] e5 baseline depth=14 load=94 size=8 trial=1 main=ƒ4vrfNTeby
+[10:17:56] e5 baseline depth=14 load=94 size=8 trial=2 main=ƒ4wAPkDUH5
+[10:18:36] e5 coscheduled depth=14 load=94 size=8 trial=2 scout=ƒ4wUAjC2hM main=504453589368832
+[10:18:53] e5 coscheduled depth=14 load=94 size=8 trial=3 scout=ƒ4wbUwWXa7 main=504731654946816
+[10:19:09] e5 baseline depth=14 load=94 size=8 trial=3 main=ƒ4wimZunyV
+[10:19:49] e5 baseline depth=14 load=94 size=8 trial=4 main=ƒ4x2X6P4L7
+[10:20:30] e5 coscheduled depth=14 load=94 size=8 trial=4 scout=ƒ4xLHbBrPq main=506361477595136
+[10:20:46] e5 baseline depth=14 load=94 size=8 trial=5 main=ƒ4xTZT7VLs
+[10:21:27] e5 coscheduled depth=14 load=94 size=8 trial=5 scout=ƒ4xmKfcRJo main=507314624790528
+[10:21:43] e5 coscheduled depth=14 load=94 size=8 trial=6 scout=ƒ4xtebSa5D main=507593395011584
+[10:22:00] e5 baseline depth=14 load=94 size=8 trial=6 main=ƒ4y1xF9LkP
+[10:22:40] e5 coscheduled depth=14 load=94 size=8 trial=7 scout=ƒ4yKmhvhW7 main=508549880872960
+[10:22:57] e5 baseline depth=14 load=94 size=8 trial=7 main=ƒ4yT86G9LB
+[10:23:37] e5 baseline depth=14 load=94 size=8 trial=8 main=ƒ4yksBXctw
+[10:24:17] e5 coscheduled depth=14 load=94 size=8 trial=8 scout=ƒ4z4dQ2Yrs main=510181330911232
+[10:24:34] e5 baseline depth=14 load=94 size=8 trial=9 main=ƒ4zBx6Wp6B
+[10:25:14] e5 coscheduled depth=14 load=94 size=8 trial=9 scout=ƒ4zViu7TY3 main=511136709476352
+[10:25:31] e5 coscheduled depth=14 load=94 size=8 trial=10 scout=ƒ4zd58Yyg3 main=511416335335424
+[10:25:48] e5 baseline depth=14 load=94 size=8 trial=10 main=ƒ4zkQ8q6HV
+[10:26:24] ordinary work lives 60s
+[10:26:28] e5 coscheduled depth=14 load=94 size=8 trial=1 scout=ƒ514BRbW5u main=512372284325888
+[10:26:45] e5 baseline depth=14 load=94 size=8 trial=1 main=ƒ51BWndSeB
+[10:27:55] e5 baseline depth=14 load=94 size=8 trial=2 main=ƒ51iVjYwhZ
+[10:29:05] e5 coscheduled depth=14 load=94 size=8 trial=2 scout=ƒ52FV1kHRR main=515010535096320
+[10:29:22] e5 baseline depth=14 load=94 size=8 trial=3 main=ƒ52NpxswTd
+[10:30:32] e5 coscheduled depth=14 load=94 size=8 trial=3 scout=ƒ52urN8Fa7 main=516471209852928
+[10:30:49] e5 baseline depth=14 load=94 size=8 trial=4 main=ƒ533DD9UUP
+[10:31:59] e5 coscheduled depth=14 load=94 size=8 trial=4 scout=ƒ53aECfz5M main=517932085936128
+[10:32:16] e5 baseline depth=14 load=94 size=8 trial=5 main=ƒ53hbMV4Mm
+[10:33:27] e5 coscheduled depth=14 load=94 size=8 trial=5 scout=ƒ54EdEu8po main=519393867988992
+[10:33:43] e5 coscheduled depth=14 load=94 size=8 trial=6 scout=ƒ54N3PAm5Z main=519676060762112
+[10:34:00] e5 baseline depth=14 load=94 size=8 trial=6 main=ƒ54VSgWo2w
+[10:35:10] e5 baseline depth=14 load=94 size=8 trial=7 main=ƒ552SXKrxP
+[10:36:21] e5 coscheduled depth=14 load=94 size=8 trial=7 scout=ƒ55ZRBwVuy main=522317180436480
+[10:36:38] e5 baseline depth=14 load=94 size=8 trial=8 main=ƒ55gnRCY3R
+[10:37:48] e5 coscheduled depth=14 load=94 size=8 trial=8 scout=ƒ56Dno9Lt7 main=523778006188032
+[10:38:05] e5 baseline depth=14 load=94 size=8 trial=9 main=ƒ56MCGsHou
+[10:39:15] e5 coscheduled depth=14 load=94 size=8 trial=9 scout=ƒ56tH2KyqZ main=525243110129664
+[10:39:32] e5 coscheduled depth=14 load=94 size=8 trial=10 scout=ƒ571iuQmFm main=525526494085120
+[10:39:49] e5 baseline depth=14 load=94 size=8 trial=10 main=ƒ579C94tcF
+[10:40:55] ordinary work lives 120s
+[10:40:59] e5 baseline depth=14 load=94 size=8 trial=1 main=ƒ57gBysxXh
+[10:43:10] e5 coscheduled depth=14 load=94 size=8 trial=1 scout=ƒ58feEPi4o main=529178122256384
+[10:43:27] e5 baseline depth=14 load=94 size=8 trial=2 main=ƒ58o3ZDjJX
+[10:45:37] e5 coscheduled depth=14 load=94 size=8 trial=2 scout=ƒ59nXrLVPD main=531648365985792
+[10:45:54] e5 baseline depth=14 load=94 size=8 trial=3 main=ƒ59uygTJEj
+[10:48:04] e5 coscheduled depth=14 load=94 size=8 trial=3 scout=ƒ5AuSkQens main=534119515684864
+[10:48:21] e5 baseline depth=14 load=94 size=8 trial=4 main=ƒ5B2vecTUK
+[10:50:32] e5 coscheduled depth=14 load=94 size=8 trial=4 scout=ƒ5C2PQmxeK main=536591739125760
+[10:50:49] e5 coscheduled depth=14 load=94 size=8 trial=5 scout=ƒ5C9tmV4PR main=536877320896512
+[10:51:06] e5 baseline depth=14 load=94 size=8 trial=5 main=ƒ5CHNA37Ry
+[10:53:16] e5 baseline depth=14 load=94 size=8 trial=6 main=ƒ5DGptidKd
+[10:55:26] e5 coscheduled depth=14 load=94 size=8 trial=6 scout=ƒ5EGJGTqFu main=541537343635456
+[10:55:43] e5 baseline depth=14 load=94 size=8 trial=7 main=ƒ5EPmrsnZD
+[10:57:54] e5 coscheduled depth=14 load=94 size=8 trial=7 scout=ƒ5FPFmkjQj main=544010154278912
+[10:58:11] e5 coscheduled depth=14 load=94 size=8 trial=8 scout=ƒ5FWoCYpym main=544297111781376
+[10:58:28] e5 baseline depth=14 load=94 size=8 trial=8 main=ƒ5FeJdhtZu
+[11:00:38] e5 baseline depth=14 load=94 size=8 trial=9 main=ƒ5Gdn1T6WB
+[11:02:49] e5 coscheduled depth=14 load=94 size=8 trial=9 scout=ƒ5HdDmo5gj main=548957520396288
+[11:03:06] e5 baseline depth=14 load=94 size=8 trial=10 main=ƒ5HkhX6xg7
+[11:05:16] e5 coscheduled depth=14 load=94 size=8 trial=10 scout=ƒ5JkBasqDh main=551430784024576
