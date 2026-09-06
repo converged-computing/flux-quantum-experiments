@@ -124,8 +124,15 @@ drain() {
 # background load, so the classical actually has to compete for nodes
 LOAD_JOB=""
 
+# The load is submitted as chunks of LOAD_CHUNK cores rather than one big job.
+# A single job cannot be partly preempted: the plugin either kills all of it or
+# none, so a sweep over "how many cores must come from preemption" cannot tell 1
+# from 3 when the only victim available is 121 cores wide. Chunking gives the
+# victim selector something to choose. Set LOAD_CHUNK=0 for the old single-job
+# behaviour.
+LOAD_CHUNK="${LOAD_CHUNK:-8}"
 start_load() {
-    local n="$1" secs="$2" free
+    local n="$1" secs="$2" free left take id
     LOAD_JOB=""
     [ "$n" -le 0 ] && return 0
     free=$(( CORES - n ))
@@ -138,12 +145,26 @@ start_load() {
     # capture the id. Letting the load expire on its own would free the cores
     # and rescue a stranded pair, so the measurement would be the load lifetime
     # rather than anything about the scheduler.
-    LOAD_JOB=$(flux submit -n"$n" sleep "$secs" 2>/dev/null)
+    if [ "$LOAD_CHUNK" -le 0 ]; then
+        LOAD_JOB=$(flux submit -n"$n" sleep "$secs" 2>/dev/null)
+    else
+        left="$n"
+        while [ "$left" -gt 0 ]; do
+            take="$LOAD_CHUNK"
+            [ "$take" -gt "$left" ] && take="$left"
+            id=$(flux submit -n"$take" sleep "$secs" 2>/dev/null)
+            [ -n "$id" ] && LOAD_JOB="${LOAD_JOB:+$LOAD_JOB }$id"
+            left=$(( left - take ))
+        done
+    fi
     sleep 1
 }
 
 stop_load() {
-    [ -n "${LOAD_JOB:-}" ] && flux cancel "$LOAD_JOB" >/dev/null 2>&1
+    local id
+    for id in ${LOAD_JOB:-}; do
+        [ -n "$id" ] && flux cancel "$id" >/dev/null 2>&1
+    done
     LOAD_JOB=""
 }
 
@@ -345,6 +366,7 @@ print(sorted({v.get('policy','?') for v in json.load(sys.stdin).get('queues',{})
         echo "overhead    $OVERHEAD"
         echo "service     $SERVICE"
         echo "timeout     $TIMEOUT"
+    echo "load_chunk  $LOAD_CHUNK"
         echo "started     $(date -Is)"
     } > "${OUT%.csv}.meta"
     say "config recorded in ${OUT%.csv}.meta"

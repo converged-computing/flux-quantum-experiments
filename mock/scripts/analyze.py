@@ -74,7 +74,14 @@ def derive(row):
     out["bg_drain_s"] = (bg_drain - t0) if (bg_drain and t0) else None
     recorded = f(row, "load_cores")
     load_cores = int(recorded) if recorded else int(row["load_pct"]) * 128 // 100
-    out["slack"] = (int(os.environ.get("CORES", 128)) - load_cores) - size
+    spare = int(os.environ.get("CORES", 128)) - load_cores
+    out["slack"] = spare - size
+    # What the sweep actually varies. Preemptible classical work is part of a
+    # pair's budget by policy, so a pair is never short of room: it just has to
+    # take some of its cores from preemption. That quantity is >= 0, unlike
+    # slack, which reports a deficit that policy says cannot exist.
+    need = size + 1 if arm in ("coscheduled", "nowarmup") else size
+    out["preempt_cores"] = max(0, need - spare)
     out["node_seconds"] = held * size if held is not None else None
 
     # The scout holds a core of its own for the whole vendor wait and for the
@@ -101,6 +108,12 @@ def derive(row):
     # 1 when the arm never completed inside TIMEOUT. Its timing fields are
     # blank, so it must be kept out of every mean, but it is not missing data:
     # it says this arm could not run under this condition.
+    # release_lat_s alone hides the cost of a pair that could not be placed.
+    # Measured on hardware: at slack 0 the classical waits 5.002s, one whole
+    # preempt_after, and every bit of it lands in vendor_wait_s because the
+    # scout is what gets held. Only the sum tells the truth.
+    out["time_to_alloc_s"] = (alloc - submit) if (alloc and submit) else None
+
     out["timedout"] = int(f(row, "timedout") or 0)
 
     out["quantum_usd"] = (out["billable_s"] or 0) * QUANTUM_RATE
@@ -166,7 +179,8 @@ def main(paths):
          ["arm", "size"],
          ["idle_node_s", "node_seconds", "scout_node_s", "total_node_s"]),
         ("e4", "does the knee track allocation size",
-         ["arm", "size", "slack"], ["release_lat_s", "quantum_usd"]),
+         ["arm", "size", "preempt_cores"],
+         ["vendor_wait_s", "release_lat_s", "time_to_alloc_s", "quantum_usd"]),
     ):
         sub = [r for r in rows if r["exp"] == exp]
         if not sub:

@@ -126,7 +126,10 @@ def derive(row):
     load_cores = int(recorded) if recorded else CORES * out["load_pct"] // 100
     out["load_cores"] = load_cores
     out["timedout"] = int(row.get("timedout") or 0)
-    out["slack"] = (CORES - load_cores) - size
+    spare = CORES - load_cores
+    out["slack"] = spare - size
+    need = size + 1 if arm in ("coscheduled", "nowarmup") else size
+    out["preempt_cores"] = max(0, need - spare)
     out["node_seconds"] = held * size if held is not None else None
 
     # The scout holds one core for the whole vendor wait and the classical run.
@@ -261,7 +264,7 @@ def fig_latency(e1, plt):
     lineband(ax, released, "depth", "release_lat_s",
              set(e1["arm"]) - {"baseline"}, logy=True)
     ax.set_xlabel("vendor queue depth (tasks ahead)")
-    ax.set_ylabel("release latency (s), log scale")
+    ax.set_ylabel("submit to classical allocated (s), log scale")
     ax.set_title("Release latency does not grow with vendor queue depth")
     ax.annotate("band is the interquartile range",
                 xy=(0.97, 0.04), xycoords="axes fraction", ha="right",
@@ -343,25 +346,25 @@ def fig_knee_size(e4, plt):
     fig, ax = plt.subplots(figsize=(6.4, 3.9))
     for i, size in enumerate(sizes):
         d = cos[cos["size"] == size]
-        m = d.groupby("slack")["release_lat_s"].median()
+        m = d.groupby("preempt_cores")["time_to_alloc_s"].median()
         # the sizes land on top of each other, which is the result, so nudge
         # them apart to make the agreement visible
         nudge = (i - (len(sizes) - 1) / 2) * 0.05
         ax.plot(m.index + nudge, m.values, marker="o", markersize=5,
                 linewidth=1.4, alpha=0.85,
                 color=cmap(i / max(1, len(sizes) - 1)), label=f"{size} tasks")
-    # The cliff is between slack -1 and 0, not between 0 and 1. The scout takes
-    # one core (cli.py, scout_cores=1), so a pair of size N needs N+1 and should
-    # break one core earlier than that. It does not, and the reason is not
-    # established. Shade what was measured and say so, rather than shade the
-    # prediction and let the caption disagree with the data.
-    ax.axvspan(-1.5, -0.5, color="#D55E00", alpha=0.08, linewidth=0)
-    ax.axvline(-0.5, color="#333333", linestyle=":", linewidth=1.2)
-    ax.annotate("pair could not\nbe placed", xy=(0.04, 0.30),
+    # The cliff is at slack 0, where the spare equals the request and there is
+    # no core left for the scout. Measured: slack 0 costs 5.002s, exactly one
+    # preempt_after. It looked free only because that cost lands in
+    # vendor_wait_s rather than release_lat_s, so plot time_to_alloc_s here.
+    # 0 means the pair fitted without disturbing anyone. Everything to the right
+    # had to take cores from preemptible classical work, which policy allows.
+    ax.axvline(0.5, color="#333333", linestyle=":", linewidth=1.2)
+    ax.annotate("fits without\npreempting", xy=(0.04, 0.30),
                 xycoords="axes fraction", fontsize=9, color="#B04000")
     ax.set_yscale("log")
-    ax.set_xlabel("spare cores beyond the request")
-    ax.set_ylabel("release latency (s), log scale")
+    ax.set_xlabel("cores the pair had to take from preemption")
+    ax.set_ylabel("submit to classical allocated (s), log scale")
     ax.set_title("Every allocation size breaks at the same spare core count")
     ax.legend(title="allocation", loc="center right")
     save(fig, "fig5-collapse")
@@ -420,7 +423,7 @@ def fig_arms(rows_e2, plt):
                   linewidth=0)
     ax.set_yscale("log")
     ax.set_xlabel("")
-    ax.set_ylabel("release latency (s), log scale")
+    ax.set_ylabel("submit to classical allocated (s), log scale")
     ax.set_title("Release latency by arm, below the knee")
     save(fig, "fig6-arms")
     plt.close(fig)

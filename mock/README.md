@@ -58,24 +58,48 @@ with the broker.
                   no dataset. Implement it against --quantum-ibm-skip-warmup or
                   delete it.
 
-## Two open questions, settle these before the knee figures are cited
+## Two things measured on hardware, do not undo them
 
-Run `bash diagnose-knee.sh`. About four minutes, mock only.
+`diagnose-knee.sh` settled both. Rerun it if the plugin config changes.
 
-**The 2.2s release latency may be a parameter artifact.** preempt_after is 5.0s
-and e4's vendor wait is about 2.75s. 5.0 - 2.75 = 2.25, and every allocation
-size measured 2.200. That is consistent with the preemption timer running
-concurrently with the vendor wait rather than starting when the classical is
-released. If so the number is a function of DEPTH and preempt_after and moves
-when either does, which is not what a figure captioned "every size breaks the
-same way" implies.
+**The 2.2s release latency was a parameter artifact.**
 
-**The cliff is one core off from the model.** The scout takes one core
-(`cli.py`, `scout_cores=1`), so a pair of size N needs N+1 and should stop
-fitting at slack 0, where the spare equals N. It does not. slack 0 returns in
-0.003s and only slack -1 breaks. Either the scout is not costing a core at
-placement time, or admission control reserves one more than it needs. Until this
-is settled fig5 shades what was measured rather than what was predicted.
+    depth   vendor_wait   release_lat   max(0, preempt_after - vendor_wait)
+        0         2.161         2.902                                 2.839
+       14         2.864         2.196                                 2.136
+      100         7.168         0.003                                 0.000
+
+release_lat is whatever is left of the 5s preemption timer after the vendor wait
+has run it down, plus about 0.06s of dispatch. The timer runs concurrently with
+the vendor queue, so for any queue longer than preempt_after the classical is
+ready the moment the QPU is. Worth stating, but it is a claim about preempt_after
+and DEPTH, not about allocation size, and it moves when either does.
+
+**The cliff is where the pair starts needing preemption, and release_lat_s
+cannot see it.**
+
+    slack   vendor_wait   release_lat   submit -> allocated
+        2         2.865         0.003                 2.868
+        1         2.865         0.003                 2.868
+        0         7.867         0.003                 7.870   <- 5.002 = preempt_after
+       -1         2.863         2.196                 5.059
+       -2         2.863         2.197                 5.060
+
+slack 0 is where the spare equals the request and nothing is left for the scout,
+exactly as `scout_cores=1` predicts. Since preemptible classical work is part of
+a pair's budget by policy, e4 plots `preempt_cores`, how many of the pair's cores
+had to come from preemption, rather than `slack`. That quantity is never
+negative; a pair is never short of room, it just has to take some. It costs a full preempt_after. It looked
+free because the wait falls on the scout and so lands in vendor_wait_s. e4 and
+fig5 plot `time_to_alloc_s`, submit to allocated, the only column that sees it.
+
+Unexplained, and n=1: the end to end cost was not monotonic. Taking 1 core from
+preemption cost 7.87s while taking 2 cost 5.06s. The load in that run was a
+single 121-core job, which cannot be partly preempted, so the victim selector
+had no choice to make. The load is now chunked into LOAD_CHUNK-core jobs
+(default 8) so that it does. Rerun diagnose-knee.sh: if the cost is monotonic
+now, victim granularity was the explanation. If it still is not, the victim
+selection path in the plugin needs looking at before any knee figure is cited.
 
 ## Reading resource counts
 
