@@ -1,0 +1,33 @@
+[13:51:46] cluster has 128 cores, competing stream is 1 jobs of 1s = 1 core seconds
+[13:51:46] WARNING the stream is not oversubscribed, so drain time will just be BG_SECS. Raise BG_JOBS above 128
+[13:51:47] config recorded in results/e6.meta
+[13:51:47] e6 pairs=1 trial=1 admitted=1 rejected=0
+[13:51:47] e6 pairs=1 trial=2 admitted=1 rejected=0
+[13:51:48] e6 pairs=1 trial=3 admitted=1 rejected=0
+[13:51:48] e6 pairs=1 trial=4 admitted=1 rejected=0
+[13:51:49] e6 pairs=1 trial=5 admitted=1 rejected=0
+[13:51:50] e6 pairs=2 trial=1 admitted=2 rejected=0
+[13:51:51] e6 pairs=2 trial=2 admitted=2 rejected=0
+[13:51:51] e6 pairs=2 trial=3 admitted=2 rejected=0
+[13:51:52] e6 pairs=2 trial=4 admitted=2 rejected=0
+[13:51:53] e6 pairs=2 trial=5 admitted=2 rejected=0
+[13:51:54] e6 pairs=3 trial=1 admitted=2 rejected=1
+[13:51:55] e6 pairs=3 trial=2 admitted=2 rejected=1
+[13:51:56] e6 pairs=3 trial=3 admitted=2 rejected=1
+[13:51:57] e6 pairs=3 trial=4 admitted=2 rejected=1
+[13:51:58] e6 pairs=3 trial=5 admitted=2 rejected=1
+[13:51:59] e6 pairs=4 trial=1 admitted=2 rejected=2
+[13:52:00] e6 pairs=4 trial=2 admitted=2 rejected=2
+[13:52:04] e6 pairs=4 trial=3 admitted=2 rejected=2
+[13:52:05] e6 pairs=4 trial=4 admitted=2 rejected=2
+[13:52:06] e6 pairs=4 trial=5 admitted=2 rejected=2
+[13:52:08] e6 pairs=5 trial=1 admitted=2 rejected=3
+[13:52:09] e6 pairs=5 trial=2 admitted=2 rejected=3
+[13:52:10] e6 pairs=5 trial=3 admitted=2 rejected=3
+[13:52:12] e6 pairs=5 trial=4 admitted=2 rejected=3
+[13:52:13] e6 pairs=5 trial=5 admitted=2 rejected=3
+[13:52:15] e6 pairs=6 trial=1 admitted=2 rejected=4
+[13:52:16] e6 pairs=6 trial=2 admitted=2 rejected=4
+[13:52:18] e6 pairs=6 trial=3 admitted=2 rejected=4
+[13:52:19] e6 pairs=6 trial=4 admitted=2 rejected=4
+[13:52:21] e6 pairs=6 trial=5 admitted=2 rejected=4

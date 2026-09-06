@@ -1,90 +1,57 @@
 #!/usr/bin/env python3
-"""Derive the metrics from a raw experiment CSV.
+"""Tables from the experiment CSVs.
 
-    ./analyze.py e1.csv e2.csv e3.csv
+    ./analyze.py results/*.csv
 
-Everything here comes from the raw timestamps, so the analysis can be changed
-without spending another run.
-
-    vendor_wait_s     how long the QPU queue took. Free in every arm.
-    release_lat_s     from having the QPU to the classical actually running.
-                      This is what coscheduling is for.
-    node_seconds      nodes multiplied by the time they were held. The waste in
-                      the inline arm is the vendor wait times the allocation.
-    billable_s        what a real vendor would bill, which starts when the
-                      first task runs and not when the session was opened.
-    bg_drain_s        how long a competing stream of small jobs took to clear.
-                      An arm that sits on nodes it is not using makes this
-                      longer, which is the cost coscheduling avoids.
+Means with the sample standard deviation and n per cell. A censored trial,
+one that never started inside the timeout, is in no mean and is listed on
+its own.
 """
 
-import csv
-import os
 import sys
 from collections import defaultdict
 
-QUANTUM_RATE = 1.60      # dollars per second of held session, ibm pay as you go
-NODE_RATE = 0.0          # dollars per core second, set it for your instance
+from metrics import NODE_RATE, load
+
+TABLES = (
+    (
+        "e1",
+        "allocation held, against vendor queue depth",
+        ["arm", "depth"],
+        ["vendor_wait_s", "release_lat_s", "billable_s", "quantum_usd"],
+    ),
+    (
+        "e2",
+        "the arms under classical contention",
+        ["arm", "load_pct"],
+        ["release_lat_s", "idle_node_s", "quantum_usd"],
+    ),
+    (
+        "e3",
+        "core seconds consumed, against allocation size",
+        ["arm", "size"],
+        ["idle_node_s", "node_seconds", "scout_node_s", "total_node_s"],
+    ),
+    (
+        "e4",
+        "does the knee track allocation size",
+        ["arm", "size", "preempt_cores"],
+        ["vendor_wait_s", "release_lat_s", "time_to_alloc_s", "quantum_usd"],
+    ),
+    (
+        "e5",
+        "what contention costs, against how long the other work has left",
+        ["arm", "load_secs"],
+        ["vendor_wait_s", "release_lat_s", "time_to_alloc_s", "quantum_usd"],
+    ),
+)
 
 
-def f(row, key):
+def _num(x):
     try:
-        return float(row[key])
-    except (TypeError, ValueError, KeyError):
-        return None
-
-
-def derive(row):
-    size = int(row["size"])
-    work = float(row["work_s"])
-    submit, prio = f(row, "submit"), f(row, "priority")
-    alloc, start, finish = f(row, "alloc"), f(row, "start"), f(row, "finish")
-    s0, s1 = f(row, "scout_start"), f(row, "scout_finish")
-    arm = row["arm"]
-
-    out = dict(row)
-    held = (finish - alloc) if (finish and alloc) else None
-
-    # A vendor bills from when the first task runs, not from when the session
-    # was opened, so the queue wait is free in every arm and billable time
-    # starts at priority.
-    if arm == "inline":
-        # the job holds its nodes through the vendor wait, so the wait is
-        # whatever it ran for beyond the actual work
-        wait = (held - work) if held is not None else None
-        out["vendor_wait_s"] = wait
-        out["release_lat_s"] = 0.0            # nothing to release, it is inline
-        out["idle_node_s"] = wait * size if wait is not None else None
-        out["billable_s"] = work
-    elif arm in ("coscheduled", "nowarmup"):
-        out["vendor_wait_s"] = (prio - submit) if (prio and submit) else None
-        out["release_lat_s"] = (alloc - prio) if (alloc and prio) else None
-        # the classical holds nodes only for the work, and the scout holds one
-        # core, so nothing large sits idle
-        out["idle_node_s"] = 0.0
-        out["billable_s"] = (s1 - prio) if (s1 and prio) else None
-    else:  # sessionfirst
-        out["vendor_wait_s"] = (prio - f(row, "t0")) if prio else None
-        out["release_lat_s"] = (start - prio) if (start and prio) else None
-        out["idle_node_s"] = 0.0
-        # the session sits open while the classical queues, and that is billed
-        out["billable_s"] = (s1 - prio) if (s1 and prio) else None
-
-    # bg_done used to be a count of finished jobs and is now the timestamp the
-    # stream drained, so ignore the old format rather than subtract an epoch
-    # from a small integer
-    bg_drain = f(row, "bg_done")
-    t0 = f(row, "t0")
-    if bg_drain is not None and bg_drain < 1e6:
-        bg_drain = None
-    out["bg_drain_s"] = (bg_drain - t0) if (bg_drain and t0) else None
-    recorded = f(row, "load_cores")
-    load_cores = int(recorded) if recorded else int(row["load_pct"]) * 128 // 100
-    out["slack"] = (int(os.environ.get("CORES", 128)) - load_cores) - size
-    out["node_seconds"] = held * size if held is not None else None
-    out["quantum_usd"] = (out["billable_s"] or 0) * QUANTUM_RATE
-    out["classical_usd"] = (out["idle_node_s"] or 0) * NODE_RATE
-    return out
+        return (0, float(x))
+    except (TypeError, ValueError):
+        return (1, str(x))
 
 
 def summarize(rows, group_keys, metrics):
@@ -94,63 +61,101 @@ def summarize(rows, group_keys, metrics):
     print("  " + "  ".join(f"{k:>14s}" for k in group_keys + metrics) + "       n")
     for key in sorted(groups, key=lambda k: [_num(x) for x in k]):
         rs = groups[key]
-        cells = list(key)
+        cells = [str(k) for k in key]
         for m in metrics:
-            vals = []
-            for r in rs:
-                v = r.get(m)
-                if v is None or v == "":
-                    continue
-                try:
-                    vals.append(float(v))
-                except (TypeError, ValueError):
-                    pass
+            vals = [float(r[m]) for r in rs if r.get(m) not in (None, "")]
             if not vals:
                 cells.append("-")
                 continue
             n = len(vals)
             mean = sum(vals) / n
-            # a mean with no spread is not reportable, so carry the sd and n
             sd = (sum((v - mean) ** 2 for v in vals) / (n - 1)) ** 0.5 if n > 1 else 0.0
             cells.append(f"{mean:.3f}±{sd:.3f}")
-        cells.append(f"n={len(rs)}")
-        print("  " + "  ".join(f"{c:>14s}" for c in cells))
+        nto = sum(1 for r in rs if r.get("timedout"))
+        cells.append(f"n={len(rs) - nto}" + (f" +{nto} censored" if nto else ""))
+        print("  " + "  ".join(f"{str(c):>14s}" for c in cells))
     print()
 
 
-def _num(x):
-    try:
-        return (0, float(x))
-    except ValueError:
-        return (1, x)
+def censored(rows):
+    seen = defaultdict(int)
+    for r in rows:
+        if r.get("timedout"):
+            seen[(r["exp"], r["arm"], r["size"], r.get("slack"))] += 1
+    if not seen:
+        return
+    print("== conditions where an arm could not run ==")
+    print("  the arm never started inside the timeout")
+    print("  " + "  ".join(f"{h:>12s}" for h in ("exp", "arm", "size", "slack", "n")))
+    for k in sorted(seen, key=lambda x: (x[0], x[1], x[2])):
+        cells = (k[0], k[1], str(k[2]), "" if k[3] is None else str(k[3]), str(seen[k]))
+        print("  " + "  ".join(f"{x:>12s}" for x in cells))
+    print()
+
+
+def core_seconds(e3):
+    print("== e3: total core seconds, scout included ==")
+    by = defaultdict(dict)
+    for r in e3:
+        v = r.get("total_node_s")
+        if v is not None:
+            by[r["size"]].setdefault(r["arm"], []).append(v)
+    print(
+        "  "
+        + "  ".join(f"{h:>14s}" for h in ("size", "baseline", "coscheduled", "ratio"))
+    )
+    for size in sorted(by):
+        arms = by[size]
+        if "baseline" not in arms or "coscheduled" not in arms:
+            continue
+        b = sum(arms["baseline"]) / len(arms["baseline"])
+        c = sum(arms["coscheduled"]) / len(arms["coscheduled"])
+        cells = (str(size), f"{b:.1f}", f"{c:.1f}", f"{b / c:.2f}x" if c else "-")
+        print("  " + "  ".join(f"{x:>14s}" for x in cells))
+    be = [
+        r["breakeven_size"]
+        for r in e3
+        if r["arm"] == "baseline" and r["breakeven_size"]
+    ]
+    if be:
+        print(f"\n  break even at size > {sum(be) / len(be):.2f}")
+    print()
+
+
+def admission(e6):
+    print("== e6: pairs admitted against pairs asked for ==")
+    by = defaultdict(list)
+    for r in e6:
+        by[int(float(r["bg_total"]))].append(int(float(r["bg_done"])))
+    print("  " + "  ".join(f"{h:>12s}" for h in ("asked", "admitted", "n")))
+    for asked in sorted(by):
+        got = by[asked]
+        print(
+            "  "
+            + "  ".join(
+                f"{x:>12s}"
+                for x in (str(asked), f"{sum(got) / len(got):.1f}", str(len(got)))
+            )
+        )
+    print()
 
 
 def main(paths):
-    rows = []
-    for p in paths:
-        with open(p) as fh:
-            rows += [derive(r) for r in csv.DictReader(fh)]
-
-    for exp, title, keys, metrics in (
-        ("e1", "release latency against vendor queue depth",
-         ["arm", "depth"], ["vendor_wait_s", "release_lat_s", "billable_s", "quantum_usd"]),
-        ("e2", "the arms under classical contention",
-         ["arm", "load_pct"],
-         ["release_lat_s", "idle_node_s", "bg_drain_s", "quantum_usd"]),
-        ("e3", "node seconds wasted against allocation size",
-         ["arm", "size"], ["idle_node_s", "node_seconds"]),
-        ("e4", "does the knee track allocation size",
-         ["arm", "size", "slack"], ["release_lat_s", "quantum_usd"]),
-    ):
+    rows = load(paths)
+    for exp, title, keys, metrics in TABLES:
         sub = [r for r in rows if r["exp"] == exp]
-        if not sub:
-            continue
-        print(f"== {exp}: {title} ==")
-        summarize(sub, keys, metrics)
-
+        if sub:
+            print(f"== {exp}: {title} ==")
+            summarize(sub, keys, metrics)
+    censored(rows)
+    e3 = [r for r in rows if r["exp"] == "e3"]
+    if e3:
+        core_seconds(e3)
+    e6 = [r for r in rows if r["exp"] == "e6"]
+    if e6:
+        admission(e6)
     if NODE_RATE == 0.0:
-        print("note: NODE_RATE is 0, so classical_usd is not priced. Set it to "
-              "your core second rate to compare the two sides in money.")
+        print("note: NODE_RATE is 0, so classical_usd is not priced")
 
 
 if __name__ == "__main__":
