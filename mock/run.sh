@@ -10,7 +10,11 @@
 
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
-export CORES="${CORES:-$(flux resource list -no '{ncores}' 2>/dev/null || echo 128)}"
+# -s all, not the bare -no '{ncores}'. Without a state field in the format,
+# flux resource list merges free, allocated and down onto one line, so the bare
+# form returns the total while reading like the free count, and it counts down
+# cores as capacity.
+export CORES="${CORES:-$(flux resource list -s all -no '{ncores}' 2>/dev/null || echo 128)}"
 export FLUX_QUANTUM_MOCK=1
 
 which=("$@")

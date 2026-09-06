@@ -1,6 +1,6 @@
 # Flux Quantum Experiments
 
-**in progress*
+**in progress**
 
 ## License
 
