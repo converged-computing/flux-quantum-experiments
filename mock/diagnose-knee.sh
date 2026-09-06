@@ -80,23 +80,35 @@ probe() {
     if flux job wait-event -t 90 "$main" clean >/dev/null 2>&1; then
         prio=$(memo_ts "$main"); alloc=$(ev "$main" alloc)
         start=$(ev "$main" start)
-        local submit; submit=$(ev "$main" submit)
-        python3 - "$submit" "$prio" "$alloc" "$start" "$depth" "$lc" "$SIZE" "$CORES" <<'PY'
+        local submit s_sub s_start
+        submit=$(ev "$main" submit)
+        # the scout's own timeline. Inferring it from the memo cannot tell
+        # "the scout could not be placed" apart from "the scout ran and the
+        # QPU was slow", and those are different bugs.
+        s_sub=$(ev "$scout" submit); s_start=$(ev "$scout" start)
+        python3 - "$submit" "$prio" "$alloc" "$start" "$depth" "$lc" "$SIZE" "$CORES" "$s_sub" "$s_start" <<'PY'
 import sys
-sub, prio, alloc, start, depth, lc, size, cores = sys.argv[1:]
+sub, prio, alloc, start, depth, lc, size, cores, s_sub, s_start = sys.argv[1:]
 f = lambda x: float(x) if x else None
-sub, prio, alloc, start = map(f, (sub, prio, alloc, start))
+sub, prio, alloc, start, s_sub, s_start = map(
+    f, (sub, prio, alloc, start, s_sub, s_start))
 wait = (prio - sub) if (prio and sub) else None
 rel  = (alloc - prio) if (alloc and prio) else None
+# scout placement: submit to actually running. If this is ~0 the scout got its
+# core at once and any delay is in the session path. If it is ~preempt_after
+# the scout was held waiting for a core, which is a placement problem.
+s_place = (s_start - s_sub) if (s_start and s_sub) else None
+# scout run to session in hand, the real vendor queue time
+s_queue = (prio - s_start) if (prio and s_start) else None
 spare = int(cores) - int(lc)
 need = int(size) + 1
 pc = max(0, need - spare)
-print("  depth=%-4s load=%-4s from_preempt=%-2d vendor_wait=%-7s release_lat=%-7s  total=%-7s  5.0-wait=%s"
-      % (depth, lc, pc,
-         "%.3f" % wait if wait is not None else "?",
-         "%.3f" % rel if rel is not None else "?",
-         "%.3f" % (wait + rel) if (wait is not None and rel is not None) else "?",
-         "%.3f" % (5.0 - wait) if wait is not None else "?"))
+fmt = lambda v: ("%.3f" % v) if v is not None else "?"
+print("  depth=%-4s load=%-4s from_preempt=%-2d "
+      "scout_place=%-7s scout_queue=%-7s release_lat=%-7s total=%-7s"
+      % (depth, lc, pc, fmt(s_place), fmt(s_queue),
+         fmt(rel),
+         fmt(wait + rel) if (wait is not None and rel is not None) else "?"))
 PY
     else
         echo "  depth=$depth load=$lc  TIMEOUT, pair never completed"
@@ -125,7 +137,10 @@ done
 
 echo
 echo "Read Q1 as: does release_lat follow the last column."
-echo "Read Q2 as: total should rise with from_preempt, or at least not fall."
+echo "Read Q2 as: scout_place is the answer. If scout_place is near 0 the scout"
+echo "got its core at once, so any 5s belongs to the session path. If scout_place"
+echo "is near preempt_after the scout was held waiting for a core it should have"
+echo "had, since from_preempt=1 means 8 cores were free and the scout wants 1."
 echo "Last run it fell, 1 core costing 7.87 and 2 costing 5.06, with an"
 echo "unchunked load. If it is monotonic now, that was the granularity of the"
 echo "victim. If it is still not, the victim selector needs looking at."
