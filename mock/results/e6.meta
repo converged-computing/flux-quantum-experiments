@@ -1,0 +1,11 @@
+cores       128
+queue_policy coschedule
+jobtap      quantum.so 
+preempt     1
+load_secs   900
+work        5
+overhead    2
+service     0.05
+timeout     600
+load_chunk  8
+started     2026-09-08T13:51:47+00:00
