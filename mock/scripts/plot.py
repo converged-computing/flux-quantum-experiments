@@ -166,6 +166,12 @@ def lineband(ax, df, x, y, arms, logy=False, spread="iqr"):
     present = [a for a in ORDER if a in arms]
     for arm in present:
         d = df[df["arm"] == arm]
+        # A censored trial never started inside the timeout, so it has no
+        # measured cost or latency. Its nominal figures are what a run would
+        # have cost had it happened, and drawing them puts a price on work that
+        # did not occur. analyze.py reports these separately as censored.
+        if "timedout" in d.columns:
+            d = d[d["timedout"] == 0]
         if d.empty or d[y].isna().all():
             continue
         g = d.groupby(x)[y]
@@ -279,17 +285,41 @@ def fig_latency(e1, plt):
 
 
 def fig_knee(e2, plt):
-    """One panel. The billed session is the consequence and the release latency
-    is just the mechanism behind it, so plotting both is the same number twice.
+    """What contention costs, and what bounds it.
+
+    Below the boundary the pair fits and the two arms cost the same. Above it
+    the classical half cannot start the moment the scout releases it, and the
+    session is billed for the gap. Preemption is what keeps that gap short: the
+    cost is a cancel and an epilog, not however long somebody else's job had
+    left to run.
+
+    The baseline is worth reading alongside this. Above the boundary it does
+    not merely cost more, it does not start at all inside the timeout, because
+    nothing preempts on behalf of an unprotected request.
+
+    The billed session is the consequence and the release latency is the
+    mechanism behind it, so plotting both would be the same number twice.
     """
     fig, ax = plt.subplots(figsize=(6.4, 3.9))
     lineband(ax, e2, "load_pct", "quantum_usd", set(e2["arm"]))
+
+    # derive the step from the data, so re-running cannot leave a stale claim
+    cos = e2[e2["arm"] == "coscheduled"]
+    if not cos.empty:
+        by_load = cos.groupby("load_pct")["quantum_usd"].mean()
+        floor = by_load.min()
+        above = by_load[by_load > floor * 1.05]
+        if len(above):
+            knee = int(above.index.min())
+            step = above.mean() - floor
+            ax.axvline(knee - 1, color="#333333", linestyle=":", linewidth=1.2)
+            ax.annotate(
+                "the pair stops fitting at {}%\npreemption makes room, and the\nsession is billed ${:.2f} for the wait".format(knee, step),
+                xy=(0.04, 0.62), xycoords="axes fraction", fontsize=9,
+                color="#666666")
     ax.set_xlabel("classical utilisation (%)")
     ax.set_ylabel("billed vendor session (USD)")
-    ax.set_title("Past the knee, the session is billed while the job queues")
-    ax.annotate("from here the classical job cannot\nstart when the scout releases it",
-                xy=(0.52, 0.72), xycoords="axes fraction", fontsize=9,
-                color="#666666")
+    ax.set_title("Preemption bounds what contention costs the session")
     ax.legend(title=None, loc="center left")
     save(fig, "fig3-knee")
     plt.close(fig)
@@ -332,13 +362,26 @@ def fig_waste(e3, plt):
 
 
 def fig_knee_size(e4, plt):
-    """The mechanism, tested by collapsing it.
+    """The mechanism, tested by collapsing it, and where the grace period lands.
 
     Each allocation size breaks at a different utilisation, which on its own is
-    just four unrelated step functions. If the boundary really is the pair not
-    fitting, then plotting against spare cores rather than utilisation should
-    put every size on the same curve, stepping in the same place. That is a
-    test and not a restatement.
+    just four unrelated step functions. Plotting against cores taken from
+    preemption rather than utilisation puts every size on the same curve, which
+    is a test of the boundary and not a restatement of it.
+
+    The shape is not monotonic, and the reason is worth knowing. The delay
+    moves between the two halves depending on which one has to wait:
+
+        0 cores   the pair fits, about 2.9s, ordinary vendor queue wait
+        1 core    about 7.9s, and it is the scout that waits out the grace
+                  period, so all of it lands in vendor_wait_s and the classical
+                  is released within milliseconds of the scout starting
+        2 cores   the scout gets in, so the classical is the one that waits,
+                  and the grace period lands in release_lat_s instead
+
+    One grace period either way, different column. So the axis here is submit
+    to classical allocated, which counts it once wherever it fell. Measured
+    identically at all four allocation sizes.
     """
     import numpy as np
 
@@ -369,8 +412,9 @@ def fig_knee_size(e4, plt):
     ax.set_yscale("log")
     ax.set_xlabel("cores the pair had to take from preemption")
     ax.set_ylabel("submit to classical allocated (s), log scale")
-    ax.set_title("However many cores it has to take, every size pays the same")
-    ax.legend(title="allocation", loc="center right")
+    ax.set_title("One grace period, landing in whichever half has to wait")
+    ax.legend(title="allocation", loc="lower left",
+              bbox_to_anchor=(0.0, -0.42), ncol=4, frameon=False)
     save(fig, "fig5-collapse")
     plt.close(fig)
 

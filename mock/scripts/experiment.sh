@@ -361,13 +361,28 @@ import json,sys
 print(sorted({v.get('policy','?') for v in json.load(sys.stdin).get('queues',{}).values()})[0])
 " 2>/dev/null || echo unknown)"
         echo "jobtap      $(flux jobtap list 2>/dev/null | tr '\n' ' ')"
-        echo "preempt     $(flux dmesg 2>/dev/null | grep -c 'preemption is on')"
+        # The configured values, read back from the plugin itself, not a count
+        # of log lines that happen to still be in the dmesg ring. This block
+        # exists to say afterwards what produced the data, and a whole campaign
+        # was once collected with preemption off with no way to tell.
+        # whatever is loaded, by whatever filename. Builtin plugins are dot
+        # prefixed, so anything else is ours.
+        qplug=$(flux jobtap list 2>/dev/null | grep -v '^\.' | head -1)
+        flux jobtap query "${qplug:-quantum.so}" 2>/dev/null | flux python -c "
+import json, sys
+try:
+    q = json.load(sys.stdin)
+except Exception:
+    q = {}
+for k in ('total_cores', 'reserve_cores', 'preempt_after', 'vendors'):
+    print('%-12s %s' % (k, q.get(k, 'unknown')))
+" 2>/dev/null || echo "plugin_conf unknown"
         echo "load_secs   $LOAD_SECS"
         echo "work        $WORK"
         echo "overhead    $OVERHEAD"
         echo "service     $SERVICE"
         echo "timeout     $TIMEOUT"
-    echo "load_chunk  $LOAD_CHUNK"
+        echo "load_chunk  $LOAD_CHUNK"
         echo "started     $(date -Is)"
     } > "${OUT%.csv}.meta"
     say "config recorded in ${OUT%.csv}.meta"
