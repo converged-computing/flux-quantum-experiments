@@ -34,12 +34,11 @@ CORES = int(os.environ.get("CORES", 128))
 
 # Okabe and Ito, safe for the common colour vision deficiencies and it prints
 ARMS = {
-    "inline": ("#D55E00", "inline"),
+    "baseline": ("#D55E00", "baseline"),
     "coscheduled": ("#009E73", "coscheduled"),
-    "sessionfirst": ("#E69F00", "session first"),
     "nowarmup": ("#0072B2", "no warmup"),
 }
-ORDER = ["inline", "coscheduled", "sessionfirst", "nowarmup"]
+ORDER = ["baseline", "coscheduled", "nowarmup"]
 
 
 def style():
@@ -100,7 +99,7 @@ def derive(row):
     out["arm_label"] = ARMS.get(arm, (None, arm))[1]
     held = (finish - alloc) if (finish and alloc) else None
 
-    if arm == "inline":
+    if arm == "baseline":
         # the job takes its nodes first, so it holds them through the vendor
         # wait and nothing is billed for waiting
         wait = (held - work) if held is not None else None
@@ -126,8 +125,29 @@ def derive(row):
     recorded = num(row.get("load_cores"))
     load_cores = int(recorded) if recorded else CORES * out["load_pct"] // 100
     out["load_cores"] = load_cores
-    out["slack"] = (CORES - load_cores) - size
+    out["timedout"] = int(row.get("timedout") or 0)
+    spare = CORES - load_cores
+    out["slack"] = spare - size
+    need = size + 1 if arm in ("coscheduled", "nowarmup") else size
+    out["preempt_cores"] = max(0, need - spare)
+    # Submit to allocated, for the whole pair. At slack 0 the classical waits a
+    # whole preempt_after and all of it lands in vendor_wait_s, because the
+    # scout is what gets held. Only the sum tells the truth, so fig5 uses this.
+    out["time_to_alloc_s"] = (alloc - sub) if (alloc and sub) else None
     out["node_seconds"] = held * size if held is not None else None
+
+    # The scout holds one core for the whole vendor wait and the classical run.
+    # Leaving it out understates the design and flips the sign at small sizes.
+    if arm in ("coscheduled", "nowarmup"):
+        out["scout_node_s"] = (s1 - s0) if (s1 and s0) else None
+    else:
+        out["scout_node_s"] = 0.0
+    if out["node_seconds"] is not None and out["scout_node_s"] is not None:
+        out["total_node_s"] = out["node_seconds"] + out["scout_node_s"]
+    else:
+        out["total_node_s"] = None
+    wait = out["vendor_wait_s"]
+    out["breakeven_size"] = ((wait + work) / wait) if wait else None
     out["quantum_usd"] = (out["billable_s"] or 0) * QUANTUM_RATE
     out["classical_usd"] = (out["idle_node_s"] or 0) * NODE_RATE
     return out
@@ -206,12 +226,12 @@ def box(ax, df, x, y, arms, logy=False, showpoints=True):
 
 def fig_held(e1, plt):
     """How long the allocation is actually held, for each arm, as the vendor
-    queue deepens. The inline arm holds its nodes through the queue wait, the
+    queue deepens. The baseline arm holds its nodes through the queue wait, the
     coscheduled arm does not, and the gap between the two lines is the saving.
     Both are measured, nothing here is inferred."""
     fig, ax = plt.subplots(figsize=(6.4, 3.9))
     have = set(e1["arm"])
-    for arm in ("inline", "coscheduled", "sessionfirst"):
+    for arm in ("baseline", "coscheduled"):
         if arm not in have:
             continue
         d = e1[e1["arm"] == arm]
@@ -224,8 +244,8 @@ def fig_held(e1, plt):
                         alpha=0.2, linewidth=0)
         ax.plot(mid.index, mid.values, color=color, marker="o", markersize=4,
                 linewidth=1.7, label=label)
-    if "inline" in have and "coscheduled" in have:
-        a = e1[e1["arm"] == "inline"]
+    if "baseline" in have and "coscheduled" in have:
+        a = e1[e1["arm"] == "baseline"]
         b = e1[e1["arm"] == "coscheduled"]
         ha = (a["finish"].astype(float) - a["alloc"].astype(float)).groupby(a["depth"]).median()
         hb = (b["finish"].astype(float) - b["alloc"].astype(float)).groupby(b["depth"]).median()
@@ -235,7 +255,7 @@ def fig_held(e1, plt):
                         label="allocation time coscheduling avoids")
     ax.set_xlabel("vendor queue depth (tasks ahead)")
     ax.set_ylabel("allocation held (s)")
-    ax.set_title("The inline arm holds its nodes through the vendor queue wait")
+    ax.set_title("The baseline arm holds its nodes through the vendor queue wait")
     ax.legend(loc="upper left")
     ax.margins(x=0.02)
     save(fig, "fig1-held")
@@ -244,11 +264,11 @@ def fig_held(e1, plt):
 
 def fig_latency(e1, plt):
     fig, ax = plt.subplots(figsize=(6.4, 3.8))
-    released = e1[e1["arm"] != "inline"]
+    released = e1[e1["arm"] != "baseline"]
     lineband(ax, released, "depth", "release_lat_s",
-             set(e1["arm"]) - {"inline"}, logy=True)
+             set(e1["arm"]) - {"baseline"}, logy=True)
     ax.set_xlabel("vendor queue depth (tasks ahead)")
-    ax.set_ylabel("release latency (s), log scale")
+    ax.set_ylabel("submit to classical allocated (s), log scale")
     ax.set_title("Release latency does not grow with vendor queue depth")
     ax.annotate("band is the interquartile range",
                 xy=(0.97, 0.04), xycoords="axes fraction", ha="right",
@@ -284,17 +304,26 @@ def fig_waste(e3, plt):
         d = e3[e3["arm"] == arm]
         if d.empty:
             continue
-        g = d.groupby("size")["node_seconds"]
+        g = d.groupby("size")["total_node_s"]
         mean, sd = g.mean(), g.std().fillna(0)
         color, label = ARMS[arm]
         ax.errorbar(mean.index, mean.values, yerr=sd.values, color=color,
                     marker="o", markersize=5, linewidth=1.7, capsize=3,
                     label=label)
+    # below the break even the scout core costs more than the wait saves, so
+    # mark it rather than let the reader assume the design always wins
+    be = e3[e3["arm"] == "baseline"]["breakeven_size"].dropna()
+    if not be.empty:
+        x = float(be.mean())
+        ax.axvline(x, color="#999999", linestyle=":", linewidth=1)
+        ax.annotate(f"break even, size {x:.1f}", xy=(x, 0.55),
+                    xycoords=("data", "axes fraction"), rotation=90,
+                    fontsize=8, color="#666666", ha="right", va="center")
     ax.set_xlabel("allocation size (tasks)")
-    ax.set_ylabel("total core seconds consumed")
-    ax.set_title("Identical work, and the inline arm consumes twice the cluster")
-    ax.annotate("bars are one standard deviation over 10 trials",
-                xy=(0.97, 0.04), xycoords="axes fraction", ha="right",
+    ax.set_ylabel("total core seconds consumed, scout included")
+    ax.set_title("Identical work, and the baseline arm consumes roughly twice the cluster")
+    ax.annotate("scout core included, bars are one sd over 10 trials",
+                xy=(0.97, 0.10), xycoords="axes fraction", ha="right",
                 fontsize=8, color="#666666")
     ax.legend(title=None, loc="upper left")
     ax.margins(x=0.04)
@@ -321,21 +350,26 @@ def fig_knee_size(e4, plt):
     fig, ax = plt.subplots(figsize=(6.4, 3.9))
     for i, size in enumerate(sizes):
         d = cos[cos["size"] == size]
-        m = d.groupby("slack")["release_lat_s"].median()
+        m = d.groupby("preempt_cores")["time_to_alloc_s"].median()
         # the sizes land on top of each other, which is the result, so nudge
         # them apart to make the agreement visible
         nudge = (i - (len(sizes) - 1) / 2) * 0.05
         ax.plot(m.index + nudge, m.values, marker="o", markersize=5,
                 linewidth=1.4, alpha=0.85,
                 color=cmap(i / max(1, len(sizes) - 1)), label=f"{size} tasks")
-    ax.axvspan(-1.5, 0.5, color="#D55E00", alpha=0.08, linewidth=0)
+    # The cliff is at slack 0, where the spare equals the request and there is
+    # no core left for the scout. Measured: slack 0 costs 5.002s, exactly one
+    # preempt_after. It looked free only because that cost lands in
+    # vendor_wait_s rather than release_lat_s, so plot time_to_alloc_s here.
+    # 0 means the pair fitted without disturbing anyone. Everything to the right
+    # had to take cores from preemptible classical work, which policy allows.
     ax.axvline(0.5, color="#333333", linestyle=":", linewidth=1.2)
-    ax.annotate("no spare core\nfor the scout", xy=(0.04, 0.30),
+    ax.annotate("fits without\npreempting", xy=(0.04, 0.30),
                 xycoords="axes fraction", fontsize=9, color="#B04000")
     ax.set_yscale("log")
-    ax.set_xlabel("spare cores beyond the request")
-    ax.set_ylabel("release latency (s), log scale")
-    ax.set_title("Every allocation size breaks at the same spare core count")
+    ax.set_xlabel("cores the pair had to take from preemption")
+    ax.set_ylabel("submit to classical allocated (s), log scale")
+    ax.set_title("However many cores it has to take, every size pays the same")
     ax.legend(title="allocation", loc="center right")
     save(fig, "fig5-collapse")
     plt.close(fig)
@@ -348,9 +382,12 @@ def fig_knee_size(e4, plt):
         m = d.groupby("load_pct")["release_lat_s"].mean()
         broke = [l for l, v in m.items() if v > 1.0]
         measured.append(min(broke) if broke else np.nan)
-        predicted.append(math.ceil((CORES - size) * 100.0 / CORES))
+        # experiment.sh computes the load as want * 100 / CORES with integer
+        # division, so the predicted break has to floor the same way
+        predicted.append(int((CORES - size) * 100 // CORES))
     ax.plot(sizes, predicted, color="#999999", linewidth=9, alpha=0.55,
-            solid_capstyle="round", label="predicted, free cores = request")
+            solid_capstyle="round",
+            label="predicted break, free cores = request (pair needs one more)")
     ax.plot(sizes, measured, marker="o", markersize=8, linewidth=0,
             color=ARMS["coscheduled"][0], label="measured knee")
     for x, y in zip(sizes, measured):
@@ -361,7 +398,10 @@ def fig_knee_size(e4, plt):
     ax.set_xlabel("allocation size (tasks)")
     ax.set_ylabel("utilisation at the knee (%)")
     ax.set_title("So the knee moves with the size of the request")
-    ax.legend(loc="upper right")
+    # outside the axes: a legend swatch inside them reads as another measured
+    # point, and there are only four
+    ax.legend(loc="lower left", bbox_to_anchor=(0.0, -0.38), ncol=2,
+              frameon=False)
     ax.margins(x=0.06)
     save(fig, "fig6-knee-size")
     plt.close(fig)
@@ -371,7 +411,7 @@ def fig_arms(rows_e2, plt):
     """Distributions of release latency by arm, below the knee. Three discrete
     categories and the shape of each distribution is the point, which is what a
     boxplot is for."""
-    below = rows_e2[(rows_e2["load_pct"] <= 93) & (rows_e2["arm"] != "inline")]
+    below = rows_e2[(rows_e2["load_pct"] <= 93) & (rows_e2["arm"] != "baseline")]
     if below.empty:
         return
     import seaborn as sns
@@ -390,9 +430,52 @@ def fig_arms(rows_e2, plt):
                   linewidth=0)
     ax.set_yscale("log")
     ax.set_xlabel("")
-    ax.set_ylabel("release latency (s), log scale")
+    ax.set_ylabel("submit to classical allocated (s), log scale")
     ax.set_title("Release latency by arm, below the knee")
     save(fig, "fig6-arms")
+    plt.close(fig)
+
+
+def fig_admission(e6, plt):
+    """What admission promises.
+
+    Every other experiment runs one pair at a time, so the admission check is
+    never the binding constraint. Here several pairs are asked for at once
+    against a budget too small for all of them. Admitted saturates at what the
+    machine can actually reach and stays there, which is the point: a pair that
+    is admitted will run, and one that cannot is refused at submit rather than
+    left holding a metered session it cannot use.
+    """
+    if e6.empty:
+        return
+    # e6 reuses the background load columns to carry how many pairs were asked
+    # for and how many were admitted, and they arrive as text
+    e6 = e6.copy()
+    e6["asked"] = e6["bg_total"].astype(int)
+    e6["admitted"] = e6["bg_done"].astype(int)
+    fig, ax = plt.subplots(figsize=(6.4, 3.9))
+    g = e6.groupby("asked")["admitted"]
+    asked = sorted(e6["asked"].unique())
+    med = [g.median().get(k) for k in asked]
+    lo = [g.min().get(k) for k in asked]
+    hi = [g.max().get(k) for k in asked]
+    ax.plot(asked, asked, color="#BBBBBB", linewidth=6, solid_capstyle="round",
+            label="asked for", zorder=1)
+    ax.fill_between(asked, lo, hi, color="#0E7C61", alpha=0.18, zorder=2)
+    ax.plot(asked, med, marker="o", color="#0E7C61", linewidth=2,
+            label="admitted", zorder=3)
+    ceiling = max(med) if med else 0
+    ax.annotate(
+        "admitted stops at {:g}, what the cores allow.\n"
+        "the rest are refused at submit, with no\n"
+        "job and no vendor session".format(ceiling),
+        xy=(0.04, 0.68), xycoords="axes fraction", fontsize=9, color="#666666")
+    ax.set_xlabel("pairs asked for at once")
+    ax.set_ylabel("pairs admitted")
+    ax.set_title("Admission promises the pair will run, not that the sum fits")
+    ax.set_xticks(asked)
+    ax.legend(loc="lower right", frameon=False)
+    save(fig, "fig7-admission")
     plt.close(fig)
 
 
@@ -413,7 +496,7 @@ def main(paths):
     os.makedirs(OUTDIR, exist_ok=True)
     plt = style()
 
-    e1, e2, e3, e4 = (frame(rows, e) for e in ("e1", "e2", "e3", "e4"))
+    e1, e2, e3, e4, e6 = (frame(rows, e) for e in ("e1", "e2", "e3", "e4", "e6"))
     if e1 is not None:
         fig_held(e1, plt)
     if e2 is not None:
@@ -424,6 +507,8 @@ def main(paths):
         fig_waste(e3, plt)
     if e4 is not None:
         fig_knee_size(e4, plt)
+    if e6 is not None:
+        fig_admission(e6, plt)
 
     print(f"\n{len(rows)} rows from {len(paths)} files, cores={CORES}")
     if NODE_RATE == 0.0:
