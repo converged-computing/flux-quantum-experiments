@@ -369,7 +369,7 @@ def fig_knee_size(e4, plt):
     ax.set_yscale("log")
     ax.set_xlabel("cores the pair had to take from preemption")
     ax.set_ylabel("submit to classical allocated (s), log scale")
-    ax.set_title("Every allocation size breaks at the same spare core count")
+    ax.set_title("However many cores it has to take, every size pays the same")
     ax.legend(title="allocation", loc="center right")
     save(fig, "fig5-collapse")
     plt.close(fig)
@@ -398,7 +398,10 @@ def fig_knee_size(e4, plt):
     ax.set_xlabel("allocation size (tasks)")
     ax.set_ylabel("utilisation at the knee (%)")
     ax.set_title("So the knee moves with the size of the request")
-    ax.legend(loc="upper right")
+    # outside the axes: a legend swatch inside them reads as another measured
+    # point, and there are only four
+    ax.legend(loc="lower left", bbox_to_anchor=(0.0, -0.38), ncol=2,
+              frameon=False)
     ax.margins(x=0.06)
     save(fig, "fig6-knee-size")
     plt.close(fig)
@@ -433,6 +436,49 @@ def fig_arms(rows_e2, plt):
     plt.close(fig)
 
 
+def fig_admission(e6, plt):
+    """What admission promises.
+
+    Every other experiment runs one pair at a time, so the admission check is
+    never the binding constraint. Here several pairs are asked for at once
+    against a budget too small for all of them. Admitted saturates at what the
+    machine can actually reach and stays there, which is the point: a pair that
+    is admitted will run, and one that cannot is refused at submit rather than
+    left holding a metered session it cannot use.
+    """
+    if e6.empty:
+        return
+    # e6 reuses the background load columns to carry how many pairs were asked
+    # for and how many were admitted, and they arrive as text
+    e6 = e6.copy()
+    e6["asked"] = e6["bg_total"].astype(int)
+    e6["admitted"] = e6["bg_done"].astype(int)
+    fig, ax = plt.subplots(figsize=(6.4, 3.9))
+    g = e6.groupby("asked")["admitted"]
+    asked = sorted(e6["asked"].unique())
+    med = [g.median().get(k) for k in asked]
+    lo = [g.min().get(k) for k in asked]
+    hi = [g.max().get(k) for k in asked]
+    ax.plot(asked, asked, color="#BBBBBB", linewidth=6, solid_capstyle="round",
+            label="asked for", zorder=1)
+    ax.fill_between(asked, lo, hi, color="#0E7C61", alpha=0.18, zorder=2)
+    ax.plot(asked, med, marker="o", color="#0E7C61", linewidth=2,
+            label="admitted", zorder=3)
+    ceiling = max(med) if med else 0
+    ax.annotate(
+        "admitted stops at {:g}, what the cores allow.\n"
+        "the rest are refused at submit, with no\n"
+        "job and no vendor session".format(ceiling),
+        xy=(0.04, 0.68), xycoords="axes fraction", fontsize=9, color="#666666")
+    ax.set_xlabel("pairs asked for at once")
+    ax.set_ylabel("pairs admitted")
+    ax.set_title("Admission promises the pair will run, not that the sum fits")
+    ax.set_xticks(asked)
+    ax.legend(loc="lower right", frameon=False)
+    save(fig, "fig7-admission")
+    plt.close(fig)
+
+
 def main(paths):
     rows = []
     for p in paths:
@@ -450,7 +496,7 @@ def main(paths):
     os.makedirs(OUTDIR, exist_ok=True)
     plt = style()
 
-    e1, e2, e3, e4 = (frame(rows, e) for e in ("e1", "e2", "e3", "e4"))
+    e1, e2, e3, e4, e6 = (frame(rows, e) for e in ("e1", "e2", "e3", "e4", "e6"))
     if e1 is not None:
         fig_held(e1, plt)
     if e2 is not None:
@@ -461,6 +507,8 @@ def main(paths):
         fig_waste(e3, plt)
     if e4 is not None:
         fig_knee_size(e4, plt)
+    if e6 is not None:
+        fig_admission(e6, plt)
 
     print(f"\n{len(rows)} rows from {len(paths)} files, cores={CORES}")
     if NODE_RATE == 0.0:

@@ -42,7 +42,8 @@ esac
 # The background load must outlive any trial, so that a stranded pair is freed
 # by preemption and not by the load expiring underneath it.
 LOAD_SECS="${LOAD_SECS:-900}"
-SIZE5="${SIZE5:-8}"             # allocation size for e5
+SIZE5="${SIZE5:-8}"
+SIZE6="${SIZE6:-8}"             # classical size for e6             # allocation size for e5
 OUT="${OUT:-}"                  # also append the CSV here, stdout still gets it
 FRESH="${FRESH:-0}"             # 1 to discard OUT and start over
 # Competing stream, to measure whether the nodes an arm sits on were usable by
@@ -437,6 +438,54 @@ run_e5() {
     done
 }
 
+run_e6() {
+    # Does admission actually mean the pair will run.
+    #
+    # Every other experiment runs one pair at a time, so the admission check is
+    # never the binding constraint and a wrong check cannot show. This one
+    # submits several pairs at once against a budget too small for all of them,
+    # which is the only situation where the difference between a quota and a
+    # capacity test is visible.
+    #
+    # A quota compares outstanding pairs against total capacity, so it lets a
+    # pair in whenever the arithmetic fits, whether or not the cores can be
+    # reached. A capacity test asks what is free, plus what can be taken back
+    # from unprotected work, less what is already promised to pairs that have
+    # not started.
+    #
+    # The plugin has to be loaded with a total_cores small enough to bind:
+    #     flux jobtap remove quantum.so
+    #     flux jobtap load .../quantum.so vendors=mock protect_types=qpu \
+    #         total_cores=$E6_BUDGET reserve_cores=0
+    local admitted rejected err
+    for k in ${PAIRS:-1 2 3 4 5 6}; do
+        for t in $(seq 1 "$TRIALS"); do
+            admitted=0
+            rejected=0
+            for _ in $(seq 1 "$k"); do
+                err=$(mktemp)
+                flux submit --quantum-vendor mock \
+                        --quantum-mock-queue-depth "${DEPTH:-14}" \
+                        --quantum-mock-service-time "$SERVICE" \
+                        --quantum-mock-base-overhead "$OVERHEAD" \
+                        -n"$SIZE6" -- sleep "$WORK" >/dev/null 2>"$err"
+                if grep -q "held classical job" "$err"; then
+                    admitted=$(( admitted + 1 ))
+                else
+                    rejected=$(( rejected + 1 ))
+                fi
+                rm -f "$err"
+            done
+            say "e6 pairs=$k trial=$t admitted=$admitted rejected=$rejected"
+            # one row per attempt group, so the analysis can plot admitted
+            # against how many were asked for
+            row "e6,coscheduled,${DEPTH:-14},0,$SIZE6,$t,,,,,,,,,$k,$admitted,$WORK,0,$LOAD_SECS,0"
+            flux cancel --all >/dev/null 2>&1
+            drain
+        done
+    done
+}
+
 header
 case "$WHAT" in
     e1) run_e1 ;;
@@ -444,6 +493,7 @@ case "$WHAT" in
     e3) run_e3 ;;
     e4) run_e4 ;;
     e5) run_e5 ;;
+    e6) run_e6 ;;
     all) run_e1; run_e2; run_e3; run_e4; run_e5 ;;
-    *) echo "usage: $0 {e1|e2|e3|e4|e5|all}" >&2; exit 2 ;;
+    *) echo "usage: $0 {e1|e2|e3|e4|e5|e6|all}" >&2; exit 2 ;;
 esac
