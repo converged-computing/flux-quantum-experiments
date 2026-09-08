@@ -130,6 +130,10 @@ def derive(row):
     out["slack"] = spare - size
     need = size + 1 if arm in ("coscheduled", "nowarmup") else size
     out["preempt_cores"] = max(0, need - spare)
+    # Submit to allocated, for the whole pair. At slack 0 the classical waits a
+    # whole preempt_after and all of it lands in vendor_wait_s, because the
+    # scout is what gets held. Only the sum tells the truth, so fig5 uses this.
+    out["time_to_alloc_s"] = (alloc - sub) if (alloc and sub) else None
     out["node_seconds"] = held * size if held is not None else None
 
     # The scout holds one core for the whole vendor wait and the classical run.
