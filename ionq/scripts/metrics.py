@@ -16,6 +16,16 @@ Per row, seconds:
     vendor_exec_ms   median execution_duration_ms the service reported.
     held_s           classical allocated to finished, the cores held.
     session_open_s   the session baseline's own session creation time.
+    vendor_queue_s   median per circuit of the service's submitted_at to
+                     started_at, the device's queue as the circuit saw it.
+
+Core seconds, what the classical side cost:
+
+    held_core_s      size × held_s, the classical job's cores for its life.
+    queue_core_s     size × the sum of one task's circuit queue waits, the
+                     cores held while a circuit sat in the device's queue.
+    scout_core_s     the scout's one core for its life, pair only.
+    pair_core_s      held_core_s plus scout_core_s, what the pair cost.
 
 Censored rows, timedout=1, keep their fields blank and are in no mean.
 """
@@ -26,6 +36,8 @@ import glob
 import json
 import os
 import statistics
+
+SCOUT_CORES = 1  # the scout is submitted -n1
 
 
 def num(x):
@@ -47,13 +59,10 @@ def iso(x):
         return None
 
 
-def jobs_for(path, row):
-    """The workload's JSON lines for a row, from the directory beside the CSV."""
-    d = os.path.splitext(path)[0] + "-jobs"
-    name = "%s-%s-%s-%s.jsonl" % (row["exp"], row["arm"], row["trial"], row["batch"])
+def read_events(path):
     out = []
     try:
-        with open(os.path.join(d, name)) as fh:
+        with open(path) as fh:
             for line in fh:
                 line = line.strip()
                 if line.startswith("{"):
@@ -64,6 +73,27 @@ def jobs_for(path, row):
     except OSError:
         pass
     return out
+
+
+def jobs_for(path, row):
+    """The workload's JSON lines for a row, from the directory beside the CSV.
+
+    The name carries the circuit count. Older runs named the file without
+    it, and the e3 sweep overwrote it at every count, so a file named the
+    old way is only believed when the workload says it ran this row's count."""
+    d = os.path.splitext(path)[0] + "-jobs"
+    stem = "%s-%s-%s-%s" % (row["exp"], row["arm"], row["trial"], row["batch"])
+    name = "%s-i%s" % (stem, row["iters"])
+    if row.get("queue"):
+        name += "-q%s" % row["queue"]
+    events = read_events(os.path.join(d, name + ".jsonl"))
+    if events:
+        return events
+    events = read_events(os.path.join(d, stem + ".jsonl"))
+    starts = [e for e in events if e.get("event") == "start"]
+    if starts and str(starts[0].get("iterations")) == str(row["iters"]):
+        return events
+    return []
 
 
 def derive(row, events):
@@ -83,15 +113,32 @@ def derive(row, events):
     def gap(a, b):
         return (b - a) if (a is not None and b is not None) else None
 
+    s_finish = num(row.get("scout_finish"))
+    out["queue"] = row.get("queue") or ""
+
     out["scout_lead_s"] = gap(s_start, prio)
     out["handoff_s"] = gap(prio, alloc)
     out["startup_s"] = gap(alloc, start)
     out["held_s"] = gap(alloc, finish)
     out["time_to_alloc_s"] = gap(submit, alloc)
+    out["held_core_s"] = (
+        out["size"] * out["held_s"] if out["held_s"] is not None else None
+    )
+    scout_life = gap(s_start, s_finish)
+    out["scout_core_s"] = SCOUT_CORES * scout_life if scout_life is not None else None
+    out["pair_core_s"] = (
+        out["held_core_s"] + (out["scout_core_s"] or 0.0)
+        if out["held_core_s"] is not None
+        else None
+    )
 
     jobs = [e for e in events if e.get("event") == "job"]
     starts = [e for e in events if e.get("event") == "start"]
-    out["circuits"] = len(jobs)
+    # every task of the job runs the workload, so the records are per task
+    # and in lockstep. Sums over circuits are per task, not over the job
+    tasks = max(1, len(starts))
+    out["tasks"] = tasks
+    out["circuits"] = len(jobs) // tasks
     out["failed"] = sum(1 for e in jobs if e.get("status") != "completed")
     out["session_open_s"] = starts[0].get("session_open_s") if starts else None
     out["session"] = out.get("session") or (
@@ -112,6 +159,14 @@ def derive(row, events):
     out["to_first_s"] = gap(submit, first_done)
     last_done = jobs[-1].get("done") if jobs else None
     out["to_last_s"] = gap(submit, last_done)
+    # the device's queue per circuit, as the service reported it
+    queued = [
+        gap(iso(e.get("submitted_at")), iso(e.get("started_at")))
+        for e in jobs
+        if iso(e.get("submitted_at")) is not None and iso(e.get("started_at")) is not None
+    ]
+    out["vendor_queue_s"] = statistics.median(queued) if queued else None
+    out["queue_core_s"] = out["size"] * sum(queued) / tasks if queued else None
     # the service's own view of the first circuit, queue and execution
     if jobs:
         out["vendor_first_s"] = gap(
