@@ -1,0 +1,50 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='980' height='285' viewBox='0 0 980 285'>
+<rect width='100%' height='100%' fill='white'/>
+<text x='490.0' y='18.0' font-family='Helvetica,Arial,sans-serif' font-size='13' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>Sunday 18 October on Forte-1: the one long queue of the run, as Braket counted it</text>
+<rect x='784.7' y='194.0' width='19.3' height='8.0' fill='#56B4E9' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='209.2' y='204.0' width='30.0' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='308.6' y='204.0' width='30.0' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='367.9' y='204.0' width='20.0' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='477.3' y='204.0' width='10.0' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='546.6' y='204.0' width='10.0' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='646.0' y='204.0' width='20.0' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='784.7' y='204.0' width='20.0' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<line x1='70.0' y1='190.0' x2='830.0' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='66.0' y='190.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>0</text>
+<line x1='70.0' y1='154.8' x2='830.0' y2='154.8' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='66.0' y='154.8' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>5</text>
+<line x1='70.0' y1='119.5' x2='830.0' y2='119.5' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='66.0' y='119.5' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>10</text>
+<line x1='70.0' y1='84.3' x2='830.0' y2='84.3' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='66.0' y='84.3' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>15</text>
+<line x1='70.0' y1='49.0' x2='830.0' y2='49.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='66.0' y='49.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>20</text>
+<line x1='70.0' y1='40.0' x2='70.0' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='70.0' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>00:00</text>
+<line x1='149.3' y1='40.0' x2='149.3' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='149.3' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>02:00</text>
+<line x1='228.7' y1='40.0' x2='228.7' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='228.7' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>04:00</text>
+<line x1='308.0' y1='40.0' x2='308.0' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='308.0' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>06:00</text>
+<line x1='387.4' y1='40.0' x2='387.4' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='387.4' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>08:00</text>
+<line x1='466.7' y1='40.0' x2='466.7' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='466.7' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>10:00</text>
+<line x1='546.0' y1='40.0' x2='546.0' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='546.0' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>12:00</text>
+<line x1='625.4' y1='40.0' x2='625.4' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='625.4' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>14:00</text>
+<line x1='704.7' y1='40.0' x2='704.7' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='704.7' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>16:00</text>
+<line x1='784.1' y1='40.0' x2='784.1' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='784.1' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>18:00</text>
+<line x1='70.0' y1='190.0' x2='830.0' y2='190.0' stroke='#777777' stroke-width='0.8'/>
+<line x1='70.0' y1='40.0' x2='70.0' y2='190.0' stroke='#777777' stroke-width='0.8'/>
+<text x='36.0' y='115.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto' transform='rotate(-90 36 115.0)'>tasks waiting</text>
+<polyline fill='none' stroke='#D55E00' stroke-width='1.8' stroke-opacity='1.0' stroke-linejoin='round' points='70.5,190.0 142.5,190.0 142.5,183.0 240.5,183.0 240.5,190.0 241.2,190.0 241.2,183.0 245.9,183.0 245.9,190.0 246.5,190.0 246.5,183.0 253.9,183.0 253.9,190.0 275.9,190.0 275.9,175.9 280.5,175.9 280.5,190.0 301.2,190.0 301.2,183.0 337.9,183.0 337.9,190.0 338.6,190.0 338.6,183.0 342.6,183.0 342.6,190.0 347.3,190.0 347.3,183.0 351.9,183.0 351.9,190.0 364.6,190.0 364.6,183.0 380.6,183.0 380.6,175.9 399.3,175.9 399.3,168.9 400.0,168.9 400.0,147.7 400.6,147.7 400.6,126.6 401.3,126.6 401.3,119.5 415.3,119.5 415.3,126.6 546.0,126.6 546.0,119.5 552.0,119.5 552.0,77.2 554.0,77.2 554.0,63.1 754.0,63.1 754.0,56.1 830.0,56.1 830.0,56.1'/>
+<text x='834.0' y='202.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='start' fill='#777777' font-weight='normal' dominant-baseline='middle'>Braket: outside window</text>
+<text x='834.0' y='212.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='start' fill='#777777' font-weight='normal' dominant-baseline='middle'>IonQ: unavailable</text>
+<text x='450.0' y='236.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>hour of day, UTC</text>
+<text x='70.0' y='260.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#777777' font-weight='normal' dominant-baseline='auto'>The queue built from 08:00 and stood at 9 to 19 tasks for the rest of the day. IonQ reported the machine unavailable in short spells through the morning while Braket&#x27;s count kept growing.</text>
+</svg>

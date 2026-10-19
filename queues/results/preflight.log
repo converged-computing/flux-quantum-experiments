@@ -1,0 +1,37 @@
+
+=== 0. python and the packages ===
+  ok    flux_quantum importable
+  ok    braket sdk
+  ok    qiskit-ibm-runtime
+
+=== 1. credentials, by name ===
+  ok    aws credentials
+  ok    IONQ_API_KEY
+  ok    ibm credentials
+
+=== 2. one tick from each vendor ===
+  braket: sampling 4 device(s)
+  ionq: sampling 2 device(s)
+  qiskit_runtime_service._discover_account:WARNING:2026-10-14 12:10:07,446: Loading account with the given token. A saved account will not be used.
+  ibm: sampling every backend the account can see
+  {"device": "arn:aws:braket:us-east-1::device/qpu/ionq/Forte-1", "normal": 9, "priority": 0, "jobs": 0, "jobs_note": "0", "status": "ONLINE", "open": false, "r
+  {"device": "arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1", "normal": 0, "priority": 0, "jobs": 0, "jobs_note": "0", "status": "OFFLINE", "open
+  {"device": "arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q", "normal": 0, "priority": 0, "jobs": 0, "jobs_note": "0", "status": "ONLINE", "open":
+  {"device": "arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet", "normal": 0, "priority": 0, "jobs": 0, "jobs_note": "0", "status": "ONLINE", "open": true, "raw
+  {"device": "qpu.forte-1", "status": "unavailable", "degraded": false, "average_queue_time": 235046491, "last_updated": "2026-10-14T19:00:35Z", "has_access": n
+  {"device": "qpu.forte-enterprise-1", "status": "unavailable", "degraded": false, "average_queue_time": 6870772, "last_updated": "2026-10-14T19:00:35Z", "has_a
+  {"device": "ibm_boston", "pending_jobs": 68, "operational": true, "status_msg": "active", "qubits": 156, "raw": {"status": {"backend_name": "ibm_boston", "bac
+  {"device": "ibm_fez", "pending_jobs": 39, "operational": true, "status_msg": "maintenance", "qubits": 156, "raw": {"status": {"backend_name": "ibm_fez", "back
+  {"device": "ibm_kingston", "pending_jobs": 50, "operational": true, "status_msg": "active", "qubits": 156, "raw": {"status": {"backend_name": "ibm_kingston", 
+  {"device": "ibm_marrakesh", "pending_jobs": 4, "operational": true, "status_msg": "active", "qubits": 156, "raw": {"status": {"backend_name": "ibm_marrakesh",
+  {"device": "ibm_phoenix", "pending_jobs": 229, "operational": true, "status_msg": "active", "qubits": 120, "raw": {"status": {"backend_name": "ibm_phoenix", "
+  {"device": "ibm_pittsburgh", "pending_jobs": 64, "operational": true, "status_msg": "active", "qubits": 156, "raw": {"status": {"backend_name": "ibm_pittsburg
+  ok    braket reports 4 device(s)
+  ok    ionq reports 2 device(s)
+  ok    ibm reports 6 device(s)
+
+=== 3. the paired machines ===
+  forte-1                braket Forte-1                                                      ionq qpu.forte-1
+  forte-enterprise-1     braket Forte-Enterprise-1                                           ionq qpu.forte-enterprise-1
+
+=== PASS: nohup bash run.sh > results/run.log 2>&1 & ===
