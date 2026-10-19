@@ -126,8 +126,27 @@ The figures, from `plot.py`:
 
 Everything above was against the fake. On the device every circuit bills,
 so the campaign is not run as it stands, and run.sh is left as it ran
-against the fake so those results can be reproduced. The device has its
-own path, pilot.sh, with small stages, each priced before it runs:
+against the fake so those results can be reproduced.
+
+What IonQ told us about sessions, which changes the economics of the
+design as it stands. Any session that runs at least one job is billed a
+one hour minimum of device time when it ends, about $4,480 at list price,
+and neither `cost_limit` nor the project budget caps that charge. A session
+created and ended with no job in it costs nothing. Session jobs do not skip
+the queue; they go into a separate queue with about half the device's
+capacity, so they wait a minute or two rather than hours. A session is
+marked started when its first job is submitted, not when it runs, so the
+scout waits for its warm-up to start running. `duration_limit_min` counts
+from creation. `cost_limit` rejects a job that would cross it rather than
+ending the session, and `job_count_limit` has a bug. Session capacity per
+device is limited and creation returns 409 when it is full, which the
+scout retries. So one session per classical job, which is what every
+experiment above does, pays the hour minimum every time, and the design
+has to move to sessions shared by many classical jobs, or to reservations
+with a scheduled start, before anything here is worth running on Forte.
+
+The device has its own path, pilot.sh, with small stages, each priced
+before it runs, the session minimum included:
 
     export IONQ_API_KEY=...
     bash pilot.sh estimate    prices every stage at the account's rates, bills nothing
@@ -143,8 +162,10 @@ bill past it. Jobs are one task, `TASKS=1`, so one copy of each circuit is
 sent; the fake campaign ran `SIZE` tasks, each submitting its own, which
 the simulator did not charge for.
 
-`smoke` is the first thing to run: a plain job and a pair with one circuit
-each, three billed jobs. Afterwards `bill` reads every job back from the
+`smoke` is the first thing to run once the design fits the economics: a
+plain job and a pair with one circuit each, three billed jobs and one
+session, so about $4,560 at list price until a contract rate says
+otherwise, set with `SESSION_MIN_USD`. Afterwards `bill` reads every job back from the
 service and shows the backend it ran on, the session it ran in, its status
 and what was charged, and flags anything that ran on the simulator or
 outside a session. That, and not our own logs, is the check that it works.

@@ -83,6 +83,9 @@ def describe(client, jid, raw=False):
     # the service answers the cost route with only dry_run for a job that
     # cost nothing, the simulator's, so no cost keys means free, not unknown
     free = "cost" not in cost and "estimated_cost" not in cost and not cost.get("error")
+    # a job refused at submission never ran and has no cost record at all
+    if job.get("status") == "failed" and "404" in str(cost.get("error", "")):
+        free, cost = True, {}
     return {
         "id": jid,
         "free": free,
