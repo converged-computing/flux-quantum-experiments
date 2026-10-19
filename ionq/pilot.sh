@@ -1,7 +1,14 @@
 #!/bin/bash
-# Small, bounded runs on the device, against the IonQ API directly. run.sh is
-# the campaign as it ran against the fake and stays as it is; this is the
-# separate path for anything that bills.
+# Small, bounded runs against the IonQ API directly, on the simulator by
+# default. run.sh is the campaign as it ran against the fake and stays as it
+# is; this is the separate path for the real service.
+#
+# The simulator is free and, once IonQ enables sessions on the account, it
+# has real sessions with no hour minimum, so every stage runs there for
+# nothing and tests our side against the real API: create, first job,
+# started, release, teardown, limits. It cannot show the queue effect, since
+# sessions do not change how fast simulator jobs run; that stays a model, in
+# the fake, with IonQ's numbers.
 #
 #     export IONQ_API_KEY=...
 #     bash pilot.sh estimate    price every stage at the account's rates. Bills nothing
@@ -14,6 +21,14 @@
 # Every stage is priced from the service's estimate endpoint before anything
 # is submitted, and refused when that is over BUDGET, 100 USD by default. A
 # stage never resumes: an earlier run of it is kept aside under a timestamp.
+#
+# IonQ bills every session that runs at least one job a one hour minimum of
+# device time, about 4,480 USD at list price, when the session ends. Neither
+# cost_limit nor the project budget caps that charge. So every session a
+# stage would open is priced at SESSION_MIN_USD (4480) on top of its jobs,
+# and until a contract rate says otherwise no stage here fits in a budget
+# anyone should set casually. Set SESSION_MIN_USD to the contract rate, and
+# BUDGET knowingly.
 # Every session opened carries a cost limit of BUDGET as well, so a session
 # nobody is watching cannot bill past it. Each job is one task, so one copy
 # of each circuit is sent. Results go to results-forte/, and bill reads back
@@ -26,8 +41,9 @@ set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
 cd "$HERE" || exit 1
 STAGE="${1:-estimate}"
-TARGET="${TARGET:-qpu.forte-1}"
+TARGET="${TARGET:-simulator}"
 BUDGET="${BUDGET:-100}"
+SESSION_MIN_USD="${SESSION_MIN_USD:-4480}"
 SHOTS="${SHOTS:-100}"
 TRIALS="${TRIALS:-2}"
 OUTDIR="${OUTDIR:-results-forte}"
@@ -49,16 +65,24 @@ case "${IONQ_API_URL:-https://api.ionq.co/v0.4}" in
     https://api.ionq.co*) ;;
     *) [ "${FAKE_OK:-0}" = 1 ] || die "IONQ_API_URL is ${IONQ_API_URL}, not IonQ. FAKE_OK=1 to rehearse against the fake" ;;
 esac
+# a session that runs a job on a QPU bills an hour of device time, about the
+# whole of a small credit balance. Nothing here opens one on a QPU unless
+# told so in as many words
+case "$TARGET" in
+    simulator) ;;
+    *) [ "${QPU_SESSIONS_OK:-0}" = 1 ] || die "TARGET=$TARGET would open sessions on a QPU, each billed an hour minimum (about \$$SESSION_MIN_USD). QPU_SESSIONS_OK=1 if that is really the intent" ;;
+esac
 
-# what a stage submits: circuits and warm-ups. e4 is an upper bound, its
-# jobs are interrupted
+# what a stage submits: circuits, warm-ups, and sessions that will run a
+# job. The coscheduled arm opens one per pair, the session arm one per job.
+# e4 is an upper bound, its jobs are interrupted
 counts() {
     case "$1" in
-        smoke) echo "2 1" ;;
-        e1)    echo "$((3 * TRIALS)) $TRIALS" ;;
-        e3)    echo "$((18 * TRIALS)) $((2 * TRIALS))" ;;
-        e4)    echo "12 4" ;;
-        *)     echo "0 0" ;;
+        smoke) echo "2 1 1" ;;
+        e1)    echo "$((3 * TRIALS)) $TRIALS $((2 * TRIALS))" ;;
+        e3)    echo "$((18 * TRIALS)) $((2 * TRIALS)) $((4 * TRIALS))" ;;
+        e4)    echo "12 4 4" ;;
+        *)     echo "0 0 0" ;;
     esac
 }
 
@@ -66,10 +90,16 @@ counts() {
 # total and the per job prices, exit 1 when over BUDGET
 price() {
     set -- $(counts "$1")
-    flux python - "$TARGET" "$SHOTS" "$1" "$2" "$BUDGET" <<'EOF'
+    # with FLUX_QUANTUM_IONQ_WARMUP=0 the scout sends no warm-up, so none is priced
+    [ "${FLUX_QUANTUM_IONQ_WARMUP:-1}" = 0 ] && set -- "$1" 0 "$3"
+    # the simulator has no session minimum
+    [ "$TARGET" = simulator ] && set -- "$1" "$2" 0
+    flux python - "$TARGET" "$SHOTS" "$1" "$2" "$3" "$SESSION_MIN_USD" "$BUDGET" <<'EOF'
 import sys
 from flux_quantum.backends.ionq import IonQBackend
-target, shots, circuits, warmups, budget = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), float(sys.argv[5])
+target, shots = sys.argv[1], int(sys.argv[2])
+circuits, warmups, sessions = int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5])
+session_min, budget = float(sys.argv[6]), float(sys.argv[7])
 c = IonQBackend().client
 def est(qubits, q1, q2):
     got = c.get("/jobs/estimate?backend=%s&qubits=%d&shots=%d&1q_gates=%d&2q_gates=%d&error_mitigation=false"
@@ -78,8 +108,12 @@ def est(qubits, q1, q2):
     return float(got.get("estimated_total_cost") or 0), got.get("cost_unit", "usd"), rate
 circuit, unit, rate = est(2, 1, 1)
 warm, _, _ = est(1, 1, 0)
-total = circuits * circuit + warmups * warm
-print("  %d circuits at %.2f and %d warm-ups at %.2f: %.2f %s" % (circuits, circuit, warmups, warm, total, unit))
+jobs_cost = circuits * circuit + warmups * warm
+total = jobs_cost + sessions * session_min
+print("  %d circuits at %.2f and %d warm-ups at %.2f: %.2f %s" % (circuits, circuit, warmups, warm, jobs_cost, unit))
+if sessions:
+    print("  %d session(s) that run a job, at the one hour minimum of %.2f each: %.2f" % (sessions, session_min, sessions * session_min))
+    print("  total %.2f %s. The session minimum is billed when the session ends and no cost_limit or budget stops it" % (total, unit))
 if rate.get("job_cost_minimum") is not None:
     print("  the account's minimum per job is %s" % rate["job_cost_minimum"])
 if rate.get("fake"):

@@ -85,17 +85,21 @@ def stats(vals):
     return statistics.median(vals), q[0], q[2]
 
 
-def one_pair(rows, path, exp="e1"):
+def one_pair(rows, path, exp="e1", queue=None):
     """The coscheduled trial whose first-result time is the median, with its
-    circuits, and the plain trial beside it. The anatomy figure draws one
-    trial rather than a mean so every bar is a real interval."""
-    cos = live(rows, exp, "coscheduled")
+    circuits, and the plain trial beside it, at one queue level when given.
+    The anatomy figure draws one trial rather than a mean so every bar is a
+    real interval."""
+    def here(rs):
+        return [r for r in rs if queue is None or num(r.get("queue")) == queue]
+
+    cos = here(live(rows, exp, "coscheduled"))
     cos = [r for r in cos if r["to_first_s"] is not None]
     if not cos:
         return None, None, []
     cos.sort(key=lambda r: r["to_first_s"])
     pair = cos[len(cos) // 2]
-    plain = live(rows, exp, "plain")
+    plain = here(live(rows, exp, "plain"))
     plain = sorted(
         [r for r in plain if r["to_first_s"] is not None], key=lambda r: r["to_first_s"]
     )
@@ -103,123 +107,110 @@ def one_pair(rows, path, exp="e1"):
     return pair, plain, [e for e in jobs_for(path, pair) if e.get("event") == "job"]
 
 
+def events_of(path, row):
+    return jobs_for(path, row) if path else []
+
+
 def fig_anatomy(rows, paths, plt, outdir):
-    """Every interval of one pair, from the submit, on one clock."""
-    path = next((p for p in paths if p.endswith("e1.csv")), None)
-    pair, plain, jobs = one_pair(rows, path)
+    """The median e1 trial of the pair and of the plain job, in two panels
+    on a shared clock, each from its own submit. They are separate runs.
+    A job's circuit is drawn inside that job's running bar, since it is
+    something the job does, not a job of its own."""
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
+
+    # the hold only matters when the device has a queue. e5 has one, so the
+    # longest queue it ran is the trial to draw; e1 had none, and is the
+    # fallback, titled as such
+    e5 = next((p for p in paths if p.endswith("e5.csv")), None)
+    queues = sorted({num(r.get("queue")) for r in live(rows, "e5") if num(r.get("queue")) is not None})
+    if e5 and queues:
+        path, q = e5, queues[-1]
+        pair, plain, jobs = one_pair(rows, path, "e5", q)
+        title = "One trial of each with a %g s device queue per circuit, fake IonQ service" % q
+    else:
+        path = next((p for p in paths if p.endswith("e1.csv")), None)
+        pair, plain, jobs = one_pair(rows, path)
+        title = "One e1 trial of each, no device queue, fake IonQ service"
     if pair is None:
         return
-    t0 = num(pair["submit"])
+    size = int(pair.get("size") or 0)
+    WAIT = "#C8C8C8"  # held, no cores
+    POLL = "#8FD3BE"  # the scout on its core, waiting on the vendor
+    QUEUED = "#FFFFFF"
+    EXEC = INK
+    green, orange = COLOR["coscheduled"], COLOR["plain"]
 
-    def at(key, r=pair):
+    def rel(r, key):
         v = num(r.get(key))
-        return None if v is None else v - t0
+        return None if v is None else v - num(r["submit"])
 
-    lanes = []  # (label, [(start, end, colour, text)])
-    lanes.append(
-        (
-            "scout",
-            [
-                (at("scout_start"), at("priority"), "#8FD3BE", "getting the hold"),
-                (at("priority"), at("scout_finish"), COLOR["coscheduled"], "holding"),
-            ],
-        )
-    )
-    lanes.append(
-        (
-            "classical (held)",
-            [
-                (0.0, at("alloc"), "#CCCCCC", "held, no cores"),
-                (at("alloc"), at("finish"), COLOR["coscheduled"], "running"),
-            ],
-        )
-    )
-    if jobs:
-        j = jobs[0]
-        s, d = j["submitted"] - t0, j["done"] - t0
-        segs = [(s, d, "#8FD3BE", "circuit, as the job saw it")]
-        vs, ve = iso(j.get("started_at")), iso(j.get("completed_at"))
-        if vs is not None and ve is not None:
-            segs.append((vs - t0, ve - t0, COLOR["coscheduled"], "executing"))
-        lanes.append(("first circuit", segs))
-    if plain is not None:
-        p0 = num(plain["submit"])
-        lanes.append(
-            (
-                "plain job",
-                [
-                    (
-                        num(plain["alloc"]) - p0,
-                        num(plain["finish"]) - p0,
-                        COLOR["plain"],
-                        "running",
-                    )
-                ],
-            )
-        )
+    def circuit(ax, y, r, events):
+        """The job's circuits as a strip inside its bar: white while sent and
+        waiting at IonQ, dark while executing. Every task of a job runs the
+        workload in lockstep, so one task's circuits are drawn."""
+        js = [e for e in events if e.get("event") == "job"]
+        tasks = max(1, sum(1 for e in events if e.get("event") == "start"))
+        t0 = num(r["submit"])
+        for j in js[: max(1, len(js) // tasks)] if tasks > 1 else js:
+            ax.barh(y, j["done"] - j["submitted"], left=j["submitted"] - t0, height=0.18,
+                    color=QUEUED, edgecolor=INK, linewidth=0.6, zorder=3)
+            vs, ve = iso(j.get("started_at")), iso(j.get("completed_at"))
+            if vs is not None and ve is not None:
+                ax.barh(y, ve - vs, left=vs - t0, height=0.18, color=EXEC, linewidth=0, zorder=4)
 
-    fig, ax = plt.subplots(figsize=(7.2, 0.62 * len(lanes) + 1.4))
-    ys = list(range(len(lanes)))[::-1]
-    span = max(
-        (end for _, segs in lanes for _, end, _, _ in segs if end is not None),
-        default=1.0,
+    def lane(ax, y, segs):
+        for start, end, colour in segs:
+            if start is not None and end is not None:
+                ax.barh(y, end - start, left=start, height=0.55, color=colour,
+                        edgecolor="white", linewidth=1, zorder=2)
+
+    fig, (top, bottom) = plt.subplots(
+        2, 1, figsize=(7.0, 4.2), sharex=True, gridspec_kw={"height_ratios": [2, 1]}
     )
-    for y, (label, segs) in zip(ys, lanes):
-        outside = []
-        for start, end, colour, text in segs:
-            if start is None or end is None:
-                continue
-            ax.barh(
-                y,
-                end - start,
-                left=start,
-                height=0.5,
-                color=colour,
-                edgecolor="white",
-                linewidth=1,
-            )
-            # a segment narrower than a fifth of the axis cannot hold its text
-            if end - start > 0.2 * span:
-                ax.text(
-                    (start + end) / 2,
-                    y,
-                    text,
-                    ha="center",
-                    va="center",
-                    fontsize=8,
-                    color="white" if colour not in ("#CCCCCC", "#8FD3BE") else INK,
-                )
-            else:
-                outside.append("%s %.1f s" % (text, end - start))
-        if outside:
-            right = max(end for _, end, _, _ in segs if end is not None)
-            ax.text(
-                right + 0.01 * span,
-                y,
-                ", ".join(outside),
-                ha="left",
-                va="center",
-                fontsize=8,
-                color=INK,
-            )
-    ax.set_yticks(ys)
-    ax.set_yticklabels([l for l, _ in lanes])
-    ax.set_xlabel("seconds from submit")
-    ax.set_title("One pair against the plain job. The hold is all of the difference")
-    ax.grid(axis="y", visible=False)
-    prio = at("priority")
+    jobs = events_of(path, pair)
+    lane(top, 1, [(rel(pair, "scout_start"), rel(pair, "priority"), POLL),
+                  (rel(pair, "priority"), rel(pair, "scout_finish"), green)])
+    lane(top, 0, [(0.0, rel(pair, "alloc"), WAIT), (rel(pair, "alloc"), rel(pair, "finish"), green)])
+    circuit(top, 0, pair, events_of(path, pair))
+    if pair.get("pair_core_s") is not None:
+        top.text(rel(pair, "scout_finish"), 1.38, " %.0f core-s, scout included" % pair["pair_core_s"],
+                 fontsize=8, color=INK, va="bottom", clip_on=False)
+    prio = rel(pair, "priority")
     if prio is not None:
-        ax.axvline(prio, color=INK, linestyle=":", linewidth=1)
-        ax.text(
-            prio,
-            max(ys) + 0.5,
-            " session active, job released",
-            fontsize=8,
-            color=INK,
-            va="bottom",
-        )
-    ax.set_ylim(-0.6, max(ys) + 1.0)
-    ax.set_xlim(0, span * 1.45)
+        top.axvline(prio, color=INK, linestyle=":", linewidth=1, zorder=1)
+    top.set_yticks([1, 0])
+    top.set_yticklabels(["scout, 1 core", "classical job, %d cores" % size])
+    top.set_ylim(-0.6, 1.6)
+    top.set_title("Coscheduled pair", loc="left", fontsize=10)
+    top.grid(axis="y", visible=False)
+
+    if plain is not None:
+        lane(bottom, 0, [(rel(plain, "alloc"), rel(plain, "finish"), orange)])
+        circuit(bottom, 0, plain, jobs_for(path, plain))
+        bottom.text(rel(plain, "finish"), 0.38, " %.0f core-s" % (size * (rel(plain, "finish") - rel(plain, "alloc"))),
+                    fontsize=8, color=INK, va="bottom", clip_on=False)
+    bottom.set_yticks([0])
+    bottom.set_yticklabels(["plain job, %d cores" % size])
+    bottom.set_ylim(-0.6, 0.6)
+    bottom.set_title("Plain job, a separate run", loc="left", fontsize=10)
+    bottom.grid(axis="y", visible=False)
+    bottom.set_xlabel("seconds since that run's submit")
+    bottom.set_xlim(left=0)
+
+    fig.suptitle(title, fontsize=11)
+    handles = [
+        Patch(color=POLL, label="scout on its core, waiting for the session"),
+        Patch(color=WAIT, label="classical job held, no cores"),
+        Patch(color=green, label="coscheduled job running"),
+        Patch(color=orange, label="plain job running"),
+        Patch(facecolor=QUEUED, edgecolor=INK, label="its circuit, sent and waiting at IonQ"),
+        Patch(color=EXEC, label="its circuit executing"),
+    ]
+    if prio is not None:
+        handles.append(Line2D([], [], color=INK, linestyle=":", label="session active, job released"))
+    bottom.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.9), ncol=2, fontsize=8)
+    fig.tight_layout()
     save(fig, outdir, "fig1-anatomy")
     plt.close(fig)
 
@@ -304,7 +295,7 @@ def fig_first(rows, plt, outdir):
     ax.set_yticks(ys)
     ax.set_yticklabels(arms)
     ax.set_xlabel("seconds from submit to the first circuit's result (median of trials)")
-    ax.set_title("What a user waits for, and where the pair spends it")
+    ax.set_title("Submit to first circuit result, by arm, fake IonQ service")
     ax.grid(axis="y", visible=False)
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.22), ncol=2, fontsize=8)
     if tiny:
@@ -385,7 +376,7 @@ def fig_pairs(rows, plt, outdir):
         ax1.legend(loc="upper left", fontsize=8)
     ax1.set_xlabel("place in the batch, by submit order")
     ax1.set_ylabel("submit to cores allocated (s)")
-    ax1.set_title("The device is held by one pair at a time")
+    ax1.set_title("Wait for cores by place in the batch")
     ax1.margins(x=0.12)
 
     med = [statistics.median(span[k]) for k in ks]
@@ -426,10 +417,11 @@ def fig_pairs(rows, plt, outdir):
         )
     ax2.set_xlabel("pairs submitted at once")
     ax2.set_ylabel("first submit to last finish (s)")
-    ax2.set_title("Makespan grows with the batch")
+    ax2.set_title("Batch makespan")
     ax2.set_xticks(ks)
     ax2.legend(loc="upper left", fontsize=8)
     ax2.margins(x=0.08)
+    fig.suptitle("fake IonQ service", fontsize=9, color=MUTED)
     fig.tight_layout()
     save(fig, outdir, "fig3-pairs")
     plt.close(fig)
@@ -500,7 +492,7 @@ def fig_circuits(rows, plt, outdir):
             )
     ax1.set_xlabel("circuits per job")
     ax1.set_ylabel("submit to job finished (s)")
-    ax1.set_title("The hold is a fixed cost per job")
+    ax1.set_title("Job time by circuits per job")
     ax1.set_xticks(iters)
     ax1.margins(x=0.18)
     ax1.legend(loc="upper left", fontsize=8)
@@ -526,7 +518,7 @@ def fig_circuits(rows, plt, outdir):
     ax2.set_xticklabels([str(i) for i in iters])
     ax2.set_xlabel("circuits per job")
     ax2.set_ylabel("median circuit latency in the job (s)")
-    ax2.set_title("Per circuit, inside or outside a session")
+    ax2.set_title("Median circuit latency per job")
     if have:
         ax2.legend(loc="lower right", fontsize=8)
         # from zero, or a few milliseconds of noise look like a difference
@@ -557,6 +549,7 @@ def fig_circuits(rows, plt, outdir):
             fontsize=8,
             color=MUTED,
         )
+    fig.suptitle("fake IonQ service", fontsize=9, color=MUTED)
     fig.tight_layout()
     save(fig, outdir, "fig4-circuits")
     plt.close(fig)
@@ -617,7 +610,7 @@ def fig_cores(rows, plt, outdir):
         )
     ax1.set_xlabel("device queue (s per circuit)")
     ax1.set_ylabel("core seconds per job")
-    ax1.set_title("What the classical side holds through the queue")
+    ax1.set_title("Core-seconds per job")
     ax1.set_xticks(qs)
     ax1.legend(loc="upper left", fontsize=8)
     ax1.margins(x=0.05)
@@ -681,10 +674,11 @@ def fig_cores(rows, plt, outdir):
     )
     ax2.set_xlabel("device queue (s per circuit)")
     ax2.set_ylabel("core seconds, relative to the pair")
-    ax2.set_title("What a baseline costs against the pair")
+    ax2.set_title("Core-seconds relative to the coscheduled pair")
     ax2.set_xticks(qs)
     ax2.set_ylim(bottom=0)
     ax2.margins(x=0.2)
+    fig.suptitle("fake IonQ service", fontsize=9, color=MUTED)
     fig.tight_layout()
     save(fig, outdir, "fig5-cores")
     plt.close(fig)

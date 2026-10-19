@@ -2,6 +2,7 @@
 """Figures from the experiment CSVs, a pdf and a png each into plots/.
 
     ./plot.py results/*.csv
+    python scripts/plot.py results/*.csv
 
     fig1-held        allocation held, by vendor queue depth
     fig3-knee        where coscheduling stops paying, and what bounds the cost
@@ -207,15 +208,15 @@ def fig_waste(e3, plt):
         )
     ax.set_xlabel("allocation size (tasks)")
     ax.set_ylabel("total core seconds consumed, scout included")
-    ax.set_title("Identical work, and the baseline consumes roughly twice the cluster")
-    ax.annotate(
-        "scout core included, bars are one sd over 10 trials",
-        xy=(0.97, 0.10),
-        xycoords="axes fraction",
-        ha="right",
-        fontsize=8,
-        color="#666666",
-    )
+    ax.set_title("Resource Utilization with Co-scheduling")
+#    ax.annotate(
+#        "scout core included, bars are one sd over 10 trials",
+#        xy=(0.97, 0.10),
+#        xycoords="axes fraction",
+#        ha="right",
+#        fontsize=8,
+#        color="#666666",
+#    )
     ax.legend(loc="upper left")
     ax.margins(x=0.04)
     save(fig, "fig4-waste")

@@ -198,7 +198,8 @@ else
 import sys
 from flux_quantum.backends.ionq import APIError, IonQBackend
 c = IonQBackend().client
-body = {"backend": sys.argv[1], "settings": {"duration_limit_min": 1, "job_count_limit": 1}}
+# no job_count_limit: IonQ says it has a bug. A session with no job in it bills nothing
+body = {"backend": sys.argv[1], "settings": {"duration_limit_min": 1}}
 try:
     s = c.post("/sessions", body)
 except APIError as e:
