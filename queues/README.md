@@ -17,8 +17,8 @@ What comes out:
   tick and at lags, and whether they agree the machine is up
 - **how the queue moves**: how often the depth rises, falls and sits
   still, and the steepest sustained fall, which is a lower bound on how
-  fast the device clears tasks. That, with IonQ's average in seconds, is
-  what turns a depth into a wait for the mock
+  fast the device clears tasks. That, with IonQ's queue time, is what
+  turns a depth into a wait for the mock
 
 ## Findings, 14 to 18 October 2026
 
@@ -39,13 +39,17 @@ response of the call it came from.
   execution windows in the device properties say otherwise, so a scheduler
   reading status alone would submit into a machine that is not running.
 - **Forte-Enterprise-1 was OFFLINE on Braket for the first twelve hours**,
-  then on without a break. IonQ showed the same machine unavailable for
-  nine of those hours and again for nine hours on Thursday.
+  until 07:00 UTC Thursday, then ONLINE for the rest of the run. It was
+  ONLINE but outside its execution window from 08:00 to 14:00 Thursday,
+  so it was taking work 81% of the time. IonQ showed it unavailable from
+  the start until 04:15 Thursday, again from 07:45 to 16:45 Thursday, and
+  twice briefly on Friday.
 - **IonQ reports more downtime than Braket for the same machine.**
-  Forte-1 was available 91% of the time through IonQ and ONLINE 97% through
-  Braket, with sixteen short unavailable spells on the IonQ side, most under
-  fifteen minutes, several on Sunday morning while Braket's count of waiting
-  tasks kept growing.
+  Forte-1 was available 91% of the time through IonQ and taking work 97%
+  through Braket, meaning ONLINE and inside an execution window. IonQ had
+  sixteen unavailable spells, twelve of them half an hour or less. Some
+  match Braket's daily 18:00 window closure, and several fell on Sunday
+  morning while Braket's count of waiting tasks kept growing.
 - **IBM backends go into maintenance in short spells.** Pittsburgh five
   times on Wednesday and Thursday, marrakesh four times over the weekend,
   fez for its first ten hours. Boston, kingston and phoenix were active the
@@ -93,12 +97,13 @@ the busiest, and a count and a time can sit on one axis.
 ![Forte-1 over four days as Braket and IonQ report it](plots/forte1-braket-vs-ionq.svg)
 
 - **Braket's count and IonQ's average are not the same thing.** Braket's
-  number changes minute to minute. IonQ's `average_queue_time` is in
-  milliseconds, updates every fifteen minutes, and moves slowly. Forte-1
+  number changes minute to minute. IonQ's `average_queue_time`
+  updates every fifteen minutes and moves slowly. IonQ's docs call it the
+  current wait time and type it as a unix timestamp with no unit. We read
+  it as milliseconds, the only unit that gives a plausible wait. Forte-1
   went from 65 hours to 57 hours over the whole run, and Forte-Enterprise-1
-  reported the same 1.9 hours for four days without changing once. That is
-  a long-window rolling average of what finished jobs waited, not the
-  queue now. The rank correlation between the two for Forte-1 is 0.05 at
+  reported the same 1.9 hours for four days without changing once.
+  Whatever it measures, it does not track the queue minute to minute. The rank correlation between the two for Forte-1 is 0.05 at
   the same minute and no better at any lag.
 - **For timing anything, Braket's count is the signal**, for the
   IonQ-direct experiments as much as the Braket ones. IonQ's number says
@@ -163,9 +168,8 @@ fidelity means. Cepheus publishes every 30 minutes.
   no hybrid job was queued or running on it. A hybrid job hold would have
   had the Priority queue to itself. Cepheus showed one prioritised task on
   Friday, someone else's hybrid job.
-- **IonQ's backend record for Forte-Enterprise-1 carries a field called
-  `kw`**, 4.57, that Forte-1's does not. It is in the raw rows. Its meaning
-  is not documented.
+- **IonQ's backend record for Forte-Enterprise-1 has a `kw` field**,
+  between 4.57 and 4.62, that Forte-1's does not. It is in the raw rows.
 
 ### What this means for the experiments
 
@@ -200,7 +204,7 @@ network.
 | vendor | call | the analysis uses | cost |
 |--------|------|-------------------|------|
 | Braket | `AwsDevice.queue_depth()`, device metadata | tasks waiting in the Normal and Priority queues, hybrid jobs waiting, ONLINE, inside an execution window | free |
-| IonQ | `GET /backends` | `average_queue_time` in seconds, `status`, `degraded` | free |
+| IonQ | `GET /backends` | `average_queue_time`, read as milliseconds, `status`, `degraded` | free |
 | IBM | `QiskitRuntimeService.backends()`, `status()` | `pending_jobs`, `operational`, `status_msg` | free |
 
 Those are the fields the tables read. Every row also keeps the whole
@@ -216,8 +220,7 @@ Each vendor reports a different thing, a count, a time, a count, so they
 are never put on one axis. The paired machines are compared by rank, which
 needs no units.
 
-A session's own queue is not visible from outside on any of them. IonQ's
-sessions go to a separate queue with about half the device's capacity, and
+A session's own queue is not visible from outside on any of them.
 Braket's hybrid job token puts a task in the Priority queue, whose length
 Braket does report. So the Priority count is in every Braket sample. How
 long a task of ours would wait in either queue is a later experiment's
