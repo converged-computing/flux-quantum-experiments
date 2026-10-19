@@ -226,7 +226,7 @@ def forte1_braket_vs_ionq(rows, out):
     p2 = c.panel(left, top + ph + gap, pw, ph, (0, hours_since(t1, t0)), (0, hi * 1.1))
     p2.frame(xticks=xt, xfmt=xf, ylabel="average queue time (h)", yfmt=lambda v: "{:.0f}".format(v))
     p2.step(ix, iy, VENDOR["ionq"])
-    c.text(left + 4, top + ph + gap + 12, "IonQ: average_queue_time, in hours. An average over past jobs, updated every 15 minutes. Between {:.0f} and {:.0f} hours all week.".format(lo, hi), size=9)
+    c.text(left + 4, top + ph + gap + 12, "IonQ: average_queue_time, in hours, read as milliseconds. Updated every 15 minutes. Between {:.0f} and {:.0f} hours all week.".format(lo, hi), size=9)
 
     p3 = c.panel(left, top + 2 * (ph + gap), pw, ph, (0, hours_since(t1, t0)), (0, 105))
     p3.frame(xticks=xt, xfmt=xf, ylabel="rank within its own series", yticks=[0, 25, 50, 75, 100], xlabel="UTC, midnights marked")

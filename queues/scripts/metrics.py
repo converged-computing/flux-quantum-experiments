@@ -7,8 +7,9 @@ a machine's two views are paired. The fields each vendor gives:
     braket   normal, priority, jobs     counts, the service's queue depth
              open                       inside an execution window
              status                     ONLINE or not
-    ionq     average_queue_time         the service's own average, which it
-                                        reports in milliseconds. measure()
+    ionq     average_queue_time         the service's own queue time. The
+                                        docs give no unit, we read it as
+                                        milliseconds. measure()
                                         turns it into seconds
              status, degraded           available or not
     ibm      pending_jobs               count
@@ -62,9 +63,9 @@ def by_device(rows):
 
 
 def measure(r):
-    """The vendor's queue number for a row, or None. IonQ's average is in
-    milliseconds and comes back here in seconds, so every vendor's number
-    is a count or a time in seconds."""
+    """The vendor's queue number for a row, or None. IonQ's queue time is
+    read as milliseconds, an assumption since its docs give no unit, and
+    comes back here in seconds."""
     v = r.get(MEASURE.get(r["vendor"], ""))
     try:
         v = None if v is None else float(v)

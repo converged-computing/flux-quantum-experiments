@@ -256,7 +256,7 @@ overview(s){
   const grid=div("grid",s); M.forEach((m,i)=>sparkTile(grid,m,i));
   const f=div("findings",s);
   const F=[["Online does not mean open.","Braket says ONLINE even when a machine is between its run windows and will not run anything. Cepheus is closed four hours a day. Garnet is closed all weekend. Forte-1 is closed every evening at six. You only learn this from the device properties.","calendar","See the calendar"],
-           ["Braket and IonQ report different things for the same machine.","Braket counts the tasks waiting right now. IonQ reports an average wait over past jobs, and that average barely moved all week. For Forte-1 the two numbers have a correlation of 0.05.","forte","See both numbers"],
+           ["Braket and IonQ report different things for the same machine.","Braket counts the tasks waiting right now. IonQ reports a queue time that barely moved all week. For Forte-1 the two numbers have a correlation of 0.05.","forte","See both numbers"],
            ["Queue depths build up while the machine is open and closed.","Forte-1's job queue got larger while it was open. Garnet's got larger while it was closed for the weekend, and it emptied minutes after it opened. I suspect different use cases.","spread","See the split"]];
   for (const [h,p,tab,link] of F){ const c=div("finding",f,`<h3>${h}</h3><p>${p}</p>`); const a=document.createElement("a"); a.textContent=link; a.onclick=()=>show(tab); c.appendChild(a); }
 },
@@ -277,7 +277,7 @@ calendar(s){
 },
 queues(s){
   const body = card(s, "Every queue over the four days", "One panel per machine. Gray shading is when the machine was not taking work. Hover to see the value at that minute. Uncheck a machine to hide it.",
-    "For Braket this is the number of tasks waiting in the Normal queue. For IBM it is the number of pending jobs. For IonQ it is a field called average_queue_time. IonQ reports it in milliseconds and we show it in hours. We read once a minute and plot every five minutes.",
+    "For Braket this is the number of tasks waiting in the Normal queue. For IBM it is the number of pending jobs. For IonQ it is a field called average_queue_time. IonQ's docs give no unit, we read it as milliseconds and show it in hours. We read once a minute and plot every five minutes.",
     "Queues are short most of the time and long in bursts. Forte-1's queue built while it was open. Garnet's built while it was shut, and it cleared minutes after the machine opened. A queue on a shut machine is work waiting for it to open.");
   const ctl=div("controls",body); let lastv=null; const vis=new Set(M.map((m,i)=>i));
   M.forEach((m,i)=>{ if (m.vendor!==lastv){ ctl.innerHTML+=`<span class="vendor">${m.vendor}</span>`; lastv=m.vendor; } const lab=document.createElement("label"); const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=true; cb.onchange=()=>{ cb.checked?vis.add(i):vis.delete(i); draw(); }; lab.appendChild(cb); lab.innerHTML+=sw(m.color)+m.name; lab.insertBefore(cb, lab.firstChild); ctl.appendChild(lab); });
@@ -291,7 +291,7 @@ queues(s){
   draw();
 },
 forte(s){
-  const body = card(s, "Braket and IonQ report different numbers for Forte-1", `Forte-1 is one machine. You can reach it through Braket or through IonQ's own API. Braket reports how many tasks are waiting right now. IonQ reports average_queue_time, which is an average wait over past jobs. That average drifted from 65 hours to 57 hours over the week. The bottom panel puts both on one scale. Each minute is ranked against all the other minutes in its own line. 0 is the emptiest minute that line ever had and 100 is the busiest. If both numbers measured the same queue, the two lines would move together.`,
+  const body = card(s, "Braket and IonQ report different numbers for Forte-1", `Forte-1 is one machine. You can reach it through Braket or through IonQ's own API. Braket reports how many tasks are waiting right now. IonQ reports average_queue_time, which its docs call the current wait time. It drifted from 65 hours to 57 hours over the week. The bottom panel puts both on one scale. Each minute is ranked against all the other minutes in its own line. 0 is the emptiest minute that line ever had and 100 is the busiest. If both numbers measured the same queue, the two lines would move together.`,
     "We read both services in the same pass every minute, so each pair of numbers comes from the same minute. IonQ's last_updated stamp changed every fifteen minutes. The correlation is Spearman's rank correlation over all paired minutes.",
     `The two lines do not move together. The correlation is ${D.forte_rho}. If you want to know the queue on Forte-1 right now, use Braket's count. IonQ's average does not tell you.`);
   const wrap=div("panel",body); const TOP=22,H=110,GAP=40; const total=3*(H+GAP)+TOP; const svg=el("svg",{viewBox:`0 0 ${W} ${total}`},wrap);
@@ -385,7 +385,7 @@ data(s){
   for (const m of M){ const st=m.stats; h+=`<tr><td>${sw(m.color)}${m.name}</td><td>${m.vendor}</td><td>${m.unit}</td><td>${pct(st.up)}</td><td>${pct(st.empty_open)}</td><td>${st.n_closed?pct(st.empty_closed):"-"}</td><td>${fmt(st.p10)}</td><td>${fmt(st.p50)}</td><td>${fmt(st.p90)}</td><td>${fmt(st.max)}</td><td>${st.drain_per_min==null?"-":fmt(st.drain_per_min,1)}</td><td>${Math.max(0,m.versions-1)}</td></tr>`; }
   body.innerHTML+=h+"</table>";
   const r=div("row",s);
-  card(r,"What we asked each service","We asked Braket for each device's queue depth and its device record. The depth is a count of tasks waiting in the Normal and Priority queues, plus hybrid jobs. The record has the status, the run windows and the calibration. We asked IonQ for its backend list, which gives a status and average_queue_time in milliseconds. We asked IBM for every backend the account can see, which gives pending jobs, whether it is operational, its status message, and the calibration record.",null,null);
+  card(r,"What we asked each service","We asked Braket for each device's queue depth and its device record. The depth is a count of tasks waiting in the Normal and Priority queues, plus hybrid jobs. The record has the status, the run windows and the calibration. We asked IonQ for its backend list, which gives a status and average_queue_time, which we read as milliseconds. We asked IBM for every backend the account can see, which gives pending jobs, whether it is operational, its status message, and the calibration record.",null,null);
   card(r,"What we kept, and what this cannot tell you","Every row keeps the full response from the service, how long the call took, and which minute it belongs to. That is how we line up a machine read through two services. Big records that a service repeats without change are stored once and then again whenever they change. None of this can tell you how long your own task would wait. That takes a real task, and a task on these machines costs money and only measures one submission on one day. The raw rows are in results/queues.jsonl next to this page. The figures come from scripts/figures.py and this page from scripts/page.py.",null,null);
 }};
 
