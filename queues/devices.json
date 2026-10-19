@@ -1,0 +1,15 @@
+{
+  "_": "What to sample. pairs names one machine two ways, so the two services' views of it line up tick for tick. braket, ionq and ibm are everything sampled, paired or not.",
+  "pairs": {
+    "forte-1": {"braket": "arn:aws:braket:us-east-1::device/qpu/ionq/Forte-1", "ionq": "qpu.forte-1"},
+    "forte-enterprise-1": {"braket": "arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1", "ionq": "qpu.forte-enterprise-1"}
+  },
+  "braket": [
+    "arn:aws:braket:us-east-1::device/qpu/ionq/Forte-1",
+    "arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1",
+    "arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q",
+    "arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet"
+  ],
+  "ionq": ["qpu.forte-1", "qpu.forte-enterprise-1"],
+  "ibm": []
+}
