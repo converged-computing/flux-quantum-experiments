@@ -26,6 +26,7 @@ braket normal, ionq average_queue_time, ibm pending_jobs.
 """
 
 import json
+import sys
 import math
 from collections import defaultdict
 
@@ -33,13 +34,22 @@ MEASURE = {"braket": "normal", "ionq": "average_queue_time", "ibm": "pending_job
 
 
 def load(paths):
+    """Every row. A line that does not parse, the half written last line a
+    power cut can leave, is skipped and counted rather than ending the run."""
     rows = []
+    bad = 0
     for p in paths:
         with open(p) as f:
             for line in f:
                 line = line.strip()
-                if line:
+                if not line:
+                    continue
+                try:
                     rows.append(json.loads(line))
+                except ValueError:
+                    bad += 1
+    if bad:
+        print("skipped {} line(s) that did not parse".format(bad), file=sys.stderr)
     return rows
 
 

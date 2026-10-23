@@ -283,43 +283,82 @@ class Sampler:
         self.out = out
         self.interval = interval
         self.vendors = {}
+        self.missing = []
+        self.failing = {}
         for name in vendors:
-            try:
-                self.vendors[name] = VENDORS[name](spec.get(name) or [])
-                listed = spec.get(name) or []
-                print(
-                    "{}: sampling {}".format(
-                        name,
-                        (
-                            "{} device(s)".format(len(listed))
-                            if listed
-                            else "every backend the account can see"
-                        ),
-                    ),
-                    flush=True,
-                )
-            except Exception as e:
-                print("{}: not sampled, {}".format(name, e), flush=True)
-                self.write(
-                    {
-                        "kind": "setup",
-                        "vendor": name,
-                        "error": repr(e),
-                        "t": now(),
-                        "ts": stamp(),
-                    }
-                )
+            self.setup(name)
         self.tick = 0
         self.stop = False
 
+    # a vendor that could not be set up is retried this often, in ticks, and a
+    # vendor whose every call failed this many ticks in a row is rebuilt, which
+    # picks up refreshed credentials and drops a client in a bad state
+    RETRY_TICKS = 60
+    REBUILD_AFTER = 30
+    # one vendor's calls may take this long before the tick moves on. An SDK
+    # call with no timeout of its own would otherwise stall every vendor
+    CALL_TIMEOUT = 120
+
+    def setup(self, name):
+        if name in self.missing:
+            self.missing.remove(name)
+        try:
+            self.vendors[name] = VENDORS[name](self.spec.get(name) or [])
+            listed = self.spec.get(name) or []
+            print(
+                "{}: sampling {}".format(
+                    name,
+                    (
+                        "{} device(s)".format(len(listed))
+                        if listed
+                        else "every backend the account can see"
+                    ),
+                ),
+                flush=True,
+            )
+        except Exception as e:
+            print("{}: not sampled, {}".format(name, e), flush=True)
+            self.missing.append(name)
+            self.write(
+                {
+                    "kind": "setup",
+                    "vendor": name,
+                    "error": repr(e),
+                    "t": now(),
+                    "ts": stamp(),
+                }
+            )
+
     def write(self, row):
+        self.write_rows([row])
+
+    def write_rows(self, rows):
+        """Append and force to disk, so a power cut loses at most the tick in
+        flight and never leaves earlier rows only in the page cache."""
+        if not rows:
+            return
         with open(self.out, "a") as f:
-            f.write(json.dumps(row, default=str) + "\n")
+            f.write("".join(json.dumps(r, default=str) + "\n" for r in rows))
+            f.flush()
+            os.fsync(f.fileno())
 
     def one_tick(self, echo=False):
         self.tick += 1
         t = now()
-        for name, vendor in self.vendors.items():
+        if self.missing and self.tick % self.RETRY_TICKS == 0:
+            for name in list(self.missing):
+                print("{}: retrying setup".format(name), flush=True)
+                self.setup(name)
+        for name, vendor in list(self.vendors.items()):
+            rows = []
+
+            def _late(signum, frame):
+                raise TimeoutError(
+                    "{} took longer than {}s".format(name, self.CALL_TIMEOUT)
+                )
+
+            previous = signal.signal(signal.SIGALRM, _late)
+            signal.alarm(self.CALL_TIMEOUT)
             try:
                 for r in vendor.sample():
                     r.update(
@@ -332,11 +371,11 @@ class Sampler:
                             "t_call": now(),
                         }
                     )
-                    self.write(r)
+                    rows.append(r)
                     if echo:
                         print(json.dumps(r, default=str))
             except Exception as e:
-                self.write(
+                rows.append(
                     {
                         "kind": "sample",
                         "vendor": name,
@@ -349,6 +388,30 @@ class Sampler:
                 )
                 if echo:
                     print("{}: {}".format(name, e))
+            finally:
+                signal.alarm(0)
+                signal.signal(signal.SIGALRM, previous)
+            self.write_rows(rows)
+            self.track_failures(name, rows)
+
+    def track_failures(self, name, rows):
+        """Rebuild a vendor whose every row has failed for REBUILD_AFTER ticks
+        in a row. Expired credentials look like this, and a fresh client
+        reads the credential chain again."""
+        if rows and all(r.get("error") for r in rows):
+            self.failing[name] = self.failing.get(name, 0) + 1
+        else:
+            self.failing[name] = 0
+        if self.failing[name] >= self.REBUILD_AFTER:
+            print(
+                "{}: {} ticks of errors, rebuilding its client".format(
+                    name, self.failing[name]
+                ),
+                flush=True,
+            )
+            self.failing[name] = 0
+            self.vendors.pop(name, None)
+            self.setup(name)
 
     def run(self):
         def stop(signum, frame):
@@ -391,7 +454,7 @@ def main(argv=None):
         args.out,
         args.interval,
     )
-    if not s.vendors:
+    if not s.vendors and (args.once or not s.missing):
         sys.exit("no vendor could be set up")
     if args.once:
         s.one_tick(echo=True)
