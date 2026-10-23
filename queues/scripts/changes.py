@@ -25,7 +25,7 @@ import os
 # October run every machine's changes fell under 15% or between 30 and 45%,
 # with nothing between, so the line sits in the gap.
 FULL = 0.25
-MANY = 20     # numbers that moved for many rather than few
+MANY = 20  # numbers that moved for many rather than few
 
 
 def flat(d, p="", out=None):
@@ -49,12 +49,22 @@ def is_stamp(k):
 def kind(prev, cur):
     keys = set(prev) | set(cur)
     moved = [k for k in keys if prev.get(k) != cur.get(k) and not is_stamp(k)]
-    measured = [k for k in cur if not is_stamp(k) and isinstance(cur[k], (int, float)) and not isinstance(cur[k], bool)]
+    measured = [
+        k
+        for k in cur
+        if not is_stamp(k)
+        and isinstance(cur[k], (int, float))
+        and not isinstance(cur[k], bool)
+    ]
     if not moved:
         return "timestamps", 0, 0.0
     if all("calibrationsref" in k.lower() or k.lower().endswith("ref") for k in moved):
         return "pointer", len(moved), 0.0
-    nums = [k for k in moved if isinstance(cur.get(k), (int, float)) and not isinstance(cur.get(k), bool)]
+    nums = [
+        k
+        for k in moved
+        if isinstance(cur.get(k), (int, float)) and not isinstance(cur.get(k), bool)
+    ]
     share = len(nums) / len(measured) if measured else 0.0
     if share >= FULL:
         return "calibration", len(moved), share
@@ -64,7 +74,12 @@ def kind(prev, cur):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("files", nargs="+")
-    ap.add_argument("--out", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "results", "changes.json"))
+    ap.add_argument(
+        "--out",
+        default=os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "..", "results", "changes.json"
+        ),
+    )
     args = ap.parse_args(argv)
     last, out, repeat = {}, [], {}
     for path in args.files:
@@ -72,7 +87,10 @@ def main(argv=None):
             for line in f:
                 if '"properties"' not in line and '"configuration"' not in line:
                     continue
-                r = json.loads(line)
+                try:
+                    r = json.loads(line)
+                except ValueError:
+                    continue  # a half written line from a crash
                 for field in ("properties", "configuration"):
                     if field not in r:
                         continue
@@ -80,12 +98,26 @@ def main(argv=None):
                     cur = flat(r[field])
                     if key in last:
                         k, n, share = kind(last[key], cur)
-                        row = {"vendor": r["vendor"], "device": r["device"], "record": field, "t": r["t"], "kind": k, "moved": n, "share": round(share, 3)}
+                        row = {
+                            "vendor": r["vendor"],
+                            "device": r["device"],
+                            "record": field,
+                            "t": r["t"],
+                            "kind": k,
+                            "moved": n,
+                            "share": round(share, 3),
+                        }
                         # a service sometimes serves the old and new record
                         # in turn for a few minutes, so the same change shows
                         # up again. Keep the first.
                         prev = repeat.get(key)
-                        if prev and prev["moved"] == n and prev["kind"] == k and r["t"] - prev["t"] <= 600 and n:
+                        if (
+                            prev
+                            and prev["moved"] == n
+                            and prev["kind"] == k
+                            and r["t"] - prev["t"] <= 600
+                            and n
+                        ):
                             prev["t"] = r["t"]
                         else:
                             out.append(row)
@@ -94,9 +126,17 @@ def main(argv=None):
     with open(args.out, "w") as f:
         json.dump(out, f)
     from collections import Counter
+
     c = Counter((o["device"].split("/")[-1], o["kind"]) for o in out)
     for dev in sorted({d for d, _ in c}):
-        print("  {:<20} {}".format(dev, ", ".join("{} {}".format(n, k) for (d, k), n in sorted(c.items()) if d == dev)))
+        print(
+            "  {:<20} {}".format(
+                dev,
+                ", ".join(
+                    "{} {}".format(n, k) for (d, k), n in sorted(c.items()) if d == dev
+                ),
+            )
+        )
     print("  {} changes to {}".format(len(out), args.out))
 
 
