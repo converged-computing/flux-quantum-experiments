@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One page with the four days in it: tabs, hover everywhere, plain words.
+"""One page with the whole run in it: tabs, hover everywhere, plain words.
 
     ./page.py results/queues.jsonl --out plots/index.html
 
@@ -17,7 +17,7 @@ import sys
 from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from figures import ORDER, STATE, VENDOR, UNIT, devices_in_order, percentiles, short, state  # noqa: E402
+from figures import ORDER, STATE, VENDOR, UNIT, devices_in_order, percentiles, short, span_days, span_text, state  # noqa: E402
 from metrics import by_device, changes, hour_of, load, measure, quantiles, spearman  # noqa: E402
 
 STATES = list(STATE)
@@ -118,9 +118,9 @@ def pack(rows, every=300, record_changes=None):
                         for c in sorted((record_changes or {}).get((v, d), []), key=lambda c: c["t"])],
             "versions": len([r for r in rs if "properties" in r]),
         })
-    # Forte-1 at full resolution, both services, aligned by tick
-    fb = {r["tick"]: r for r in dev.get(("braket", FORTE_B), [])}
-    fi = {r["tick"]: r for r in dev.get(("ionq", FORTE_I), [])}
+    # Forte-1 at full resolution, both services, aligned by the tick's start
+    fb = {r["t"]: r for r in dev.get(("braket", FORTE_B), [])}
+    fi = {r["t"]: r for r in dev.get(("ionq", FORTE_I), [])}
     ticks = sorted(set(fb) & set(fi))
     forte = [[round((fb[k]["t"] - t0) / 3600.0, 3), measure(fb[k]), None if measure(fi[k]) is None else round(measure(fi[k]) / 3600.0, 2),
               STATES.index(state(fb[k])), STATES.index(state(fi[k]))] for k in ticks]
@@ -131,6 +131,8 @@ def pack(rows, every=300, record_changes=None):
     start = datetime.datetime.fromtimestamp(t0, datetime.timezone.utc)
     return {
         "start_iso": start.isoformat(), "hours": round((t1 - t0) / 3600.0, 2), "n_rows": len(rows),
+        "n_errors": len([r for r in rows if r.get("error")]),
+        "span": span_text(t0, t1), "span_days": span_days(t0, t1),
         "states": STATES, "state_colors": [STATE[s] for s in STATES], "machines": machines,
         "change_kinds": CHANGE_LABELS, "change_colors": CHANGE_COLORS, "have_changes": record_changes is not None,
         "forte": forte, "forte_rho": None if spearman(bx, iy) is None else round(spearman(bx, iy), 2),
@@ -140,7 +142,7 @@ def pack(rows, every=300, record_changes=None):
 
 PAGE = r"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Queues, 14 to 18 October 2026</title>
+<title>Queues, __SPAN__</title>
 <style>
 :root{--ink:#1f2328;--muted:#656d76;--line:#e6e8eb;--faint:#f4f6f8;--bg:#f7f8fa;--card:#fff;--accent:#0072B2;--braket:#D55E00;--ionq:#0072B2;--ibm:#009E73;--good:#009E73;--closed:#56B4E9;--maint:#E69F00;--down:#D55E00}
 *{box-sizing:border-box} html{scroll-behavior:smooth}
@@ -183,7 +185,7 @@ table.tbl{border-collapse:collapse;font-size:12.5px;width:100%} .tbl th,.tbl td{
 .legend{font-size:12px;margin:2px 0 10px} .legend span{margin-right:14px;white-space:nowrap} .note{color:var(--muted);font-size:12.5px;margin:10px 0 0}
 @media (max-width:860px){.app{grid-template-columns:1fr} aside{position:static;height:auto} .band,.content{padding-left:18px;padding-right:18px}}
 </style></head><body><div class="app">
-<aside><p class="brand">Quantum queues</p><p class="when">Braket, IonQ and IBM<br>14 to 18 October 2026<br>one reading a minute</p><nav id="nav"></nav>
+<aside><p class="brand">Quantum queues</p><p class="when">Braket, IonQ and IBM<br>__SPAN__<br>one reading a minute</p><nav id="nav"></nav>
 <div class="legend"><div><span class="sw" style="background:var(--good)"></span>taking work</div><div><span class="sw" style="background:var(--closed)"></span>online, outside its window</div><div><span class="sw" style="background:var(--maint)"></span>maintenance</div><div><span class="sw" style="background:var(--down)"></span>offline or unavailable</div><div style="margin-top:10px"><span class="sw" style="background:var(--braket)"></span>Braket &nbsp;<span class="sw" style="background:var(--ionq)"></span>IonQ &nbsp;<span class="sw" style="background:var(--ibm)"></span>IBM</div></div></aside>
 <main><div class="band"><h1 id="title">What do quantum vendor queues actually look like? 🤔</h1><p id="subtitle"></p></div><div class="content" id="main"></div></main></div>
 <script>
@@ -191,10 +193,13 @@ const D = __DATA__;
 const DAY = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const start = new Date(D.start_iso);
 const W = 1080, L = 64, R = 16;
-function when(h){ const d = new Date(start.getTime() + h*3600e3); return DAY[d.getUTCDay()]+" "+d.getUTCDate()+" Oct "+String(d.getUTCHours()).padStart(2,"0")+":"+String(d.getUTCMinutes()).padStart(2,"0"); }
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function when(h){ const d = new Date(start.getTime() + h*3600e3); return DAY[d.getUTCDay()]+" "+d.getUTCDate()+" "+MON[d.getUTCMonth()]+" "+String(d.getUTCHours()).padStart(2,"0")+":"+String(d.getUTCMinutes()).padStart(2,"0"); }
 function midnights(){ const out=[]; const d=new Date(start.getTime()); d.setUTCHours(0,0,0,0); d.setUTCDate(d.getUTCDate()+1); while((d-start)/3600e3 <= D.hours){ out.push([(d-start)/3600e3, DAY[d.getUTCDay()]]); d.setUTCDate(d.getUTCDate()+1);} return out; }
 const MID = midnights();
-const DAYS = (()=>{ const out=[]; let h0=0; for (const [h] of MID){ out.push({from:h0,to:h}); h0=h; } out.push({from:h0,to:D.hours}); return out.map((d,i)=>({...d, name: DAY[(start.getUTCDay()+i)%7], date: new Date(start.getTime()+(d.from+.01)*3600e3).getUTCDate()})); })();
+const DAYS = (()=>{ const out=[]; let h0=0; for (const [h] of MID){ out.push({from:h0,to:h}); h0=h; } out.push({from:h0,to:D.hours}); return out.map((d,i)=>{ const at=new Date(start.getTime()+(d.from+.01)*3600e3); return {...d, name: DAY[at.getUTCDay()], date: at.getUTCDate()+" "+MON[at.getUTCMonth()]}; }); })();
+// the day Forte-1's queue was longest, which is where the One day view opens
+const BUSIEST = (()=>{ let best=null; for (const p of forteB.points) if (p[1]!=null && (best==null || p[1]>best[1])) best=p; const h=best?best[0]:0; return Math.max(0, DAYS.findIndex(d=>h>=d.from&&h<=d.to)); })();
 function fmt(v, d){ if (v==null) return "-"; if (d!=null) return v.toFixed(d); return Math.abs(v)>=100 ? v.toFixed(0) : (Number.isInteger(v) ? String(v) : v.toFixed(1)); }
 function pct(v){ return v==null ? "-" : Math.round(v*100)+"%"; }
 function el(tag, attrs, parent){ const e = document.createElementNS("http://www.w3.org/2000/svg", tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
@@ -222,12 +227,12 @@ function sw(color){ return `<span class="sw" style="background:${color}"></span>
 const M = D.machines;
 const forteB = M.find(m=>m.vendor==="braket"&&m.name==="Forte-1"), forteI = M.find(m=>m.vendor==="ionq"&&m.name==="qpu.forte-1");
 const VC = {braket:"#D55E00",ionq:"#0072B2",ibm:"#009E73"};
-document.getElementById("subtitle").textContent = `I was interested to know what queues actually looked like across IBM Quantum, Braket (AWS), and IonQ. The last two are particularly interesting because they provide interfaces to the same machines. Will they show the same status? To not incur charges, we do not submit work, but rather look at metrics that indicate queue depth. In total we read the queues of twelve quantum machines once a minute for four days. Yes - a lot of reads! We never submitted anything. There were ${D.n_rows.toLocaleString()} readings total, and none failed. Times are in UTC. Hover over anything for details.`;
+document.getElementById("subtitle").textContent = `I was interested to know what queues actually looked like across IBM Quantum, Braket (AWS), and IonQ. The last two are particularly interesting because they provide interfaces to the same machines. Will they show the same status? To not incur charges, we do not submit work, but rather look at metrics that indicate queue depth. In total we read the queues of ${M.length} quantum machines once a minute for ${D.span_days} days, ${D.span}. Yes - a lot of reads! We never submitted anything. There were ${D.n_rows.toLocaleString()} readings total, ${D.n_errors?D.n_errors.toLocaleString()+" of which failed":"and none failed"}. A gap in a line is time the sampler was not running. Times are in UTC. Hover over anything for details.`;
 
 const TABS = [["overview","Overview"],["calendar","Calendar"],["queues","Queues"],["forte","Forte-1, Braket vs IonQ"],["day","One day"],["hours","By hour"],["spread","Spread and drain"],["calibration","Calibration"],["data","Data"]];
 const nav=document.getElementById("nav"), main=document.getElementById("main"); const sections={};
 for (const [id,name] of TABS){ const b=document.createElement("button"); b.textContent=name; b.onclick=()=>show(id); b.dataset.id=id; nav.appendChild(b); const s=document.createElement("section"); s.id="s-"+id; main.appendChild(s); sections[id]=s; }
-const built={}; let dayMachine = M.indexOf(forteB), dayIndex = DAYS.length-1; let redrawDay = null;
+const built={}; let dayMachine = M.indexOf(forteB), dayIndex = BUSIEST; let redrawDay = null;
 function show(id){ for (const b of nav.children) b.classList.toggle("on", b.dataset.id===id); for (const k in sections) sections[k].classList.toggle("on", k===id); if (!built[id]){ built[id]=true; BUILD[id](sections[id]); } else if (id==="day" && redrawDay) redrawDay(); location.hash=id; window.scrollTo(0,0); }
 function openDay(i, d){ dayMachine=i; if (d!=null) dayIndex=d; show("day"); }
 
@@ -246,13 +251,13 @@ function sparkTile(parent, m, i){
 
 const BUILD = {
 overview(s){
-  div("text",s,"We queried Braket, IonQ and IBM APIs to get metadata about their machines once a minute from Wednesday night to Sunday night. We never submitted a task, so we never changed the queues we were watching. We say a machine is taking work when it is online and serving tasks or jobs. Each box below is one machine. The line is its queue over the four days. The strip under the line shows when the machine was taking work. Click a box to see that machine one day at a time.").style.maxWidth="900px";
+  div("text",s,"We queried Braket, IonQ and IBM APIs to get metadata about their machines once a minute, ${D.span}. We never submitted a task, so we never changed the queues we were watching. We say a machine is taking work when it is online and serving tasks or jobs. Each box below is one machine. The line is its queue over the run. The strip under the line shows when the machine was taking work. Click a box to see that machine one day at a time.").style.maxWidth="900px";
   { const k=div("tilekey",s); const seen=new Set(M.flatMap(m=>m.runs.map(r=>r[2])));
     k.innerHTML = `<span class="kh">Line color</span>` + ["braket","ionq","ibm"].map(v=>`<span>${sw(VC[v])}${v==="braket"?"Braket":v==="ionq"?"IonQ":"IBM"}</span>`).join("")
       + `<span class="kh">Strip under the line</span>` + D.states.map((st,i)=>seen.has(i)?`<span>${sw(D.state_colors[i])}${st}</span>`:"").join("")
       + `<span class="kh">Gray behind the line</span><span>${sw("#e6e8eb")}not taking work</span>`; }
   const g=div("stats",s);
-  for (const [n,l] of [[D.n_rows.toLocaleString(),"readings over four days, none failed"],[pct(forteB.stats.empty_open),"of the time Forte-1 was taking work, its queue was empty"],[fmt(forteB.stats.max),"tasks waiting on Forte-1 at its worst, Sunday afternoon"],[D.forte_rho,"correlation between Braket's count and IonQ's average for the same machine"]]) div("stat",g,`<div class="n">${n}</div><div class="l">${l}</div>`);
+  for (const [n,l] of [[D.n_rows.toLocaleString(),`readings over ${D.span_days} days`],[pct(forteB.stats.empty_open),"of the time Forte-1 was taking work, its queue was empty"],[fmt(forteB.stats.max),`tasks waiting on Forte-1 at its worst, ${DAYS[BUSIEST].name} ${DAYS[BUSIEST].date}`],[D.forte_rho,"correlation between Braket's count and IonQ's average for the same machine"]]) div("stat",g,`<div class="n">${n}</div><div class="l">${l}</div>`);
   const grid=div("grid",s); M.forEach((m,i)=>sparkTile(grid,m,i));
   const f=div("findings",s);
   const F=[["Online does not mean open.","Braket says ONLINE even when a machine is between its run windows and will not run anything. Cepheus is closed four hours a day. Garnet is closed all weekend. Forte-1 is closed every evening at six. You only learn this from the device properties.","calendar","See the calendar"],
@@ -276,7 +281,7 @@ calendar(s){
   bars(b2, M.map(m=>({label:m.name, v:m.stats.up, color:m.color, tip:`${m.name} was taking work ${pct(m.stats.up)} of the time`})), v=>pct(v), 1);
 },
 queues(s){
-  const body = card(s, "Every queue over the four days", "One panel per machine. Gray shading is when the machine was not taking work. Hover to see the value at that minute. Uncheck a machine to hide it.",
+  const body = card(s, "Every queue over the run", "One panel per machine. Gray shading is when the machine was not taking work. Hover to see the value at that minute. Uncheck a machine to hide it.",
     "For Braket this is the number of tasks waiting in the Normal queue. For IBM it is the number of pending jobs. For IonQ it is a field called average_queue_time. IonQ's docs give no unit, we read it as milliseconds and show it in hours. We read once a minute and plot every five minutes.",
     "Queues are short most of the time and long in bursts. Forte-1's queue built while it was open. Garnet's built while it was shut, and it cleared minutes after the machine opened. A queue on a shut machine is work waiting for it to open.");
   const ctl=div("controls",body); let lastv=null; const vis=new Set(M.map((m,i)=>i));
@@ -315,9 +320,9 @@ forte(s){
   card(r,"Do they agree the machine is up?", `Mostly. In ${pct(D.forte_both_up)} of the minutes where either one said Forte-1 was up, both did. IonQ showed sixteen short outages that Braket never did. Several were on Sunday morning while Braket's count kept growing.`, "Braket up means ONLINE and inside a run window. IonQ up means status available. We compared them minute by minute.", "Status is the one thing you can cross check between the two services. Even there they differ a little.");
 },
 day(s){
-  const body = card(s, "One day, one machine", "Pick a day and a machine. The line is the queue through that day. Gray shading is when the machine was not taking work. It opens on Sunday on Forte-1, which had the one long queue of the whole run.",
+  const body = card(s, "One day, one machine", "Pick a day and a machine. The line is the queue through that day. Gray shading is when the machine was not taking work. It opens on Forte-1 on the day its queue was longest.",
     "This uses the same once a minute checks as the Queues view. We plot one point every five minutes for the day you pick.",
-    "On Sunday Forte-1 had nine to nineteen tasks waiting for eleven hours. This is when a hold helps. Without one, a classical job sits on its cores for the whole wait. For the other 85 hours Forte-1 was basically free.");
+    `Forte-1's queue reached ${fmt(forteB.stats.max)} tasks on ${DAYS[BUSIEST].name} ${DAYS[BUSIEST].date}. A long queue is when a hold helps. Without one, a classical job sits on its cores for the whole wait. The rest of the time Forte-1 was mostly free.`);
   const ctl=div("controls",body); const dayc=div("",ctl); const mc=document.createElement("select"); M.forEach((m,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=m.name+" ("+m.vendor+")"; mc.appendChild(o); }); ctl.appendChild(mc);
   DAYS.forEach((d,i)=>{ const b=document.createElement("button"); b.className="chip"; b.textContent=d.name+" "+d.date; b.onclick=()=>{ dayIndex=i; draw(); }; dayc.appendChild(b); });
   mc.onchange=()=>{ dayMachine=+mc.value; draw(); }; const chart=div("panel",body);
@@ -329,8 +334,8 @@ day(s){
 },
 hours(s){
   const body = card(s, "By hour of the day", "Two heat maps. Rows are machines and columns are UTC hours. The top map shows how much of each hour the machine was not taking work. White is never and dark is the whole hour. The bottom map shows the median queue in each hour. Each machine is scaled to its own busiest hour. Hover a cell for the numbers.",
-    "We sorted every check into its UTC hour. Each cell covers four hours of one machine, one hour from each day. The top map is the percent of those checks where the machine was not taking work. The bottom map is the median queue in that hour, divided by that machine's busiest hour so the colors line up across machines.",
-    "The closures repeat every day. The queues do not. Four days is not enough to say when a queue will be short, so check the queue when you send the job.");
+    "We sorted every check into its UTC hour. Each cell covers ${D.span_days} hours of one machine, one hour from each day. The top map is the percent of those checks where the machine was not taking work. The bottom map is the median queue in that hour, divided by that machine's busiest hour so the colors line up across machines.",
+    "The closures repeat every day. The queues are less regular, so check the queue when you send the job rather than trusting the hour.");
   heat(body, "Fraction of the hour not taking work", m=>m.hourly.map(h=>h.closed), (m,h,v)=>`${m.name} at ${String(h).padStart(2,"0")}:00<br>not taking work ${pct(v)} of the hour`, [213,94,0], false);
   heat(body, "Median queue in the hour, relative to the machine's busiest hour", m=>{ const vals=m.hourly.map(h=>h.median); const mx=Math.max(...vals.filter(v=>v!=null),1e-9); return vals.map(v=>v==null?null:v/mx); }, (m,h,v)=>`${m.name} at ${String(h).padStart(2,"0")}:00<br>median ${fmt(m.hourly[h].median)} ${m.unit}`, [0,114,178], true);
 },
@@ -380,13 +385,13 @@ calibration(s){
   draw();
 },
 data(s){
-  const body = card(s, "Summary stats", "There is one row per machine, measured over four days. The \"taking work\" column is the percent of the time the machine was up and could have run a job. The \"empty while open\" column is the percent of that time when the queue had nothing in it. The \"empty while shut\" column is the percent of the time the machine was not running jobs when the queue had nothing in it. For context, people can submit work to the queue when the machines are offline and it can pile up to run when they come back. The \"worst\" column is the biggest queue we ever saw on that machine in any single minute of the four days, whether it was running or not. The queue is counted differently by each vendor. On Braket it is the number of tasks waiting. On IBM it is the number of pending jobs. On IonQ it is the average queue time in hours, because that is all IonQ reports.", null, null);
+  const body = card(s, "Summary stats", `There is one row per machine, measured over ${D.span_days} days. The \"taking work\" column is the percent of the time the machine was up and could have run a job. The \"empty while open\" column is the percent of that time when the queue had nothing in it. The \"empty while shut\" column is the percent of the time the machine was not running jobs when the queue had nothing in it. For context, people can submit work to the queue when the machines are offline and it can pile up to run when they come back. The \"worst\" column is the biggest queue we ever saw on that machine in any single minute of the run, whether it was running or not. The queue is counted differently by each vendor. On Braket it is the number of tasks waiting. On IBM it is the number of pending jobs. On IonQ it is the average queue time in hours, because that is all IonQ reports.`, null, null);
   let h="<table class='tbl'><tr><th>machine</th><th>service</th><th>unit</th><th>taking work</th><th>empty while open</th><th>empty while shut</th><th>p10</th><th>median</th><th>p90</th><th>worst</th><th>drain /min</th><th>record changes</th></tr>";
   for (const m of M){ const st=m.stats; h+=`<tr><td>${sw(m.color)}${m.name}</td><td>${m.vendor}</td><td>${m.unit}</td><td>${pct(st.up)}</td><td>${pct(st.empty_open)}</td><td>${st.n_closed?pct(st.empty_closed):"-"}</td><td>${fmt(st.p10)}</td><td>${fmt(st.p50)}</td><td>${fmt(st.p90)}</td><td>${fmt(st.max)}</td><td>${st.drain_per_min==null?"-":fmt(st.drain_per_min,1)}</td><td>${Math.max(0,m.versions-1)}</td></tr>`; }
   body.innerHTML+=h+"</table>";
   const r=div("row",s);
   card(r,"What we asked each service","We asked Braket for each device's queue depth and its device record. The depth is a count of tasks waiting in the Normal and Priority queues, plus hybrid jobs. The record has the status, the run windows and the calibration. We asked IonQ for its backend list, which gives a status and average_queue_time, which we read as milliseconds. We asked IBM for every backend the account can see, which gives pending jobs, whether it is operational, its status message, and the calibration record.",null,null);
-  card(r,"What we kept, and what this cannot tell you","Every row keeps the full response from the service, how long the call took, and which minute it belongs to. That is how we line up a machine read through two services. Big records that a service repeats without change are stored once and then again whenever they change. None of this can tell you how long your own task would wait. That takes a real task, and a task on these machines costs money and only measures one submission on one day. The raw rows are in results/queues.jsonl next to this page. The figures come from scripts/figures.py and this page from scripts/page.py.",null,null);
+  card(r,"What we kept, and what this cannot tell you","Every row keeps the full response from the service, how long the call took, and which minute it belongs to. That is how we line up a machine read through two services. Big records that a service repeats without change are stored once and then again whenever they change. None of this can tell you how long your own task would wait. That takes a real task, and a task on these machines costs money and only measures one submission on one day. The raw rows are in results/queues/, one file per day. The figures come from scripts/figures.py and this page from scripts/page.py.",null,null);
 }};
 
 function bars(body, items, fmtv, fixedMax){ const wrap=div("panel",body); const RH=22,LBL=150,TOP=6,PW=W-LBL-90; const svg=el("svg",{viewBox:`0 0 ${W} ${RH*items.length+TOP+6}`},wrap); const mx=fixedMax||Math.max(...items.map(i=>i.v))*1.1;
@@ -416,7 +421,7 @@ def main(argv=None):
     # choke on, so it is broken at array boundaries. Newlines are whitespace
     # to JSON, so nothing changes for the browser
     blob = json.dumps(data, separators=(",", ":")).replace("],[", "],\n[").replace("},{", "},\n{")
-    page = PAGE.replace("__DATA__", blob)
+    page = PAGE.replace("__DATA__", blob).replace("__SPAN__", data["span"])
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     with open(args.out, "w") as f:
         f.write(page)

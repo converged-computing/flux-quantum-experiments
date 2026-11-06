@@ -1,0 +1,33 @@
+# Sample every vendor's queue until UNTIL, as a service. setup.sh fills in
+# the paths and installs this as /etc/systemd/system/queues.service.
+#
+#     sudo systemctl enable --now queues     start now and at every boot
+#     sudo systemctl stop queues             stop, which runs the analysis
+#     journalctl -u queues -f                watch
+#
+# run.sh ends itself at UNTIL, and the service does not start again after
+# that. If it dies before then it is started again a minute later, and after
+# a reboot it carries on in the same day's file.
+[Unit]
+Description=quantum queue sampler
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=@USER@
+WorkingDirectory=@QUEUES@
+EnvironmentFile=/etc/queues.env
+Environment=PY=@PY@
+ExecStart=/bin/bash @QUEUES@/run.sh
+# run.sh traps TERM, stops the sampler cleanly and runs the analysis, which
+# takes a few minutes once there are weeks of samples
+KillSignal=SIGTERM
+TimeoutStopSec=900
+# a normal end, at UNTIL or by STOP, exits 0 and stays stopped. Anything
+# else is a crash, and it starts again
+Restart=on-failure
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target

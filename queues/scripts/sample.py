@@ -3,6 +3,7 @@
 
     sample.py --once                              one tick, printed
     sample.py --out results/queues.jsonl          until stopped
+    sample.py --out results/queues                one file a UTC day in there
     sample.py --vendors braket,ionq               only those
 
 One pass over every vendor is a tick, and every row carries its tick, so a
@@ -25,6 +26,7 @@ variables QRMI reads.
 
 import argparse
 import datetime
+import errno
 import json
 import os
 import signal
@@ -77,6 +79,15 @@ def digest(obj):
     return hashlib.sha256(
         json.dumps(obj, sort_keys=True, default=str).encode()
     ).hexdigest()[:16]
+
+
+def daily(out):
+    """Whether out is a directory for one file a UTC day: a directory, or a
+    new path that is not a .jsonl file. A file that exists, like /dev/null
+    for preflight, is written to as it is."""
+    if os.path.exists(out):
+        return os.path.isdir(out)
+    return not out.endswith(".jsonl")
 
 
 class Unchanged:
@@ -278,9 +289,15 @@ class Sampler:
         vendors,
         out,
         interval,
+        stop_file=None,
     ):
+        self.stop_file = stop_file
         self.spec = spec
         self.out = out
+        # a directory gets one file a UTC day, so weeks of samples are many
+        # files the readers put together rather than one of many gigabytes
+        self.daily = daily(out)
+        self.path = None
         self.interval = interval
         self.vendors = {}
         self.missing = []
@@ -329,6 +346,12 @@ class Sampler:
                 }
             )
 
+    def file_for(self, t):
+        if not self.daily:
+            return self.out
+        day = datetime.datetime.fromtimestamp(t, datetime.timezone.utc)
+        return os.path.join(self.out, day.strftime("%Y-%m-%d") + ".jsonl")
+
     def write(self, row):
         self.write_rows([row])
 
@@ -337,14 +360,27 @@ class Sampler:
         flight and never leaves earlier rows only in the page cache."""
         if not rows:
             return
-        with open(self.out, "a") as f:
+        with open(self.path or self.file_for(now()), "a") as f:
             f.write("".join(json.dumps(r, default=str) + "\n" for r in rows))
             f.flush()
-            os.fsync(f.fileno())
+            try:
+                os.fsync(f.fileno())
+            except OSError as e:
+                # /dev/null, which preflight writes to, cannot be synced
+                if e.errno != errno.EINVAL:
+                    raise
 
     def one_tick(self, echo=False):
         self.tick += 1
         t = now()
+        path = self.file_for(t)
+        if path != self.path:
+            # a new day's file starts with every full record again, so each
+            # file stands alone and an old day can be moved off or deleted
+            for vendor in self.vendors.values():
+                if hasattr(vendor, "changed"):
+                    vendor.changed = Unchanged()
+            self.path = path
         if self.missing and self.tick % self.RETRY_TICKS == 0:
             for name in list(self.missing):
                 print("{}: retrying setup".format(name), flush=True)
@@ -431,6 +467,10 @@ class Sampler:
             if self.tick % 10 == 1:
                 print("tick {} at {}".format(self.tick, stamp()), flush=True)
             while not self.stop and now() - started < self.interval:
+                if self.stop_file and os.path.exists(self.stop_file):
+                    print("found {}, stopping".format(self.stop_file), flush=True)
+                    self.stop = True
+                    break
                 time.sleep(1)
         print("stopped after {} ticks".format(self.tick), flush=True)
 
@@ -444,15 +484,22 @@ def main(argv=None):
     )
     ap.add_argument("--interval", type=float, default=60.0)
     ap.add_argument("--once", action="store_true", help="one tick, printed, then stop")
+    ap.add_argument(
+        "--stop-file", help="stop after the current tick once this file exists"
+    )
     args = ap.parse_args(argv)
     with open(args.devices) as f:
         spec = json.load(f)
-    os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+    os.makedirs(
+        args.out if daily(args.out) else os.path.dirname(os.path.abspath(args.out)),
+        exist_ok=True,
+    )
     s = Sampler(
         spec,
         [v for v in args.vendors.split(",") if v],
         args.out,
         args.interval,
+        stop_file=args.stop_file,
     )
     if not s.vendors and (args.once or not s.missing):
         sys.exit("no vendor could be set up")

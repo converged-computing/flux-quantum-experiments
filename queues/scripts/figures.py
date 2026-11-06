@@ -7,11 +7,11 @@
                         outside its window, offline, in maintenance
     queues-timeline     every device's queue over the whole run, one panel
                         each, with the hours it was not taking work shaded
-    forte1-braket-vs-ionq  Forte-1 over the four days as Braket reports it
+    forte1-braket-vs-ionq  Forte-1 over the run as Braket reports it
                         and as IonQ reports it, and both ranked against
                         their own series on one axis
     forte1-agreement    Braket's count against IonQ's average, same minute
-    forte1-sunday       the Sunday queue on Forte-1, hour by hour
+    forte1-busiest-day  the day Forte-1's queue was longest, hour by hour
     closed-hours        fraction of each hour the machine was not taking
                         work, by hour of day
     queue-hours         each machine's median queue by hour of day, scaled to
@@ -102,6 +102,27 @@ def hours_since(t, t0):
     return (t - t0) / 3600.0
 
 
+def span_text(t0, t1):
+    """The run's dates in words: '14 to 18 October 2026', or across months
+    '23 October to 6 November 2026'."""
+    a = datetime.datetime.fromtimestamp(t0, datetime.timezone.utc)
+    b = datetime.datetime.fromtimestamp(t1, datetime.timezone.utc)
+    if (a.year, a.month) == (b.year, b.month):
+        return "{} to {} {} {}".format(a.day, b.day, b.strftime("%B"), b.year)
+    if a.year == b.year:
+        return "{} {} to {} {} {}".format(a.day, a.strftime("%B"), b.day, b.strftime("%B"), b.year)
+    return "{} {} {} to {} {} {}".format(a.day, a.strftime("%B"), a.year, b.day, b.strftime("%B"), b.year)
+
+
+def span_days(t0, t1):
+    """Whole days from the first sample to the last, at least one."""
+    return max(1, int(round((t1 - t0) / 86400.0)))
+
+
+def stamp(t):
+    return datetime.datetime.fromtimestamp(t, datetime.timezone.utc).strftime("%a %-d %b %H:%M")
+
+
 # ------------------------------------------------------------------- 1 --
 def cal_status(rows, out):
     dev = by_device(rows)
@@ -109,7 +130,7 @@ def cal_status(rows, out):
     t0 = min(r["t"] for rs in dev.values() for r in rs)
     t1 = max(r["t"] for rs in dev.values() for r in rs)
     row_h, left, top, width = 22, 170, 40, 760
-    c = svg.Canvas(left + width + 30, top + row_h * len(keys) + 90, "When each machine was taking work, 14 to 18 October 2026, UTC")
+    c = svg.Canvas(left + width + 30, top + row_h * len(keys) + 90, "When each machine was taking work, {}, UTC".format(span_text(t0, t1)))
     p = c.panel(left, top, width, row_h * len(keys), (0, hours_since(t1, t0)), (0, 1))
     for i, (v, d) in enumerate(keys):
         rs = dev[(v, d)]
@@ -139,7 +160,7 @@ def cal_status(rows, out):
         c.rect(x, y - 9, 12, 12, col)
         c.text(x + 16, y, name, size=9, baseline="middle")
         x += 16 + 7 * len(name) + 24
-    c.text(left, y + 24, "A sample every minute from Wed 14 Oct 19:10 to Sun 18 Oct 19:09 UTC. Braket: ONLINE and inside an execution window. IonQ: available. IBM: operational and active.", size=8, color=svg.MUTED)
+    c.text(left, y + 24, "A sample every minute from {} to {} UTC. Braket: ONLINE and inside an execution window. IonQ: available. IBM: operational and active.".format(stamp(t0), stamp(t1)), size=8, color=svg.MUTED)
     c.text(left, y + 36, "Braket says ONLINE for a machine that is between windows and will not run anything, so the light blue is as closed as the red.", size=8, color=svg.MUTED)
     return c.save(os.path.join(out, "cal-status.svg"))
 
@@ -152,7 +173,7 @@ def queues_timeline(rows, out):
     t1 = max(r["t"] for rs in dev.values() for r in rs)
     cols, pw, ph, gx, gy, left, top = 3, 250, 95, 60, 48, 70, 40
     nrows = (len(keys) + cols - 1) // cols
-    c = svg.Canvas(left + cols * (pw + gx), top + nrows * (ph + gy) + 20, "Every queue over the four days")
+    c = svg.Canvas(left + cols * (pw + gx), top + nrows * (ph + gy) + 20, "Every queue over the run, {}".format(span_text(t0, t1)))
     for i, (v, d) in enumerate(keys):
         rs = dev[(v, d)]
         xs = [hours_since(r["t"], t0) for r in rs]
@@ -210,7 +231,7 @@ def forte1_braket_vs_ionq(rows, out):
     t0 = min(b[0]["t"], i[0]["t"])
     t1 = max(b[-1]["t"], i[-1]["t"])
     left, top, pw, ph, gap = 70, 44, 780, 120, 46
-    c = svg.Canvas(left + pw + 40, top + 3 * (ph + gap) + 40, "Forte-1 over four days, as Braket reports it and as IonQ reports it")
+    c = svg.Canvas(left + pw + 40, top + 3 * (ph + gap) + 40, "Forte-1 over the run, as Braket reports it and as IonQ reports it")
     days = day_ticks(t0, t1)
     xt = [hours_since(t, t0) for t, _ in days]
     xf = lambda h: dict((hours_since(t, t0), n) for t, n in days).get(h, "")
@@ -265,27 +286,28 @@ def forte1_agreement(rows, out):
     for (x, y), n in spots.items():
         c.circle(p.px(x), p.py(y), 2.4, VENDOR["ionq"], 0.15 + 0.85 * (n / top_n) ** 0.5)
     c.text(left + 4, top + 12, "rank correlation {:.2f}".format(rho), size=10, weight="bold")
-    c.text(left, top + ph + 46, "Every minute of the four days is a dot, darker where minutes pile up. If both services reported the", size=8, color=svg.MUTED)
+    c.text(left, top + ph + 46, "Every minute of the run is a dot, darker where minutes pile up. If both services reported the", size=8, color=svg.MUTED)
     c.text(left, top + ph + 58, "same queue the dots would climb a line. IonQ's average takes a few slowly changing values whatever Braket counts.", size=8, color=svg.MUTED)
     return c.save(os.path.join(out, "forte1-agreement.svg"))
 
 
 # ------------------------------------------------------------------- 4 --
-def forte1_sunday(rows, out):
+def forte1_busiest_day(rows, out):
+    """The UTC day on which Braket counted the most tasks waiting on Forte-1."""
     dev = by_device(rows)
     b = dev.get(("braket", "arn:aws:braket:us-east-1::device/qpu/ionq/Forte-1"), [])
     i = dev.get(("ionq", "qpu.forte-1"), [])
     if not b:
         return None
-    suns = [t for t, n in day_ticks(b[0]["t"], b[-1]["t"]) if n == "Sun"]
-    if not suns:
-        return None
-    d0 = suns[0]
-    bb = [r for r in b if r["t"] >= d0]
-    ii = [r for r in i if r["t"] >= d0]
+    peak = max(b, key=lambda r: measure(r) or 0)
+    d0 = datetime.datetime.fromtimestamp(peak["t"], datetime.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+    d1 = d0 + 86400
+    bb = [r for r in b if d0 <= r["t"] < d1]
+    ii = [r for r in i if d0 <= r["t"] < d1]
     end = hours_since(bb[-1]["t"], d0)
     left, top, pw, ph = 70, 40, 760, 150
-    c = svg.Canvas(left + pw + 150, top + ph + 95, "Sunday 18 October on Forte-1: the one long queue of the run, as Braket counted it")
+    day = datetime.datetime.fromtimestamp(d0, datetime.timezone.utc).strftime("%A %-d %B")
+    c = svg.Canvas(left + pw + 150, top + ph + 95, "{} on Forte-1: the longest queue of the run, {} tasks, as Braket counted it".format(day, int(measure(peak) or 0)))
     p = c.panel(left, top, pw, ph, (0, end), (0, max([measure(r) or 0 for r in bb] + [1]) * 1.12))
     # bands where Braket said closed, and where IonQ said unavailable
     for rs, col, row in ((bb, STATE["online, outside its window"], 0), (ii, STATE["offline or unavailable"], 1)):
@@ -304,8 +326,8 @@ def forte1_sunday(rows, out):
     c.text(left + pw + 4, top + ph + 12, "Braket: outside window", size=7, color=svg.MUTED, baseline="middle")
     c.text(left + pw + 4, top + ph + 22, "IonQ: unavailable", size=7, color=svg.MUTED, baseline="middle")
     c.text(left + pw / 2, top + ph + 46, "hour of day, UTC", size=9, anchor="middle")
-    c.text(left, top + ph + 70, "The queue built from 08:00 and stood at 9 to 19 tasks for the rest of the day. IonQ reported the machine unavailable in short spells through the morning while Braket's count kept growing.", size=8, color=svg.MUTED)
-    return c.save(os.path.join(out, "forte1-sunday.svg"))
+    c.text(left, top + ph + 70, "The bands under the line are when Braket said the machine was outside its window and when IonQ said it was unavailable.", size=8, color=svg.MUTED)
+    return c.save(os.path.join(out, "forte1-busiest-day.svg"))
 
 
 # ------------------------------------------------------------------- 5 --
@@ -356,7 +378,7 @@ def queue_hours(rows, out):
     return heatmap(
         rows, out, "queue-hours", "Median queue by hour of day, each machine scaled to its own busiest hour",
         lambda rs: quantiles([value(r) for r in rs]).get("0.5"), "relative",
-        note="Dark is that machine's busiest hour, whatever its scale; the number at the right is the busiest hour's median. Four days is too few to call this a daily pattern.",
+        note="Dark is that machine's busiest hour, whatever its scale; the number at the right is the busiest hour's median. Each cell is one hour of one machine from every day of the run.",
     )
 
 
@@ -524,12 +546,13 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("files", nargs="+")
     ap.add_argument("--out", default=os.path.join(HERE, "..", "plots"))
+    ap.add_argument("--changes", default=os.path.join(HERE, "..", "results", "changes.json"), help="the record changes from changes.py")
     args = ap.parse_args(argv)
     rows = load(args.files)
     os.makedirs(args.out, exist_ok=True)
     global KINDS
-    KINDS = load_kinds(os.path.join(HERE, "..", "results", "changes.json"))
-    for fn in (cal_status, queues_timeline, forte1_braket_vs_ionq, forte1_agreement, forte1_sunday, closed_hours, queue_hours, queue_ranges, empty_fraction, drain, calibration):
+    KINDS = load_kinds(args.changes)
+    for fn in (cal_status, queues_timeline, forte1_braket_vs_ionq, forte1_agreement, forte1_busiest_day, closed_hours, queue_hours, queue_ranges, empty_fraction, drain, calibration):
         try:
             path = fn(rows, args.out)
             print("  {}".format(path or "{}: nothing to draw".format(fn.__name__)))

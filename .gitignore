@@ -1,1 +1,7 @@
 __pycache__
+# the samples: hundreds of megabytes a day, kept on disk and in copies,
+# never in git. The tables and figures made from them are tracked.
+queues/results*/*.jsonl
+queues/results*/queues/
+queues/results*/*.log
+queues/results*/STOP

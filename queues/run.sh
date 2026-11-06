@@ -7,9 +7,11 @@
 # Everything is printed and also appended to results/run.log, so run it in tmux
 # or screen to watch it, or with nohup ... > /dev/null 2>&1 & to not.
 #
-# Nothing is submitted, the queues are only read. Writes results/queues.jsonl,
-# appending and forcing each tick to disk, so a crash or a restart carries on in
-# the same file and loses at most the minute in flight.
+# Nothing is submitted, the queues are only read. Writes one file per UTC day
+# into results/queues/, 2026-10-25.jsonl and so on, appending and forcing each
+# tick to disk, so a crash or a restart carries on in the same day's file and
+# loses at most the minute in flight. The analysis reads the whole directory.
+# DATA=results/june puts a run's days somewhere else.
 #
 # UNTIL is a fixed end time. Starting this again after a reboot samples until the
 # same moment, it does not add DAYS again. Without UNTIL the end is DAYS from
@@ -19,7 +21,7 @@
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
 cd "$HERE" || exit 1
-mkdir -p results plots
+mkdir -p results plots "${DATA:-results/queues}"
 # print and keep a copy, appending, so a restart does not lose the old log
 exec > >(tee -a results/run.log) 2>&1
 PY=${PY:-python3}
@@ -27,6 +29,11 @@ DAYS=${DAYS:-4}
 INTERVAL=${INTERVAL:-60}
 VENDORS=${VENDORS:-braket,ionq,ibm}
 TZ_HOURS=${TZ_HOURS:-0}
+DATA=${DATA:-results/queues}
+# a run started before the samples went one file a day wrote them all to
+# results/queues.jsonl, and the analysis reads that too
+INPUTS=("$DATA")
+[ -f results/queues.jsonl ] && INPUTS=(results/queues.jsonl "$DATA")
 
 say() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] $*"; }
 
@@ -54,7 +61,7 @@ while [ "$STOPPING" = 0 ] && [ ! -e results/STOP ] && [ "$(date +%s)" -lt "$END"
     LEFT=$(( END - $(date +%s) ))
     [ "$LEFT" -gt 0 ] || break
     timeout "$LEFT" $PY scripts/sample.py --vendors "$VENDORS" --interval "$INTERVAL" \
-        --out results/queues.jsonl &
+        --out "$DATA" --stop-file results/STOP &
     CHILD=$!
     wait "$CHILD"; rc=$?
     CHILD=
@@ -65,11 +72,4 @@ while [ "$STOPPING" = 0 ] && [ ! -e results/STOP ] && [ "$(date +%s)" -lt "$END"
     fi
 done
 
-say "analysis"
-$PY scripts/analyze.py results/queues.jsonl --tz "$TZ_HOURS" --interval "$INTERVAL" \
-    --distribution results/distribution.json | tee results/analysis.txt
-$PY scripts/changes.py results/queues.jsonl --out results/changes.json
-$PY scripts/figures.py results/queues.jsonl --out plots
-$PY scripts/page.py results/queues.jsonl --out plots/index.html
-$PY scripts/plot.py results/queues.jsonl --tz "$TZ_HOURS" --out plots || say "no matplotlib figures, is matplotlib installed?"
-say "done"
+TZ_HOURS="$TZ_HOURS" INTERVAL="$INTERVAL" bash analyze.sh "${INPUTS[@]}"

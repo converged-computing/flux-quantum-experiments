@@ -22,6 +22,12 @@ What comes out:
 
 ## Findings, 14 to 18 October 2026
 
+The findings below are from the first run, four days in October. Sampling
+went on from 23 October, and the figures in `plots/` and the page in
+`plots/index.html` now cover every run, 14 October onward, with the gaps
+between runs showing as gaps. The page's dates, day counts and busiest
+day come from the data, so they stay right as the collection grows.
+
 Four days of samples, one a minute, from Wednesday 19:10 to Sunday 19:09
 UTC. That is 68,544 rows with zero errors, twelve machines through three
 services, and nothing submitted. The tables are in `results/analysis.txt`, the per device
@@ -116,7 +122,7 @@ the busiest, and a count and a time can sit on one axis.
 
 ### The one long queue, Sunday on Forte-1
 
-![Sunday on Forte-1](plots/forte1-sunday.svg)
+![the busiest day on Forte-1](plots/forte1-busiest-day.svg)
 
 The queue built from 08:00 and stood between 9 and 19 tasks for the rest
 of the day, the only sustained contention on Forte-1 in four days. The
@@ -229,45 +235,121 @@ one task on one day, which varies with everything and proves little.
 
 ## Setup
 
-Credentials in the environment for whichever vendors you want. A vendor
+Credentials go in the environment for whichever vendors you want. A vendor
 without them is skipped, not failed.
 
 ```bash
 export AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=...       # or ~/.aws/credentials
 export IONQ_API_KEY=...
-export IBM_CLOUD_TOKEN=... IBM_CLOUD_CRN=...                  # or QISKIT_IBM_TOKEN and QISKIT_IBM_INSTANCE
+export IBM_CLOUD_TOKEN=...                                    # an IBM Cloud API key
 pip install amazon-braket-sdk qiskit-ibm-runtime             # IonQ needs nothing beyond the key
+```
+
+IBM also needs the CRN of your Quantum instance. Get it with the IBM Cloud CLI.
+
+```bash
+ibmcloud login --apikey "$IBM_CLOUD_TOKEN"
+export IBM_CLOUD_CRN=$(ibmcloud resource service-instances --service-name quantum-computing --output json | jq -r '.[0].crn')
+echo "$IBM_CLOUD_CRN"                                         # crn:v1:bluemix:public:quantum-computing:...
+```
+
+If you have more than one Quantum instance, `.[0]` takes the first. List them
+with `ibmcloud resource service-instances --service-name quantum-computing` and
+pick the one you want. `QISKIT_IBM_TOKEN` and `QISKIT_IBM_INSTANCE` work in
+place of the two IBM variables.
+
+AWS SSO and other temporary credentials expire. Over a run of weeks, use an
+IAM access key, or Braket fills with errors once the session runs out.
+
+Then check that every vendor can be read.
+
+```bash
 bash preflight.sh 2>&1 | tee preflight.log
 ```
 
-Preflight takes one tick from every vendor and prints it, and checks the
-paired machines in `devices.json` are in the sampled lists. `devices.json`
-is the list: the Forte and Aria machines as Braket and IonQ report it, two more
-Braket QPUs, and an empty IBM list that means every backend the instance
-can see.
+Preflight takes one tick from every vendor and prints it. It also checks
+that the paired machines in `devices.json` are in the sampled lists.
+`devices.json` is the list of machines. It has the Forte machines as Braket and
+IonQ report them, two more Braket QPUs, and an empty IBM list, which means
+every backend the instance can see. Nothing is submitted, so none of this
+costs anything.
 
 ## Running
 
+Give it an end time. It prints as it goes and appends the same lines to
+`results/run.log`.
+
 ```bash
-nohup bash run.sh > results/run.log 2>&1 &                    # 4 days, every 60s
-DAYS=3 INTERVAL=30 nohup bash run.sh > results/run.log 2>&1 &
+UNTIL=2026-11-13T23:59:59Z nohup bash run.sh > /dev/null 2>&1 &
+tail -f results/run.log                                       # Ctrl-C stops watching, not the run
 ```
 
-It appends to `results/queues.jsonl`, so a restart carries on in the same
-file. When the days are up, or it is killed, it runs the analysis into
-`results/analysis.txt` and `results/distribution.json` and the figures
-into `plots/`.
+`DAYS=4` works in place of `UNTIL`, and `INTERVAL` sets the seconds
+between samples, 60 by default.
 
-Run it anywhere with the credentials and the packages. A cluster node is
-fine, so is a laptop that stays awake. One sampler at a time per file.
+It is built to be left alone.
+
+- Every sample is forced to disk, so a crash or a power cut loses at most
+  the minute in flight. The analysis skips a half written last line.
+- If the sampler dies before the end, it is started again a minute later.
+- A vendor that fails to start is retried every hour. A vendor whose every
+  call fails for 30 minutes gets a fresh client, which picks up refreshed
+  credentials.
+- A call that hangs for two minutes is cut off and logged, so one stuck
+  vendor does not stop the others.
+
+The samples go into `results/queues/`, one file per UTC day, named like
+`2026-10-25.jsonl`. Each day's file starts with every device's full record,
+so a day stands alone and old days can be compressed, moved off or deleted
+without breaking the rest. `DATA=results/november` writes a run somewhere
+else. A run started before this change wrote everything to
+`results/queues.jsonl`, and `run.sh` still reads that file in the analysis.
+
+After a reboot, run the same command again. `UNTIL` is a fixed time, so the
+run ends when it was going to, and the samples go on the end of that day's
+file. The time the machine was off shows up as a gap.
+
+```bash
+pgrep -af "run.sh|sample.py"                                  # is it running
+tail -20 results/run.log                                      # what it did last
+touch results/STOP                                            # stop early
+```
+
+When it ends, by time, by `STOP`, or by being killed, it runs
+`analyze.sh` over that run's files: the tables into `results/analysis.txt`
+and `results/distribution.json`, the record changes into
+`results/changes.json`, and the figures and page into `plots/`. Run one
+sampler at a time per directory.
+
+The raw samples are not in git. `.gitignore` keeps every `.jsonl` and log
+under `results*/` out, and the tables, figures and page in.
+
+The data grows by about 320 MB a day, most of it IBM calibration snapshots,
+so three weeks is about 7 GB over 21 files. The readers keep only the digest
+of each full record in memory, so the analysis does not need the 7 GB in
+RAM. Copy finished days somewhere else as you go.
 
 ## Reading it
 
+`analyze.sh` runs every step over whatever you give it, so several runs go
+on one page:
+
 ```bash
-python3 scripts/analyze.py results/queues.jsonl --tz -7
-python3 scripts/plot.py results/queues.jsonl --tz -7
-python3 scripts/figures.py results/queues.jsonl              # the SVG figures, no matplotlib needed
+bash analyze.sh results-days/queues.jsonl results/queues.jsonl results/queues
+TZ_HOURS=-7 bash analyze.sh results/queues                 # hour tables in local time
 ```
+
+Or one step at a time:
+
+```bash
+python3 scripts/analyze.py results/queues --tz -7
+python3 scripts/plot.py results/queues --tz -7
+python3 scripts/figures.py results/queues                    # the SVG figures, no matplotlib needed
+python3 scripts/analyze.py results/queues/2026-11-0*.jsonl   # some days only
+```
+
+Every script takes files, directories or both, oldest first. A directory
+means every `.jsonl` in it, read in name order, which is day order.
 
 `--tz` puts the hour of day table in local time. The tables:
 
@@ -291,7 +373,7 @@ The figures, one y axis per panel:
 | `queues-timeline` | every queue over the run, one panel each |
 | `forte1-braket-vs-ionq` | Forte-1 as Braket and as IonQ report it, and both ranked against themselves on one axis |
 | `forte1-agreement` | Braket's count against IonQ's average, same minute |
-| `forte1-sunday` | the Sunday queue on Forte-1 |
+| `forte1-busiest-day` | the day Forte-1's queue was longest, hour by hour |
 | `closed-hours`, `queue-hours` | by hour of day: fraction not taking work, median queue |
 | `queue-ranges`, `empty-fraction`, `drain` | each queue's spread, how often empty, steepest fall |
 | `calibration` | when each machine's published properties changed |
@@ -301,6 +383,62 @@ The figures, one y axis per panel:
 sorted, the quantiles by hour, the availability, and the movement. That
 is what the mock experiment reads to draw its waits from, and what the
 weekend's device experiments use to pick their hours.
+
+## Running on EC2
+
+A laptop sleeps, reboots and fills its disk. For weeks of samples, run the
+sampler on a small EC2 instance as a systemd service, which starts at boot
+and starts again if it dies. Nothing here needs much of a machine: a
+`t3.small` is plenty. What it needs is disk, about 320 MB a day, so give
+it a 100 GB volume for a month.
+
+Launch an Ubuntu 24.04 instance with your own key pair, security group and
+subnet. Port 22 from your address is the only ingress it needs.
+
+```bash
+aws ec2 run-instances --region us-east-1 \
+    --image-id "$UBUNTU_2404_AMI" --instance-type t3.small \
+    --key-name "$KEY_NAME" --security-group-ids "$SG_ID" --subnet-id "$SUBNET_ID" \
+    --block-device-mappings '[{"DeviceName":"/dev/sda1","Ebs":{"VolumeSize":100,"VolumeType":"gp3"}}]' \
+    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=quantum-queues}]'
+```
+
+On the instance, `ec2/setup.sh` installs the packages, both checkouts and
+the service. The sampler imports two plain Python modules from
+flux-quantum, so Flux itself is not installed.
+
+```bash
+ssh -i ~/.ssh/$KEY_NAME.pem ubuntu@HOST
+git clone https://github.com/converged-computing/flux-quantum-experiments
+bash flux-quantum-experiments/queues/ec2/setup.sh
+```
+
+Then the credentials, the preflight, and the service. `UNTIL` in the
+credentials file is when sampling stops.
+
+```bash
+nano /etc/queues.env                                       # UNTIL and the keys
+(set -a; . /etc/queues.env; set +a; PY=~/queues-venv/bin/python3 bash ~/flux-quantum-experiments/queues/preflight.sh)
+sudo systemctl enable --now queues                         # now, and at every boot
+journalctl -u queues -f                                    # watch
+```
+
+Use an IAM access key for AWS, not SSO. Temporary credentials expire mid
+run and Braket fills with errors.
+
+From your machine, `ec2/pull.sh` copies the instance's daily files into
+`results/ec2/`, their own directory so they never overwrite a day sampled
+here. Pull as often as you like and put everything on one page:
+
+```bash
+bash ec2/pull.sh ubuntu@HOST
+bash analyze.sh results-days/queues.jsonl results/queues.jsonl results/queues results/ec2
+```
+
+To stop early, `sudo systemctl stop queues`. The service ends the sampler
+cleanly and runs the analysis on the instance, which with weeks of samples
+takes a few minutes. The service does not start again after a normal end,
+at `UNTIL` or by `STOP`; after a crash or a reboot it does.
 
 ## Rehearsing
 

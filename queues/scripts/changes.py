@@ -20,6 +20,10 @@ data gives of one.
 import argparse
 import json
 import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from metrics import files  # noqa: E402
 
 # Share of measured numbers that moved for a full calibration. In the
 # October run every machine's changes fell under 15% or between 30 and 45%,
@@ -82,7 +86,7 @@ def main(argv=None):
     )
     args = ap.parse_args(argv)
     last, out, repeat = {}, [], {}
-    for path in args.files:
+    for path in files(args.files):
         with open(path) as f:
             for line in f:
                 if '"properties"' not in line and '"configuration"' not in line:
@@ -96,7 +100,9 @@ def main(argv=None):
                         continue
                     key = (r["vendor"], r["device"], field)
                     cur = flat(r[field])
-                    if key in last:
+                    # a restart or a new day's file writes the record again
+                    # unchanged, which is not a change
+                    if key in last and cur != last[key]:
                         k, n, share = kind(last[key], cur)
                         row = {
                             "vendor": r["vendor"],
