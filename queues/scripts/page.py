@@ -198,8 +198,6 @@ function when(h){ const d = new Date(start.getTime() + h*3600e3); return DAY[d.g
 function midnights(){ const out=[]; const d=new Date(start.getTime()); d.setUTCHours(0,0,0,0); d.setUTCDate(d.getUTCDate()+1); while((d-start)/3600e3 <= D.hours){ out.push([(d-start)/3600e3, DAY[d.getUTCDay()]]); d.setUTCDate(d.getUTCDate()+1);} return out; }
 const MID = midnights();
 const DAYS = (()=>{ const out=[]; let h0=0; for (const [h] of MID){ out.push({from:h0,to:h}); h0=h; } out.push({from:h0,to:D.hours}); return out.map((d,i)=>{ const at=new Date(start.getTime()+(d.from+.01)*3600e3); return {...d, name: DAY[at.getUTCDay()], date: at.getUTCDate()+" "+MON[at.getUTCMonth()]}; }); })();
-// the day Forte-1's queue was longest, which is where the One day view opens
-const BUSIEST = (()=>{ let best=null; for (const p of forteB.points) if (p[1]!=null && (best==null || p[1]>best[1])) best=p; const h=best?best[0]:0; return Math.max(0, DAYS.findIndex(d=>h>=d.from&&h<=d.to)); })();
 function fmt(v, d){ if (v==null) return "-"; if (d!=null) return v.toFixed(d); return Math.abs(v)>=100 ? v.toFixed(0) : (Number.isInteger(v) ? String(v) : v.toFixed(1)); }
 function pct(v){ return v==null ? "-" : Math.round(v*100)+"%"; }
 function el(tag, attrs, parent){ const e = document.createElementNS("http://www.w3.org/2000/svg", tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
@@ -227,6 +225,8 @@ function sw(color){ return `<span class="sw" style="background:${color}"></span>
 const M = D.machines;
 const forteB = M.find(m=>m.vendor==="braket"&&m.name==="Forte-1"), forteI = M.find(m=>m.vendor==="ionq"&&m.name==="qpu.forte-1");
 const VC = {braket:"#D55E00",ionq:"#0072B2",ibm:"#009E73"};
+// the day Forte-1's queue was longest, which is where the One day view opens
+const BUSIEST = (()=>{ let best=null; for (const p of forteB.points) if (p[1]!=null && (best==null || p[1]>best[1])) best=p; const h=best?best[0]:0; return Math.max(0, DAYS.findIndex(d=>h>=d.from&&h<=d.to)); })();
 document.getElementById("subtitle").textContent = `I was interested to know what queues actually looked like across IBM Quantum, Braket (AWS), and IonQ. The last two are particularly interesting because they provide interfaces to the same machines. Will they show the same status? To not incur charges, we do not submit work, but rather look at metrics that indicate queue depth. In total we read the queues of ${M.length} quantum machines once a minute for ${D.span_days} days, ${D.span}. Yes - a lot of reads! We never submitted anything. There were ${D.n_rows.toLocaleString()} readings total, ${D.n_errors?D.n_errors.toLocaleString()+" of which failed":"and none failed"}. A gap in a line is time the sampler was not running. Times are in UTC. Hover over anything for details.`;
 
 const TABS = [["overview","Overview"],["calendar","Calendar"],["queues","Queues"],["forte","Forte-1, Braket vs IonQ"],["day","One day"],["hours","By hour"],["spread","Spread and drain"],["calibration","Calibration"],["data","Data"]];
