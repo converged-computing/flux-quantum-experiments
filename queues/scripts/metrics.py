@@ -25,7 +25,9 @@ The queue measure of each vendor, the one number the analysis uses:
 braket normal, ionq average_queue_time, ibm pending_jobs.
 """
 
+import glob
 import json
+import os
 import sys
 import math
 from collections import defaultdict
@@ -33,21 +35,49 @@ from collections import defaultdict
 MEASURE = {"braket": "normal", "ionq": "average_queue_time", "ibm": "pending_jobs"}
 
 
+def files(paths):
+    """The files named, a directory standing for every .jsonl file in it in
+    name order, which for the sampler's one file a day is time order."""
+    out = []
+    for p in paths:
+        if os.path.isdir(p):
+            out.extend(sorted(glob.glob(os.path.join(p, "*.jsonl"))))
+        else:
+            out.append(p)
+    return out
+
+
 def load(paths):
-    """Every row. A line that does not parse, the half written last line a
-    power cut can leave, is skipped and counted rather than ending the run."""
+    """Every row, from files or directories of them, oldest first. A line
+    that does not parse, the half written last line a power cut can leave,
+    is skipped and counted rather than ending the run.
+
+    The full device records are most of the bytes and no table reads them,
+    changes.py does, so a row keeps only the digest under properties, and
+    only where the version changed. A sampler restart or a new day's file
+    writes the record again unchanged, and that is not a new version."""
     rows = []
     bad = 0
-    for p in paths:
+    last = {}
+    for p in files(paths):
         with open(p) as f:
             for line in f:
                 line = line.strip()
                 if not line:
                     continue
                 try:
-                    rows.append(json.loads(line))
+                    r = json.loads(line)
                 except ValueError:
                     bad += 1
+                    continue
+                r.pop("configuration", None)
+                if r.pop("properties", None) is not None:
+                    key = (r.get("vendor"), r.get("device"))
+                    d = (r.get("raw") or {}).get("properties_digest")
+                    if d is None or last.get(key) != d:
+                        r["properties"] = d or True
+                    last[key] = d
+                rows.append(r)
     if bad:
         print("skipped {} line(s) that did not parse".format(bad), file=sys.stderr)
     return rows
@@ -100,12 +130,14 @@ def available(r):
 
 def paired(rows, pairs):
     """For each named machine, the ticks where both services reported it:
-    [(t, braket row, ionq row)]."""
+    [(t, braket row, ionq row)]. Every row of a tick carries the tick's
+    start as t, which unlike the tick number does not start again from one
+    when the sampler restarts."""
     dev = by_device(rows)
     out = {}
     for name, p in pairs.items():
-        b = {r["tick"]: r for r in dev.get(("braket", p["braket"]), [])}
-        i = {r["tick"]: r for r in dev.get(("ionq", p["ionq"]), [])}
+        b = {r["t"]: r for r in dev.get(("braket", p["braket"]), [])}
+        i = {r["t"]: r for r in dev.get(("ionq", p["ionq"]), [])}
         ticks = sorted(set(b) & set(i))
         out[name] = [(b[k]["t"], b[k], i[k]) for k in ticks]
     return out

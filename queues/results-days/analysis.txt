@@ -1,0 +1,87 @@
+68544 rows, 68544 samples, 0 errors
+
+== each device ==
+vendor  device                             n   days    up     p10     p50     p90     max    unit
+braket  Garnet                          5712   4.00   48%       0       1      10      15   tasks
+braket  Forte-1                         5712   4.00   97%       0       0      11      22   tasks
+braket  Forte-Enterprise-1              5712   4.00   81%       0       0       4      40   tasks
+braket  Cepheus-1-108Q                  5712   4.00   83%       0       0       4      95   tasks
+ibm     ibm_boston                      5712   4.00  100%       1      17     157     328    jobs
+ibm     ibm_fez                         5712   4.00   89%       0       1      55      81    jobs
+ibm     ibm_kingston                    5712   4.00  100%       0       1      18     227    jobs
+ibm     ibm_marrakesh                   5712   4.00   95%       0       0      10      59    jobs
+ibm     ibm_phoenix                     5712   4.00  100%       3      78     289     410    jobs
+ibm     ibm_pittsburgh                  5712   4.00   91%       0       1      20      84    jobs
+ionq    qpu.forte-1                     5712   4.00   91%  198569  218986  231077  235730       s
+ionq    qpu.forte-enterprise-1          5712   4.00   79%    6871    6871    6871    6871       s
+
+== median by hour of day (tz +0) ==
+braket  Garnet                   0    0    1    1    1    3    3    3    3    3    3    3    2    6    1    6    7    7    7    0    0    0    0    0
+braket  Forte-1                  0    0    0    0    0    0    0    0    2    1    0    0    0    0    1    1    3    0    3    0    4    0    0    0
+braket  Forte-Enterprise-1       0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+braket  Cepheus-1-108Q           0    0    0    0    0    1    0    0    0    0    0    0    0    0    1    4    0    0    0    0    0    0    0    0
+ibm     ibm_boston             103   14   95   32   78   22   73   43   43   15   51    2   47   23   44    5    2    4    5   13   64   18  114    6
+ibm     ibm_fez                  1    1    1    0   25   38    0    1    0    1    1    1    1    1    1    2    1    1    2    1    1    1    1    1
+ibm     ibm_kingston             1    1    1    1    5    2    2    2    1    3    1    1    1    1    2    1    1    1    1    2    2    1    1    1
+ibm     ibm_marrakesh            1    0    1    0    2    0    1    0    0    0    0    0    0    0    0    1    1    0    0    3    1    1    0    0
+ibm     ibm_phoenix            247   81  106  108  100   33   71   56   35   12   68   70  101   78   66   56  103   46   97  122  184   90  184   51
+ibm     ibm_pittsburgh           0    0    0    0    4    8    0    1    3    1    1    1    1    1    2    2    2    1    0    5    1    8    2    3
+ionq    qpu.forte-1           229436 225615 226033 222743 228230 219456 225043 219707 220398 217363 221109 214017 218551 216561 215708 213934 212250 210018 209420 211595 220124 209513 229282 229282
+ionq    qpu.forte-enterprise-16871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871 6871
+hour                             0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23
+
+== median by weekday ==
+vendor  device                   Mon   Tue   Wed   Thu   Fri   Sat   Sun
+braket  Garnet                     -     -     0     0     0     3     8
+braket  Forte-1                    -     -    10     1     0     0     9
+braket  Forte-Enterprise-1         -     -     0     0     0     0     3
+braket  Cepheus-1-108Q             -     -     0     0     0     0     0
+ibm     ibm_boston                 -     -    91   146    64     5     2
+ibm     ibm_fez                    -     -    57     2     1     1     1
+ibm     ibm_kingston               -     -    24     4     1     1     1
+ibm     ibm_marrakesh              -     -    16     1     0     0     0
+ibm     ibm_phoenix                -     -   221   255    68    28    42
+ibm     ibm_pittsburgh             -     -    64     0     6     0     0
+ionq    qpu.forte-1                -     - 234985 226487 222161 207284 207685
+ionq    qpu.forte-enterprise-1     -     -  6871  6871  6871  6871  6871
+
+== the same machine through Braket and through IonQ ==
+forte-1: 5712 paired ticks over 4.0 days
+    rank correlation of Braket's count with IonQ's average at the same tick: 0.05
+    strongest at lag +10 ticks (+10 min): 0.06 (positive lag, IonQ trails Braket)
+    both say up on 93% of ticks where either does
+    empty queue: Braket 62% of ticks, IonQ 0%
+forte-enterprise-1: 5712 paired ticks, but one side never varies, so no rank correlation
+
+== the queue while taking work, against while not ==
+vendor  device                      up  empty|up  empty|dn  mean|up  mean|dn   p90|up
+braket  Garnet                    48%      84%        5%      0.5      6.7        1
+braket  Forte-1                   97%      63%       35%      2.7      6.8       11
+braket  Forte-Enterprise-1        81%      66%       97%      1.3      0.0        4
+braket  Cepheus-1-108Q            83%      74%       38%      1.9      2.3        2
+ibm     ibm_boston               100%       4%         -     62.5        -      157
+ibm     ibm_fez                   89%      34%        0%      3.7     64.6        7
+ibm     ibm_kingston             100%      23%         -      9.1        -       18
+ibm     ibm_marrakesh             95%      54%        2%      2.6     11.0        6
+ibm     ibm_phoenix              100%       5%         -    117.2        -      289
+ibm     ibm_pittsburgh            91%      48%        2%      4.3     40.8       12
+up: taking work. IonQ is left out, its average is not a queue at a minute.
+
+== how the queue moves ==
+vendor  device                  rising falling    flat   mean|d|          steepest fall
+braket  Garnet                     4%      3%     92%      0.15     1.10/min (11 to 0)
+braket  Forte-1                    1%      1%     98%      0.05     1.40/min (22 to 8)
+braket  Forte-Enterprise-1         0%      0%     99%      0.02     4.00/min (40 to 0)
+braket  Cepheus-1-108Q             2%      2%     96%      0.13     6.20/min (62 to 0)
+ibm     ibm_boston                 5%      6%     89%      0.50     8.10/min (82 to 1)
+ibm     ibm_fez                    5%      5%     90%      0.27    3.00/min (57 to 27)
+ibm     ibm_kingston               6%      6%     88%      0.83   18.10/min (189 to 8)
+ibm     ibm_marrakesh              5%      5%     90%      0.33     5.90/min (59 to 0)
+ibm     ibm_phoenix                6%      9%     85%      0.90  10.70/min (134 to 27)
+ibm     ibm_pittsburgh             4%      4%     93%      0.20    6.10/min (78 to 17)
+ionq    qpu.forte-1                1%      5%     94%     52.64 2626.14/min (208413 to 182151)
+ionq    qpu.forte-enterprise-1     0%      0%    100%      0.00 0.00/min (6871 to 6871)
+a fall is departures outrunning arrivals, so the steepest fall is a lower bound on the
+rate the device clears its queue. Arrivals hide the rest.
+
+distribution written to results/distribution.json
