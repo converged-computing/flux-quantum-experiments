@@ -113,16 +113,20 @@ class Braket:
 
     def __init__(self, devices):
         import boto3
-        from braket.aws import AwsDevice
+        from braket.aws import AwsDevice, AwsSession
 
         self.devices = {}
         self.clients = {}
         self.changed = Unchanged()
         for arn in devices:
+            # the ARN carries the region, so no AWS_DEFAULT_REGION or
+            # ~/.aws/config is needed. AwsDevice's default session reads
+            # the environment and fails without one
             region = arn.split(":")[3] or "us-east-1"
             if region not in self.clients:
                 self.clients[region] = boto3.client("braket", region_name=region)
-            self.devices[arn] = AwsDevice(arn)
+            session = AwsSession(boto_session=boto3.Session(region_name=region))
+            self.devices[arn] = AwsDevice(arn, aws_session=session)
 
     def sample(self):
         from flux_quantum.backends.braket import is_open

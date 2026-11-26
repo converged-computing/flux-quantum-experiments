@@ -1,46 +1,50 @@
 <svg xmlns='http://www.w3.org/2000/svg' width='980' height='285' viewBox='0 0 980 285'>
 <rect width='100%' height='100%' fill='white'/>
-<text x='490.0' y='18.0' font-family='Helvetica,Arial,sans-serif' font-size='13' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>Thursday 29 October on Forte-1: the longest queue of the run, 269 tasks, as Braket counted it</text>
-<rect x='640.9' y='194.0' width='15.5' height='8.0' fill='#56B4E9' stroke='none' fill-opacity='1.0' rx='0'></rect>
-<rect x='514.1' y='204.0' width='79.4' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
-<rect x='640.9' y='204.0' width='16.0' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
-<rect x='696.2' y='204.0' width='24.0' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<text x='490.0' y='18.0' font-family='Helvetica,Arial,sans-serif' font-size='13' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>Wednesday 25 November on Forte-1: the longest queue of the run, 593 tasks, as Braket counted it</text>
+<rect x='70.3' y='194.0' width='10.3' height='8.0' fill='#56B4E9' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='408.6' y='194.0' width='32.4' height='8.0' fill='#56B4E9' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='519.7' y='194.0' width='192.6' height='8.0' fill='#56B4E9' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='407.5' y='204.0' width='32.4' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='519.7' y='204.0' width='16.2' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='544.0' y='204.0' width='8.1' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='648.1' y='204.0' width='16.2' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
+<rect x='672.4' y='204.0' width='8.1' height='8.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='0'></rect>
 <line x1='70.0' y1='190.0' x2='830.0' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
 <text x='66.0' y='190.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>0</text>
-<line x1='70.0' y1='140.2' x2='830.0' y2='140.2' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='66.0' y='140.2' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>100</text>
-<line x1='70.0' y1='90.4' x2='830.0' y2='90.4' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='66.0' y='90.4' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>200</text>
-<line x1='70.0' y1='40.6' x2='830.0' y2='40.6' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='66.0' y='40.6' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>300</text>
+<line x1='70.0' y1='144.8' x2='830.0' y2='144.8' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='66.0' y='144.8' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>200</text>
+<line x1='70.0' y1='99.7' x2='830.0' y2='99.7' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='66.0' y='99.7' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>400</text>
+<line x1='70.0' y1='54.5' x2='830.0' y2='54.5' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='66.0' y='54.5' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>600</text>
 <line x1='70.0' y1='40.0' x2='70.0' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
 <text x='70.0' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>00:00</text>
-<line x1='133.4' y1='40.0' x2='133.4' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='133.4' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>02:00</text>
-<line x1='196.7' y1='40.0' x2='196.7' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='196.7' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>04:00</text>
-<line x1='260.1' y1='40.0' x2='260.1' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='260.1' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>06:00</text>
-<line x1='323.5' y1='40.0' x2='323.5' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='323.5' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>08:00</text>
-<line x1='386.9' y1='40.0' x2='386.9' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='386.9' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>10:00</text>
-<line x1='450.2' y1='40.0' x2='450.2' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='450.2' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>12:00</text>
-<line x1='513.6' y1='40.0' x2='513.6' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='513.6' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>14:00</text>
-<line x1='577.0' y1='40.0' x2='577.0' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='577.0' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>16:00</text>
-<line x1='640.4' y1='40.0' x2='640.4' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='640.4' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>18:00</text>
-<line x1='703.7' y1='40.0' x2='703.7' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='703.7' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>20:00</text>
-<line x1='767.1' y1='40.0' x2='767.1' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
-<text x='767.1' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>22:00</text>
+<line x1='134.2' y1='40.0' x2='134.2' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='134.2' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>02:00</text>
+<line x1='198.4' y1='40.0' x2='198.4' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='198.4' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>04:00</text>
+<line x1='262.6' y1='40.0' x2='262.6' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='262.6' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>06:00</text>
+<line x1='326.8' y1='40.0' x2='326.8' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='326.8' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>08:00</text>
+<line x1='391.0' y1='40.0' x2='391.0' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='391.0' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>10:00</text>
+<line x1='455.2' y1='40.0' x2='455.2' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='455.2' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>12:00</text>
+<line x1='519.4' y1='40.0' x2='519.4' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='519.4' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>14:00</text>
+<line x1='583.6' y1='40.0' x2='583.6' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='583.6' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>16:00</text>
+<line x1='647.8' y1='40.0' x2='647.8' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='647.8' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>18:00</text>
+<line x1='712.0' y1='40.0' x2='712.0' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='712.0' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>20:00</text>
+<line x1='776.2' y1='40.0' x2='776.2' y2='190.0' stroke='#DDDDDD' stroke-width='0.6'/>
+<text x='776.2' y='201.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>22:00</text>
 <line x1='70.0' y1='190.0' x2='830.0' y2='190.0' stroke='#777777' stroke-width='0.8'/>
 <line x1='70.0' y1='40.0' x2='70.0' y2='190.0' stroke='#777777' stroke-width='0.8'/>
 <text x='36.0' y='115.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto' transform='rotate(-90 36 115.0)'>tasks waiting</text>
-<polyline fill='none' stroke='#D55E00' stroke-width='1.8' stroke-opacity='1.0' stroke-linejoin='round' points='70.1,63.5 83.4,63.5 83.4,63.0 100.0,63.0 100.0,62.5 111.1,62.5 111.1,63.0 112.2,63.0 112.2,62.5 113.8,62.5 113.8,62.0 134.0,62.0 134.0,62.5 153.2,62.5 153.2,62.0 153.7,62.0 153.7,60.6 157.4,60.6 157.4,60.1 158.0,60.1 158.0,59.6 194.2,59.6 194.2,60.1 266.1,60.1 266.1,58.6 266.6,58.6 266.6,58.1 319.8,58.1 319.8,56.6 320.3,56.6 320.3,56.1 360.8,56.1 360.8,56.6 470.5,56.6 470.5,57.1 556.2,57.1 556.2,56.6 616.3,56.6 616.3,57.1 619.0,57.1 619.0,56.6 620.1,56.6 620.1,57.1 624.9,57.1 624.9,56.6 627.0,56.6 627.0,57.1 627.5,57.1 627.5,57.6 761.2,57.6 761.2,57.1 830.0,57.1 830.0,57.1'/>
+<polyline fill='none' stroke='#D55E00' stroke-width='1.8' stroke-opacity='1.0' stroke-linejoin='round' points='70.3,190.0 226.2,190.0 226.2,189.8 249.5,189.8 249.5,190.0 250.0,190.0 250.0,189.8 268.3,189.8 268.3,189.3 270.5,189.3 270.5,188.9 275.4,188.9 275.4,189.8 278.0,189.8 278.0,190.0 278.6,190.0 278.6,189.8 299.6,189.8 299.6,190.0 365.4,190.0 365.4,189.8 370.8,189.8 370.8,190.0 477.1,190.0 477.1,189.8 481.4,189.8 481.4,190.0 500.3,190.0 500.3,189.8 501.4,189.8 501.4,177.8 501.9,177.8 501.9,153.4 502.5,153.4 502.5,128.6 503.0,128.6 503.0,103.7 503.6,103.7 503.6,78.9 504.1,78.9 504.1,56.1 505.2,56.1 505.2,57.4 505.7,57.4 505.7,60.6 506.2,60.6 506.2,64.0 506.8,64.0 506.8,66.7 507.3,66.7 507.3,69.6 507.9,69.6 507.9,71.7 508.4,71.7 508.4,74.8 508.9,74.8 508.9,77.8 509.5,77.8 509.5,80.5 510.0,80.5 510.0,83.2 510.6,83.2 510.6,85.7 516.0,85.7 516.0,87.5 516.5,87.5 516.5,90.2 517.0,90.2 517.0,93.1 517.6,93.1 517.6,95.4 518.1,95.4 518.1,98.3 518.7,98.3 518.7,99.2 519.2,99.2 519.2,100.3 519.7,100.3 519.7,102.4 715.1,102.4 715.1,102.8 715.6,102.8 715.6,105.3 716.1,105.3 716.1,107.8 716.7,107.8 716.7,110.3 717.2,110.3 717.2,112.8 717.8,112.8 717.8,115.0 723.2,115.0 723.2,116.1 723.7,116.1 723.7,118.9 724.3,118.9 724.3,121.6 724.8,121.6 724.8,122.2 728.0,122.2 728.0,124.3 728.6,124.3 728.6,126.8 729.1,126.8 729.1,129.5 729.6,129.5 729.6,132.0 730.2,132.0 730.2,134.4 730.7,134.4 730.7,134.9 731.2,134.9 731.2,136.2 731.8,136.2 731.8,138.7 732.3,138.7 732.3,141.0 732.9,141.0 732.9,143.5 733.4,143.5 733.4,146.0 733.9,146.0 733.9,147.1 736.1,147.1 736.1,148.4 736.6,148.4 736.6,150.9 737.2,150.9 737.2,153.2 737.7,153.2 737.7,155.4 738.2,155.4 738.2,157.9 738.8,157.9 738.8,158.8 739.3,158.8 739.3,159.7 739.9,159.7 739.9,162.2 740.4,162.2 740.4,164.7 740.9,164.7 740.9,167.0 741.5,167.0 741.5,169.2 742.0,169.2 742.0,170.8 742.6,170.8 742.6,171.0 743.1,171.0 743.1,173.5 743.6,173.5 743.6,175.8 744.2,175.8 744.2,178.3 744.7,178.3 744.7,180.5 745.3,180.5 745.3,182.5 747.4,182.5 747.4,183.5 747.9,183.5 747.9,185.5 748.5,185.5 748.5,188.0 749.0,188.0 749.0,189.8 768.5,189.8 768.5,187.5 772.3,187.5 772.3,189.1 772.8,189.1 772.8,189.8 801.4,189.8 801.4,190.0 830.0,190.0 830.0,190.0'/>
 <text x='834.0' y='202.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='start' fill='#777777' font-weight='normal' dominant-baseline='middle'>Braket: outside window</text>
 <text x='834.0' y='212.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='start' fill='#777777' font-weight='normal' dominant-baseline='middle'>IonQ: unavailable</text>
 <text x='450.0' y='236.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>hour of day, UTC</text>

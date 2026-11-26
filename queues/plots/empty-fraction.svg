@@ -1,68 +1,69 @@
 <svg xmlns='http://www.w3.org/2000/svg' width='960' height='494' viewBox='0 0 960 494'>
 <rect width='100%' height='100%' fill='white'/>
 <text x='480.0' y='18.0' font-family='Helvetica,Arial,sans-serif' font-size='13' text-anchor='middle' fill='#333333' font-weight='normal' dominant-baseline='auto'>How often the queue was empty, while the machine was taking work and while it was not</text>
-<rect x='170.0' y='48.0' width='503.5' height='11.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='2'><title>Garnet taking work: empty 90% of 14943 minutes</title></rect>
-<text x='677.5' y='54.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>90% of 14,943 min taking work</text>
-<rect x='170.0' y='62.0' width='126.2' height='11.0' fill='#D55E00' stroke='none' fill-opacity='0.35' rx='2'><title>Garnet not taking work: empty 23% of 10234 minutes</title></rect>
-<text x='300.2' y='68.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>23% of 10,234 min not taking work</text>
+<rect x='170.0' y='48.0' width='460.5' height='11.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='2'><title>Garnet taking work: empty 82% of 26902 minutes</title></rect>
+<text x='634.5' y='54.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>82% of 26,902 min taking work</text>
+<rect x='170.0' y='62.0' width='66.9' height='11.0' fill='#D55E00' stroke='none' fill-opacity='0.35' rx='2'><title>Garnet not taking work: empty 12% of 24966 minutes</title></rect>
+<text x='240.9' y='68.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>12% of 24,966 min not taking work</text>
 <text x='164.0' y='61.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>Garnet</text>
 <text x='164.0' y='70.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='end' fill='#777777' font-weight='normal' dominant-baseline='middle'>braket</text>
-<rect x='170.0' y='82.0' width='137.4' height='11.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='2'><title>Forte-1 taking work: empty 25% of 22880 minutes</title></rect>
-<text x='311.4' y='88.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>25% of 22,880 min taking work</text>
-<rect x='170.0' y='96.0' width='21.2' height='11.0' fill='#D55E00' stroke='none' fill-opacity='0.35' rx='2'><title>Forte-1 not taking work: empty 4% of 2296 minutes</title></rect>
-<text x='195.2' y='102.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>4% of 2,296 min not taking work</text>
+<rect x='170.0' y='82.0' width='257.9' height='11.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='2'><title>Forte-1 taking work: empty 46% of 45834 minutes</title></rect>
+<text x='431.9' y='88.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>46% of 45,834 min taking work</text>
+<rect x='170.0' y='96.0' width='219.3' height='11.0' fill='#D55E00' stroke='none' fill-opacity='0.35' rx='2'><title>Forte-1 not taking work: empty 39% of 6033 minutes</title></rect>
+<text x='393.3' y='102.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>39% of 6,033 min not taking work</text>
 <text x='164.0' y='95.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>Forte-1</text>
 <text x='164.0' y='104.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='end' fill='#777777' font-weight='normal' dominant-baseline='middle'>braket</text>
-<rect x='170.0' y='116.0' width='369.9' height='11.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='2'><title>Forte-Enterprise-1 taking work: empty 66% of 4652 minutes</title></rect>
-<text x='543.9' y='122.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>66% of 4,652 min taking work</text>
-<rect x='170.0' y='130.0' width='559.0' height='11.0' fill='#D55E00' stroke='none' fill-opacity='0.35' rx='2'><title>Forte-Enterprise-1 not taking work: empty 100% of 20525 minutes</title></rect>
-<text x='733.0' y='136.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>100% of 20,525 min not taking work</text>
+<rect x='170.0' y='116.0' width='485.1' height='11.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='2'><title>Forte-Enterprise-1 taking work: empty 87% of 14245 minutes</title></rect>
+<text x='659.1' y='122.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>87% of 14,245 min taking work</text>
+<rect x='170.0' y='130.0' width='559.5' height='11.0' fill='#D55E00' stroke='none' fill-opacity='0.35' rx='2'><title>Forte-Enterprise-1 not taking work: empty 100% of 37623 minutes</title></rect>
+<text x='733.5' y='136.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>100% of 37,623 min not taking work</text>
 <text x='164.0' y='129.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>Forte-Enterprise-1</text>
 <text x='164.0' y='138.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='end' fill='#777777' font-weight='normal' dominant-baseline='middle'>braket</text>
-<rect x='170.0' y='150.0' width='444.3' height='11.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='2'><title>Cepheus-1-108Q taking work: empty 79% of 20973 minutes</title></rect>
-<text x='618.3' y='156.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>79% of 20,973 min taking work</text>
-<rect x='170.0' y='164.0' width='251.5' height='11.0' fill='#D55E00' stroke='none' fill-opacity='0.35' rx='2'><title>Cepheus-1-108Q not taking work: empty 45% of 4204 minutes</title></rect>
-<text x='425.5' y='170.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>45% of 4,204 min not taking work</text>
+<rect x='170.0' y='150.0' width='455.6' height='11.0' fill='#D55E00' stroke='none' fill-opacity='1.0' rx='2'><title>Cepheus-1-108Q taking work: empty 81% of 43245 minutes</title></rect>
+<text x='629.6' y='156.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>81% of 43,245 min taking work</text>
+<rect x='170.0' y='164.0' width='231.3' height='11.0' fill='#D55E00' stroke='none' fill-opacity='0.35' rx='2'><title>Cepheus-1-108Q not taking work: empty 41% of 8623 minutes</title></rect>
+<text x='405.3' y='170.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>41% of 8,623 min not taking work</text>
 <text x='164.0' y='163.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>Cepheus-1-108Q</text>
 <text x='164.0' y='172.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='end' fill='#777777' font-weight='normal' dominant-baseline='middle'>braket</text>
-<rect x='170.0' y='184.0' width='15.5' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_boston taking work: empty 3% of 24801 minutes</title></rect>
-<text x='189.5' y='190.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>3% of 24,801 min taking work</text>
-<rect x='170.0' y='198.0' width='0.0' height='11.0' fill='#009E73' stroke='none' fill-opacity='0.35' rx='2'><title>ibm_boston not taking work: empty 0% of 375 minutes</title></rect>
-<text x='174.0' y='204.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>0% of 375 min not taking work</text>
+<rect x='170.0' y='184.0' width='40.7' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_boston taking work: empty 7% of 51759 minutes</title></rect>
+<text x='214.7' y='190.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>7% of 51,759 min taking work</text>
+<rect x='170.0' y='198.0' width='0.0' height='11.0' fill='#009E73' stroke='none' fill-opacity='0.35' rx='2'><title>ibm_boston not taking work: empty 0% of 389 minutes</title></rect>
+<text x='174.0' y='204.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>0% of 389 min not taking work</text>
 <text x='164.0' y='197.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>ibm_boston</text>
 <text x='164.0' y='206.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='end' fill='#777777' font-weight='normal' dominant-baseline='middle'>ibm</text>
-<rect x='170.0' y='218.0' width='24.7' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_chicago taking work: empty 4% of 1089 minutes</title></rect>
-<text x='198.7' y='224.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>4% of 1,089 min taking work</text>
+<rect x='170.0' y='218.0' width='178.7' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_chicago taking work: empty 32% of 28061 minutes</title></rect>
+<text x='352.7' y='224.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>32% of 28,061 min taking work</text>
 <text x='174.0' y='241.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#777777' font-weight='normal' dominant-baseline='middle'>never not taking work</text>
 <text x='164.0' y='231.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>ibm_chicago</text>
 <text x='164.0' y='240.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='end' fill='#777777' font-weight='normal' dominant-baseline='middle'>ibm</text>
-<rect x='170.0' y='252.0' width='144.0' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_fez taking work: empty 26% of 24569 minutes</title></rect>
-<text x='318.0' y='258.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>26% of 24,569 min taking work</text>
-<rect x='170.0' y='266.0' width='0.0' height='11.0' fill='#009E73' stroke='none' fill-opacity='0.35' rx='2'><title>ibm_fez not taking work: empty 0% of 607 minutes</title></rect>
-<text x='174.0' y='272.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>0% of 607 min not taking work</text>
+<rect x='170.0' y='252.0' width='167.0' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_fez taking work: empty 30% of 49455 minutes</title></rect>
+<text x='341.0' y='258.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>30% of 49,455 min taking work</text>
+<rect x='170.0' y='266.0' width='0.0' height='11.0' fill='#009E73' stroke='none' fill-opacity='0.35' rx='2'><title>ibm_fez not taking work: empty 0% of 2693 minutes</title></rect>
+<text x='174.0' y='272.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>0% of 2,693 min not taking work</text>
 <text x='164.0' y='265.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>ibm_fez</text>
 <text x='164.0' y='274.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='end' fill='#777777' font-weight='normal' dominant-baseline='middle'>ibm</text>
-<rect x='170.0' y='286.0' width='116.8' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_kingston taking work: empty 21% of 25176 minutes</title></rect>
-<text x='290.8' y='292.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>21% of 25,176 min taking work</text>
-<text x='174.0' y='309.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#777777' font-weight='normal' dominant-baseline='middle'>never not taking work</text>
+<rect x='170.0' y='286.0' width='128.2' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_kingston taking work: empty 23% of 51995 minutes</title></rect>
+<text x='302.2' y='292.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>23% of 51,995 min taking work</text>
+<rect x='170.0' y='300.0' width='0.0' height='11.0' fill='#009E73' stroke='none' fill-opacity='0.35' rx='2'><title>ibm_kingston not taking work: empty 0% of 152 minutes</title></rect>
+<text x='174.0' y='306.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>0% of 152 min not taking work</text>
 <text x='164.0' y='299.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>ibm_kingston</text>
 <text x='164.0' y='308.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='end' fill='#777777' font-weight='normal' dominant-baseline='middle'>ibm</text>
-<rect x='170.0' y='320.0' width='243.0' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_marrakesh taking work: empty 43% of 20437 minutes</title></rect>
-<text x='417.0' y='326.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>43% of 20,437 min taking work</text>
-<rect x='170.0' y='334.0' width='1.1' height='11.0' fill='#009E73' stroke='none' fill-opacity='0.35' rx='2'><title>ibm_marrakesh not taking work: empty 0% of 4739 minutes</title></rect>
-<text x='175.1' y='340.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>0% of 4,739 min not taking work</text>
+<rect x='170.0' y='320.0' width='275.7' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_marrakesh taking work: empty 49% of 47394 minutes</title></rect>
+<text x='449.7' y='326.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>49% of 47,394 min taking work</text>
+<rect x='170.0' y='334.0' width='1.1' height='11.0' fill='#009E73' stroke='none' fill-opacity='0.35' rx='2'><title>ibm_marrakesh not taking work: empty 0% of 4753 minutes</title></rect>
+<text x='175.1' y='340.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>0% of 4,753 min not taking work</text>
 <text x='164.0' y='333.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>ibm_marrakesh</text>
 <text x='164.0' y='342.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='end' fill='#777777' font-weight='normal' dominant-baseline='middle'>ibm</text>
-<rect x='170.0' y='354.0' width='6.7' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_phoenix taking work: empty 1% of 24236 minutes</title></rect>
-<text x='180.7' y='360.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>1% of 24,236 min taking work</text>
-<rect x='170.0' y='368.0' width='0.0' height='11.0' fill='#009E73' stroke='none' fill-opacity='0.35' rx='2'><title>ibm_phoenix not taking work: empty 0% of 940 minutes</title></rect>
-<text x='174.0' y='374.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>0% of 940 min not taking work</text>
+<rect x='170.0' y='354.0' width='19.8' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_phoenix taking work: empty 4% of 51199 minutes</title></rect>
+<text x='193.8' y='360.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>4% of 51,199 min taking work</text>
+<rect x='170.0' y='368.0' width='0.0' height='11.0' fill='#009E73' stroke='none' fill-opacity='0.35' rx='2'><title>ibm_phoenix not taking work: empty 0% of 949 minutes</title></rect>
+<text x='174.0' y='374.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>0% of 949 min not taking work</text>
 <text x='164.0' y='367.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>ibm_phoenix</text>
 <text x='164.0' y='376.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='end' fill='#777777' font-weight='normal' dominant-baseline='middle'>ibm</text>
-<rect x='170.0' y='388.0' width='127.7' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_pittsburgh taking work: empty 23% of 23674 minutes</title></rect>
-<text x='301.7' y='394.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>23% of 23,674 min taking work</text>
-<rect x='170.0' y='402.0' width='7.5' height='11.0' fill='#009E73' stroke='none' fill-opacity='0.35' rx='2'><title>ibm_pittsburgh not taking work: empty 1% of 1501 minutes</title></rect>
-<text x='181.5' y='408.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>1% of 1,501 min not taking work</text>
+<rect x='170.0' y='388.0' width='136.5' height='11.0' fill='#009E73' stroke='none' fill-opacity='1.0' rx='2'><title>ibm_pittsburgh taking work: empty 24% of 46285 minutes</title></rect>
+<text x='310.5' y='394.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>24% of 46,285 min taking work</text>
+<rect x='170.0' y='402.0' width='1.9' height='11.0' fill='#009E73' stroke='none' fill-opacity='0.35' rx='2'><title>ibm_pittsburgh not taking work: empty 0% of 5862 minutes</title></rect>
+<text x='175.9' y='408.0' font-family='Helvetica,Arial,sans-serif' font-size='8' text-anchor='start' fill='#333333' font-weight='normal' dominant-baseline='middle'>0% of 5,862 min not taking work</text>
 <text x='164.0' y='401.0' font-family='Helvetica,Arial,sans-serif' font-size='9' text-anchor='end' fill='#333333' font-weight='normal' dominant-baseline='middle'>ibm_pittsburgh</text>
 <text x='164.0' y='410.0' font-family='Helvetica,Arial,sans-serif' font-size='7' text-anchor='end' fill='#777777' font-weight='normal' dominant-baseline='middle'>ibm</text>
 <line x1='170.0' y1='44.0' x2='170.0' y2='418.0' stroke='#DDDDDD' stroke-width='0.6'/>

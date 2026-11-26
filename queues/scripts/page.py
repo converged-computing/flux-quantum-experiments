@@ -195,7 +195,7 @@ const start = new Date(D.start_iso);
 const W = 1080, L = 64, R = 16;
 const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 function when(h){ const d = new Date(start.getTime() + h*3600e3); return DAY[d.getUTCDay()]+" "+d.getUTCDate()+" "+MON[d.getUTCMonth()]+" "+String(d.getUTCHours()).padStart(2,"0")+":"+String(d.getUTCMinutes()).padStart(2,"0"); }
-function midnights(){ const out=[]; const d=new Date(start.getTime()); d.setUTCHours(0,0,0,0); d.setUTCDate(d.getUTCDate()+1); while((d-start)/3600e3 <= D.hours){ out.push([(d-start)/3600e3, DAY[d.getUTCDay()]]); d.setUTCDate(d.getUTCDate()+1);} return out; }
+function midnights(){ const out=[]; const d=new Date(start.getTime()); d.setUTCHours(0,0,0,0); d.setUTCDate(d.getUTCDate()+1); while((d-start)/3600e3 <= D.hours){ out.push([(d-start)/3600e3, DAY[d.getUTCDay()], d.getUTCDate()+" "+MON[d.getUTCMonth()], d.getUTCDay()]); d.setUTCDate(d.getUTCDate()+1);} return out; }
 const MID = midnights();
 const DAYS = (()=>{ const out=[]; let h0=0; for (const [h] of MID){ out.push({from:h0,to:h}); h0=h; } out.push({from:h0,to:D.hours}); return out.map((d,i)=>{ const at=new Date(start.getTime()+(d.from+.01)*3600e3); return {...d, name: DAY[at.getUTCDay()], date: at.getUTCDate()+" "+MON[at.getUTCMonth()]}; }); })();
 function fmt(v, d){ if (v==null) return "-"; if (d!=null) return v.toFixed(d); return Math.abs(v)>=100 ? v.toFixed(0) : (Number.isInteger(v) ? String(v) : v.toFixed(1)); }
@@ -206,10 +206,56 @@ function nice(hi, n){ n=n||4; if (hi<=0) hi=1; const raw = hi/n, mag = Math.pow(
 function div(cls, parent, html){ const d=document.createElement("div"); if (cls) d.className=cls; if (html!=null) d.innerHTML=html; if (parent) parent.appendChild(d); return d; }
 function tipFor(container){ const t=div("tip", container); return { show(ev, html){ const r=container.getBoundingClientRect(); t.innerHTML=html; t.style.display="block"; let x=ev.clientX-r.left+14, y=ev.clientY-r.top+12; if (x+t.offsetWidth>r.width) x=Math.max(0, ev.clientX-r.left-t.offsetWidth-14); t.style.left=x+"px"; t.style.top=y+"px"; }, hide(){ t.style.display="none"; } }; }
 function hoverTips(wrap, svg){ const tip=tipFor(wrap); svg.addEventListener("mousemove",ev=>{ const t=ev.target.dataset&&ev.target.dataset.tip; t?tip.show(ev,t):tip.hide(); }); svg.addEventListener("mouseleave",()=>tip.hide()); }
-function dayAxis(svg, x, y, w, h, from, to, hourly){
-  if (hourly){ const span=to-from; const step = span<=6?1:(span<=24?3:6); for (let hh=Math.ceil(from); hh<=to; hh+=step){ const X=x+(hh-from)/span*w; el("line",{x1:X,y1:y,x2:X,y2:y+h,stroke:"#eceff2"},svg); txt(svg,X,y+h+13,when(hh).slice(-5),{"text-anchor":"middle","font-size":9}); } }
-  else for (const [h0,name] of MID){ if (h0<from||h0>to) continue; const X = x + (h0-from)/(to-from)*w; el("line",{x1:X,y1:y,x2:X,y2:y+h,stroke:"#1f2328","stroke-width":.6,"stroke-dasharray":"2,3"},svg); txt(svg,X+3,y+h+13,name+" 00:00",{"font-size":9}); }
+function dayMarks(from, to, w){
+  // which midnights get labels: every day when there is room, else Mondays,
+  // else every nth Monday, so labels never collide however long the run
+  const pxPerDay = w*24/Math.max(to-from,1e-9);
+  const every = pxPerDay >= 56 ? null : Math.max(1, Math.ceil(64/(7*pxPerDay)));
+  const out=[]; let mon=0;
+  for (const m of MID){ if (m[0]<from-1e-9||m[0]>to+1e-9) continue;
+    let label=null;
+    if (every==null) label=m[1]+" "+m[2];
+    else if (m[3]===1){ if (mon%every===0) label=m[1]+" "+m[2]; mon++; }
+    out.push({h:m[0],label:label});
+  }
+  return out;
+}
+function dayAxis(svg, x, y, w, h, from, to){
+  const span=to-from;
+  if (span<=48){
+    const mids=MID.filter(m=>m[0]>=from&&m[0]<=to).map(m=>[x+(m[0]-from)/span*w, m[1]+" "+m[2]]);
+    const step = span<=6?1:(span<=24?3:6);
+    for (let hh=Math.ceil(from); hh<=to; hh+=step){ const X=x+(hh-from)/span*w; el("line",{x1:X,y1:y,x2:X,y2:y+h,stroke:"#eceff2"},svg); if (!mids.some(mk=>Math.abs(mk[0]-X)<30)) txt(svg,X,y+h+13,when(hh).slice(-5),{"text-anchor":"middle","font-size":9}); }
+    for (const [X,name] of mids){ el("line",{x1:X,y1:y,x2:X,y2:y+h,stroke:"#1f2328","stroke-width":.6,"stroke-dasharray":"2,3"},svg); txt(svg,X+3,y+h+13,name,{"font-size":9,"font-weight":"600"}); }
+  } else for (const mk of dayMarks(from,to,w)){ const X = x + (mk.h-from)/span*w;
+    el("line",{x1:X,y1:y,x2:X,y2:y+h,stroke:mk.label?"#1f2328":"#cfd4da","stroke-width":mk.label?.6:.5,"stroke-dasharray":"2,3"},svg);
+    if (mk.label) txt(svg,X+3,y+h+13,mk.label,{"font-size":9});
+  }
   el("line",{x1:x,y1:y+h,x2:x+w,y2:y+h,stroke:"#9ca3af"},svg);
+}
+const RANGE={from:0,to:D.hours}; const onRange=[];
+function setRange(a,b){ a=Math.max(0,a); b=Math.min(D.hours,b); if (b-a<1){ const m=(a+b)/2; a=Math.max(0,m-.5); b=Math.min(D.hours,a+1); } RANGE.from=a; RANGE.to=b; for (const f of onRange) f(); }
+function shiftRange(dir){ const w=RANGE.to-RANGE.from; let a=RANGE.from+dir*w/2; a=Math.max(0,Math.min(a,D.hours-w)); setRange(a,a+w); }
+function rangeBar(parent){
+  const bar=div("controls",parent);
+  const mk=(label,fn)=>{ const b=document.createElement("button"); b.className="chip"; b.textContent=label; b.onclick=fn; bar.appendChild(b); return b; };
+  mk("whole run",()=>setRange(0,D.hours)); if (D.hours>14*24) mk("last 14 days",()=>setRange(D.hours-14*24,D.hours));
+  if (D.hours>7*24) mk("last 7 days",()=>setRange(D.hours-7*24,D.hours)); if (D.hours>48) mk("last 48 h",()=>setRange(D.hours-48,D.hours));
+  mk("◀",()=>shiftRange(-1)); mk("▶",()=>shiftRange(1));
+  const lab=div("note",bar); lab.style.margin="0"; lab.style.alignSelf="center";
+  const hint="drag on a chart to zoom in, double-click for the whole run";
+  const update=()=>{ const whole = RANGE.from<=0 && RANGE.to>=D.hours; lab.textContent = whole ? hint : when(RANGE.from)+" to "+when(RANGE.to)+" · "+fmt((RANGE.to-RANGE.from)/24,1)+" days · "+hint; };
+  onRange.push(update); update();
+  return bar;
+}
+function brush(wrap, svg, x, y, w, h){
+  let x0=null, rect=null;
+  const px=ev=>{ const r=svg.getBoundingClientRect(); return (ev.clientX-r.left)*(W/r.width); };
+  svg.addEventListener("mousedown",ev=>{ const p=px(ev); if (p<x||p>x+w) return; x0=p; rect=el("rect",{x:p,y:y,width:0,height:h,fill:"#0072B2","fill-opacity":.12,stroke:"#0072B2","stroke-dasharray":"3,2"},svg); ev.preventDefault(); });
+  svg.addEventListener("mousemove",ev=>{ if (x0==null||!rect) return; const p=Math.max(x,Math.min(x+w,px(ev))); rect.setAttribute("x",Math.min(x0,p)); rect.setAttribute("width",Math.abs(p-x0)); });
+  const up=ev=>{ if (x0==null) return; const p=Math.max(x,Math.min(x+w,px(ev))); const a=Math.min(x0,p), b=Math.max(x0,p); x0=null; if (rect){rect.remove(); rect=null;} if (b-a<8) return; setRange(RANGE.from+(a-x)/w*(RANGE.to-RANGE.from), RANGE.from+(b-x)/w*(RANGE.to-RANGE.from)); };
+  svg.addEventListener("mouseup",up); svg.addEventListener("mouseleave",ev=>{ if (x0!=null) up(ev); });
+  svg.addEventListener("dblclick",()=>setRange(0,D.hours));
 }
 function yAxis(svg, x, y, w, h, ymax, label, yfmt, n){ for (const t of nice(ymax, n)) { const Y = y + h - t/ymax*h; el("line",{x1:x,y1:Y,x2:x+w,y2:Y,stroke:"#eef0f2"},svg); txt(svg,x-6,Y+3,yfmt?yfmt(t):fmt(t),{"text-anchor":"end","font-size":9}); } el("line",{x1:x,y1:y,x2:x,y2:y+h,stroke:"#9ca3af"},svg); if (label) txt(svg, x-46, y+h/2, label, {"text-anchor":"middle","font-size":9,fill:"#656d76",transform:`rotate(-90 ${x-46} ${y+h/2})`}); }
 function stepPath(svg, pts, xi, yi, x, y, w, h, from, to, ymax, color, width){ let d="", last=null; for (const p of pts){ if (p[xi]<from||p[xi]>to) continue; const v=p[yi]; if (v==null){ last=null; continue; } const X=x+(p[xi]-from)/(to-from)*w, Y=y+h-Math.min(v,ymax)/ymax*h; d += last==null ? `M${X.toFixed(1)},${Y.toFixed(1)}` : `L${X.toFixed(1)},${last.toFixed(1)}L${X.toFixed(1)},${Y.toFixed(1)}`; last=Y; } return el("path",{d:d,fill:"none",stroke:color,"stroke-width":width||1.5,"stroke-linejoin":"round"},svg); }
@@ -242,7 +288,7 @@ function sparkTile(parent, m, i){
   const ymax=Math.max(1,...m.points.map(p=>p[1]||0))*1.05;
   shadeRuns(svg,m.runs,0,0,SW,SH,0,D.hours,"#f1f3f5"); stepPath(svg,m.points,0,1,0,0,SW,SH,0,D.hours,ymax,m.color,1.3);
   for (const [a,b,s] of m.runs) el("rect",{x:a/D.hours*SW,y:SH+3,width:Math.max((b-a)/D.hours*SW,.5),height:SB,fill:D.state_colors[s]},svg);
-  for (const [h0] of MID) el("line",{x1:h0/D.hours*SW,y1:0,x2:h0/D.hours*SW,y2:SH,stroke:"#1f2328","stroke-width":.5,"stroke-dasharray":"2,3"},svg);
+  for (const mk of dayMarks(0,D.hours,SW)) if (mk.label) el("line",{x1:mk.h/D.hours*SW,y1:0,x2:mk.h/D.hours*SW,y2:SH,stroke:"#1f2328","stroke-width":.5,"stroke-dasharray":"2,3"},svg);
   const st=m.stats; const worst = m.vendor==="ionq" ? `peak <b>${fmt(st.max)} h</b>` : `worst <b>${fmt(st.max)}</b>`;
   div("nums",t,`<span>taking work <b>${pct(st.up)}</b></span><span>${m.vendor==="ionq"?"":"queue empty <b>"+pct(st.empty_open)+"</b> of that time"}</span><span>${worst}</span>`);
   cursor(wrap,svg,0,0,SW,SH,0,D.hours,hr=>{ const p=at(m.points,hr,0); return p?`${sw(m.color)}<b>${fmt(p[1])}</b> ${m.unit}<br>${D.states[p[2]]}`:"-"; });
@@ -261,7 +307,7 @@ overview(s){
   const grid=div("grid",s); M.forEach((m,i)=>sparkTile(grid,m,i));
   const f=div("findings",s);
   const F=[["Online does not mean open.","Braket says ONLINE even when a machine is between its run windows and will not run anything. Cepheus is closed four hours a day. Garnet is closed all weekend. Forte-1 is closed every evening at six. You only learn this from the device properties.","calendar","See the calendar"],
-           ["Braket and IonQ report different things for the same machine.","Braket counts the tasks waiting right now. IonQ reports a queue time that barely moved all week. For Forte-1 the two numbers have a correlation of 0.05.","forte","See both numbers"],
+           ["Braket and IonQ report different things for the same machine.",`Braket counts the tasks waiting right now. IonQ reports a queue time that moves on its own schedule. For Forte-1 the two numbers have a rank correlation of ${D.forte_rho}.`,"forte","See both numbers"],
            ["Queue depths build up while the machine is open and closed.","Forte-1's job queue got larger while it was open. Garnet's got larger while it was closed for the weekend, and it emptied minutes after it opened. I suspect different use cases.","spread","See the split"]];
   for (const [h,p,tab,link] of F){ const c=div("finding",f,`<h3>${h}</h3><p>${p}</p>`); const a=document.createElement("a"); a.textContent=link; a.onclick=()=>show(tab); c.appendChild(a); }
 },
@@ -275,8 +321,8 @@ calendar(s){
     for (const [a,b,st] of m.runs){ const r=el("rect",{x:LBL+a/D.hours*PW,y:y+2,width:Math.max((b-a)/D.hours*PW,.6),height:RH-4,fill:D.state_colors[st],rx:2},g); r.dataset.tip=`<b>${m.name}</b> ${D.states[st]}<br>${when(a)} to ${when(b)} (${(b-a).toFixed(1)} h)`; }
     const t=txt(svg,LBL-8,y+RH/2+3,m.name,{"text-anchor":"end","font-size":11,cursor:"pointer"}); t.onclick=()=>{ focus = focus===i?null:i; rows.forEach((g,k)=>g.setAttribute("opacity", focus==null||focus===k?1:.15)); };
     txt(svg,LBL-8,y+RH/2+12,m.vendor,{"text-anchor":"end","font-size":8,fill:"#656d76"}); });
-  for (const [h0,name] of MID){ const X=LBL+h0/D.hours*PW; el("line",{x1:X,y1:TOP,x2:X,y2:TOP+H,stroke:"#1f2328","stroke-width":.7,"stroke-dasharray":"2,3"},svg); txt(svg,X+3,TOP-7,name+" 00:00",{"font-size":9}); }
-  txt(svg,LBL,TOP-7,"Wed 19:10",{"font-size":9}); hoverTips(wrap,svg);
+  for (const mk of dayMarks(0,D.hours,PW)){ const X=LBL+mk.h/D.hours*PW; el("line",{x1:X,y1:TOP,x2:X,y2:TOP+H,stroke:mk.label?"#1f2328":"#d7dbe0","stroke-width":mk.label?.7:.5,"stroke-dasharray":"2,3"},svg); if (mk.label) txt(svg,X+3,TOP-7,mk.label,{"font-size":9}); }
+  txt(svg,LBL,TOP-7,when(0).slice(0,-6),{"font-size":9}); hoverTips(wrap,svg);
   const b2=card(s,"How much of the time each machine took work", "Forte-1 and Forte Enterprise show up twice, once through Braket and once through IonQ, and the two answers differ. IonQ reported Forte-1 unavailable in sixteen short spells that Braket never showed.", "The percent of our once a minute checks where the machine was up and would have run a job.", null);
   bars(b2, M.map(m=>({label:m.name, v:m.stats.up, color:m.color, tip:`${m.name} was taking work ${pct(m.stats.up)} of the time`})), v=>pct(v), 1);
 },
@@ -287,25 +333,34 @@ queues(s){
   const ctl=div("controls",body); let lastv=null; const vis=new Set(M.map((m,i)=>i));
   M.forEach((m,i)=>{ if (m.vendor!==lastv){ ctl.innerHTML+=`<span class="vendor">${m.vendor}</span>`; lastv=m.vendor; } const lab=document.createElement("label"); const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=true; cb.onchange=()=>{ cb.checked?vis.add(i):vis.delete(i); draw(); }; lab.appendChild(cb); lab.innerHTML+=sw(m.color)+m.name; lab.insertBefore(cb, lab.firstChild); ctl.appendChild(lab); });
   const ctl2=div("controls",body,`<label><input type="checkbox" id="qshade" checked> shade the hours not taking work</label>`);
+  rangeBar(body);
   const charts=div("",body); ctl2.querySelectorAll("input").forEach(e=>e.addEventListener("change",draw));
-  function draw(){ charts.innerHTML=""; const shade=ctl2.querySelector("#qshade").checked; const ms=M.map((m,i)=>[m,i]).filter(([m,i])=>vis.has(i));
-    for (const [m] of ms){ const wrap=div("panel",charts); const TOP=22,H=96,BOT=22; const svg=el("svg",{viewBox:`0 0 ${W} ${H+TOP+BOT}`},wrap); const ymax=Math.max(1,...m.points.map(p=>p[1]||0))*1.08;
-      if (shade) shadeRuns(svg,m.runs,L,TOP,W-L-R,H,0,D.hours); yAxis(svg,L,TOP,W-L-R,H,ymax,m.unit,null,3); dayAxis(svg,L,TOP,W-L-R,H,0,D.hours); stepPath(svg,m.points,0,1,L,TOP,W-L-R,H,0,D.hours,ymax,m.color);
+  function draw(){ charts.innerHTML=""; const shade=ctl2.querySelector("#qshade").checked; const ms=M.map((m,i)=>[m,i]).filter(([m,i])=>vis.has(i)); const from=RANGE.from, to=RANGE.to;
+    for (const [m] of ms){ const wrap=div("panel",charts); const TOP=22,H=96,BOT=22; const svg=el("svg",{viewBox:`0 0 ${W} ${H+TOP+BOT}`},wrap);
+      const seen=m.points.filter(p=>p[0]>=from&&p[0]<=to); const ymax=Math.max(1,...seen.map(p=>p[1]||0))*1.08;
+      if (shade) shadeRuns(svg,m.runs,L,TOP,W-L-R,H,from,to); yAxis(svg,L,TOP,W-L-R,H,ymax,m.unit,null,3); dayAxis(svg,L,TOP,W-L-R,H,from,to); stepPath(svg,m.points,0,1,L,TOP,W-L-R,H,from,to,ymax,m.color);
       txt(svg,L+4,TOP-8,m.name+"  ·  "+m.vendor,{"font-size":11,"font-weight":"600"});
-      cursor(wrap,svg,L,TOP,W-L-R,H,0,D.hours,hr=>{ const p=at(m.points,hr,0); return p?`${sw(m.color)}${m.name} <b>${fmt(p[1])}</b> ${m.unit} · ${D.states[p[2]]}`:"-"; }); } }
-  draw();
+      cursor(wrap,svg,L,TOP,W-L-R,H,from,to,hr=>{ const p=at(m.points,hr,0); return p?`${sw(m.color)}${m.name} <b>${fmt(p[1])}</b> ${m.unit} · ${D.states[p[2]]}`:"-"; });
+      brush(wrap,svg,L,TOP,W-L-R,H); } }
+  draw(); onRange.push(draw);
 },
 forte(s){
   const body = card(s, "Braket and IonQ report different numbers for Forte-1", `Forte-1 is one machine. You can reach it through Braket or through IonQ's own API. Braket reports how many tasks are waiting right now. IonQ reports average_queue_time, which its docs call the current wait time. It drifted from 65 hours to 57 hours over the week. The bottom panel puts both on one scale. Each minute is ranked against all the other minutes in its own line. 0 is the emptiest minute that line ever had and 100 is the busiest. If both numbers measured the same queue, the two lines would move together.`,
     "We read both services in the same pass every minute, so each pair of numbers comes from the same minute. IonQ's last_updated stamp changed every fifteen minutes. The correlation is Spearman's rank correlation over all paired minutes.",
     `The two lines do not move together. The correlation is ${D.forte_rho}. If you want to know the queue on Forte-1 right now, use Braket's count. IonQ's average does not tell you.`);
-  const wrap=div("panel",body); const TOP=22,H=110,GAP=40; const total=3*(H+GAP)+TOP; const svg=el("svg",{viewBox:`0 0 ${W} ${total}`},wrap);
-  const F=D.forte; const bmax=Math.max(...F.map(f=>f[1]||0))*1.08, imax=Math.max(...F.map(f=>f[2]||0))*1.08;
-  const panels=[[1,bmax,"tasks waiting",forteB.color,"Braket, tasks waiting in the Normal queue"],[2,imax,"average queue time (h)",forteI.color,"IonQ, average_queue_time in hours"],[null,100,"rank within its own series",null,"Both ranked against themselves, 0 the emptiest minute that series showed, 100 the busiest"]];
-  panels.forEach(([yi,ymax,label,color,title],k)=>{ const y=TOP+k*(H+GAP); yAxis(svg,L,y,W-L-R,H,ymax,label,k===2?(v=>v+""):null,3); dayAxis(svg,L,y,W-L-R,H,0,D.hours);
-    if (yi!=null) stepPath(svg,F,0,yi,L,y,W-L-R,H,0,D.hours,ymax,color); else { stepPath(svg,F,0,5,L,y,W-L-R,H,0,D.hours,100,forteB.color,1.3); stepPath(svg,F,0,6,L,y,W-L-R,H,0,D.hours,100,forteI.color,1.3); }
-    txt(svg,L+4,y-8,title,{"font-size":11,"font-weight":"600"}); });
-  cursor(wrap,svg,L,TOP,W-L-R,total-TOP,0,D.hours,hr=>{ const f=at(F,hr,0); return f?`${sw(forteB.color)}Braket <b>${fmt(f[1])}</b> tasks waiting (rank ${fmt(f[5],0)}) · ${D.states[f[3]]}<br>${sw(forteI.color)}IonQ <b>${fmt(f[2],1)}</b> h average (rank ${fmt(f[6],0)}) · ${D.states[f[4]]}`:"-"; });
+  rangeBar(body);
+  const wrap=div("panel",body); const TOP=22,H=110,GAP=40; const total=3*(H+GAP)+TOP;
+  const F=D.forte;
+  function drawForte(){ wrap.innerHTML=""; const svg=el("svg",{viewBox:`0 0 ${W} ${total}`},wrap); const from=RANGE.from, to=RANGE.to;
+    const seen=F.filter(f=>f[0]>=from&&f[0]<=to);
+    const bmax=Math.max(1,...seen.map(f=>f[1]||0))*1.08, imax=Math.max(1,...seen.map(f=>f[2]||0))*1.08;
+    const panels=[[1,bmax,"tasks waiting",forteB.color,"Braket, tasks waiting in the Normal queue"],[2,imax,"average queue time (h)",forteI.color,"IonQ, average_queue_time in hours"],[null,100,"rank within its own series",null,"Both ranked against themselves, 0 the emptiest minute that series showed, 100 the busiest"]];
+    panels.forEach(([yi,ymax,label,color,title],k)=>{ const y=TOP+k*(H+GAP); yAxis(svg,L,y,W-L-R,H,ymax,label,k===2?(v=>v+""):null,3); dayAxis(svg,L,y,W-L-R,H,from,to);
+      if (yi!=null) stepPath(svg,F,0,yi,L,y,W-L-R,H,from,to,ymax,color); else { stepPath(svg,F,0,5,L,y,W-L-R,H,from,to,100,forteB.color,1.3); stepPath(svg,F,0,6,L,y,W-L-R,H,from,to,100,forteI.color,1.3); }
+      txt(svg,L+4,y-8,title,{"font-size":11,"font-weight":"600"}); });
+    cursor(wrap,svg,L,TOP,W-L-R,total-TOP,from,to,hr=>{ const f=at(F,hr,0); return f?`${sw(forteB.color)}Braket <b>${fmt(f[1])}</b> tasks waiting (rank ${fmt(f[5],0)}) · ${D.states[f[3]]}<br>${sw(forteI.color)}IonQ <b>${fmt(f[2],1)}</b> h average (rank ${fmt(f[6],0)}) · ${D.states[f[4]]}`:"-"; });
+    brush(wrap,svg,L,TOP,W-L-R,total-TOP); }
+  drawForte(); onRange.push(drawForte);
   const r=div("row",s);
   const b2=card(r,"Every minute as a dot", `Braket's count is on the x axis and IonQ's average is on the y axis. ${F.length.toLocaleString()} minutes. Darker dots are where many minutes landed on the same spot. If the two measured the same queue, the dots would climb a line.`, "One dot per minute, rounded to the nearest task and tenth of an hour.", null);
   const w2=div("panel",b2); const SW=520,SH=300,SL=60,ST=16; const sv=el("svg",{viewBox:`0 0 ${SW} ${SH+ST+40}`},w2);
@@ -324,9 +379,15 @@ day(s){
     "This uses the same once a minute checks as the Queues view. We plot one point every five minutes for the day you pick.",
     `Forte-1's queue reached ${fmt(forteB.stats.max)} tasks on ${DAYS[BUSIEST].name} ${DAYS[BUSIEST].date}. A long queue is when a hold helps. Without one, a classical job sits on its cores for the whole wait. The rest of the time Forte-1 was mostly free.`);
   const ctl=div("controls",body); const dayc=div("",ctl); const mc=document.createElement("select"); M.forEach((m,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=m.name+" ("+m.vendor+")"; mc.appendChild(o); }); ctl.appendChild(mc);
-  DAYS.forEach((d,i)=>{ const b=document.createElement("button"); b.className="chip"; b.textContent=d.name+" "+d.date; b.onclick=()=>{ dayIndex=i; draw(); }; dayc.appendChild(b); });
+  let daySel=null;
+  if (DAYS.length<=14) DAYS.forEach((d,i)=>{ const b=document.createElement("button"); b.className="chip"; b.textContent=d.name+" "+d.date; b.onclick=()=>{ dayIndex=i; draw(); }; dayc.appendChild(b); });
+  else { // a run of weeks has too many days for chips
+    const prev=document.createElement("button"); prev.className="chip"; prev.textContent="◀"; prev.onclick=()=>{ if (dayIndex>0){ dayIndex--; draw(); } }; dayc.appendChild(prev);
+    daySel=document.createElement("select"); DAYS.forEach((d,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=d.name+" "+d.date; daySel.appendChild(o); }); daySel.onchange=()=>{ dayIndex=+daySel.value; draw(); }; dayc.appendChild(daySel);
+    const next=document.createElement("button"); next.className="chip"; next.textContent="▶"; next.onclick=()=>{ if (dayIndex<DAYS.length-1){ dayIndex++; draw(); } }; dayc.appendChild(next);
+  }
   mc.onchange=()=>{ dayMachine=+mc.value; draw(); }; const chart=div("panel",body);
-  function draw(){ mc.value=dayMachine; [...dayc.children].forEach((c,k)=>c.classList.toggle("on",k===dayIndex)); chart.innerHTML=""; const m=M[dayMachine], d=DAYS[dayIndex]; const from=d.from, to=d.to; const pts=m.points.filter(p=>p[0]>=from&&p[0]<=to); const TOP=22,H=220,BOT=24; const svg=el("svg",{viewBox:`0 0 ${W} ${H+TOP+BOT}`},chart);
+  function draw(){ mc.value=dayMachine; if (daySel) daySel.value=dayIndex; else [...dayc.children].forEach((c,k)=>c.classList.toggle("on",k===dayIndex)); chart.innerHTML=""; const m=M[dayMachine], d=DAYS[dayIndex]; const from=d.from, to=d.to; const pts=m.points.filter(p=>p[0]>=from&&p[0]<=to); const TOP=22,H=220,BOT=24; const svg=el("svg",{viewBox:`0 0 ${W} ${H+TOP+BOT}`},chart);
     const ymax=Math.max(1,...pts.map(p=>p[1]||0))*1.1; shadeRuns(svg,m.runs,L,TOP,W-L-R,H,from,to); yAxis(svg,L,TOP,W-L-R,H,ymax,m.unit,null,4); dayAxis(svg,L,TOP,W-L-R,H,from,to,true); stepPath(svg,m.points,0,1,L,TOP,W-L-R,H,from,to,ymax,m.color,1.8);
     txt(svg,L+4,TOP-8,`${m.name} · ${when(from+.01).slice(0,10)} · grey means not taking work`,{"font-size":11,"font-weight":"600"});
     cursor(chart,svg,L,TOP,W-L-R,H,from,to,hr=>{ const p=at(m.points,hr,0); return p?`${sw(m.color)}${m.name} <b>${fmt(p[1])}</b> ${m.unit} · ${D.states[p[2]]}`:"-"; }); }
@@ -369,7 +430,7 @@ calibration(s){
   D.change_kinds.forEach((name,k)=>{ const n=ms.reduce((a,m)=>a+m.changes.filter(c=>c[1]===k).length,0); if(!n) return; const b=document.createElement("button"); b.className="chip on"; b.innerHTML=`${sw(D.change_colors[k])}${name} <span style="opacity:.6">${n}</span>`; b.onclick=()=>{ shown.has(k)?shown.delete(k):shown.add(k); b.classList.toggle("on",shown.has(k)); draw(); }; leg.appendChild(b); });
   const wrap=div("panel",body);
   function draw(){ wrap.innerHTML=""; const RH=30,LBL=170,TOP=22,PW=W-LBL-170; const svg=el("svg",{viewBox:`0 0 ${W} ${RH*ms.length+TOP+30}`},wrap);
-    for (const [h0,name] of MID){ const X=LBL+h0/D.hours*PW; el("line",{x1:X,y1:TOP,x2:X,y2:TOP+RH*ms.length,stroke:"#1f2328","stroke-width":.7,"stroke-dasharray":"2,3"},svg); txt(svg,X+3,TOP-7,name,{"font-size":9}); }
+    for (const mk of dayMarks(0,D.hours,PW)){ const X=LBL+mk.h/D.hours*PW; el("line",{x1:X,y1:TOP,x2:X,y2:TOP+RH*ms.length,stroke:mk.label?"#1f2328":"#d7dbe0","stroke-width":mk.label?.7:.5,"stroke-dasharray":"2,3"},svg); if (mk.label) txt(svg,X+3,TOP-7,mk.label,{"font-size":9}); }
     ms.forEach((m,i)=>{ const y=TOP+i*RH;
       shadeRuns(svg,m.runs,LBL,y+2,PW,RH-4,0,D.hours,"#f4f5f7");
       const list = m.changes.length ? m.changes : m.calibration.map(h=>[h,3,null,null]);
