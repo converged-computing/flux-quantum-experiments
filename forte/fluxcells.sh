@@ -169,6 +169,58 @@ canary() {
     sleep 60
 }
 
+# --------------------------------------------------------------- phase 2c
+# Twice this campaign paid for a full sweep whose premise - that fillers
+# create standing queue depth - turned out false underneath a shallower
+# bug (attempt 1: pool bookkeeping; attempt 2: serial submission slower
+# than the device). This gate tests the premise ITSELF for ~$3.50: burst
+# 10 fillers, submit one probe task, and require the probe to actually
+# sit deep in the queue. If it does not, the cells would measure another
+# floor, and the run stops here instead of $150 later.
+depth_probe() {
+    say "=== phase 2c: queue-depth probe (burst 10 fillers + 1 task, ~\$3.50) ==="
+    local out best waited
+    out=$(python3 - <<PYEOF
+import sys, time
+sys.path.insert(0, "$(dirname "$APP")")
+import qemcmc as R
+path = R.P.BraketPath(device="$CEPHEUS")
+pool = R.FillerPool(path, shots=$FILLER_SHOTS, target=10)
+pool.top_up()
+t0 = time.time()
+probe = path.submit($FILLER_SHOTS, None, "depth-probe")
+best = 0
+waited = 0.0
+try:
+    for _ in range(90):
+        view = path.describe(probe)
+        try:
+            best = max(best, int(view.get("position")))
+        except (TypeError, ValueError):
+            pass
+        if view.get("terminal"):
+            waited = time.time() - t0
+            break
+        time.sleep(1)
+finally:
+    pool.drain()
+    path.cancel(probe)
+print("{} {:.0f}".format(best, waited))
+PYEOF
+) || fail "the depth probe errored; nothing further was spent"
+    read -r best waited <<<"$out"
+    say "probe task: deepest observed position $best, finished after ${waited}s"
+    # depth is proven by the position, or by the probe demonstrably waiting
+    # behind the burst (position polling can miss a fast-moving queue)
+    if [ "${best:-0}" -ge 5 ] 2>/dev/null || [ "${waited:-0}" -ge 8 ] 2>/dev/null; then
+        say "depth probe: OK (the burst creates real queue depth)"
+    else
+        fail "the filler burst did NOT create queue depth (position $best, \
+${waited}s to finish). The contention premise is false on this device right \
+now; the cells would measure another floor. Stopping at ~\$3.50, not \$150."
+    fi
+}
+
 # ---------------------------------------------------------------- phase 3
 # One cell = one measured job at one filler level. Baseline first, then the
 # pair, 60 s of clear between them: each cell must see only its own fillers.
@@ -286,6 +338,7 @@ case "${1:-check}" in
         node_rehearsal
         confirm_cost
         canary
+        depth_probe
         cells
         evidence
         ;;
