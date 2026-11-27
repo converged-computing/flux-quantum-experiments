@@ -13,6 +13,11 @@ quantum and classical coscheduling for Flux. One directory per vendor.
   through Braket): the hold mechanism standalone and through flux, batch
   contention, filler sweeps, with protocol, runbook, batch scripts and the
   evidence directories. See [forte/PROTOCOL.md](forte/PROTOCOL.md).
+- [busyness/](busyness/) coscheduling under sampled busy-ness: every trial
+  draws its queue depth from the 42-day measured distributions (and
+  future-scaled versions of them), both arms replay the same draw, and the
+  paired contrast comes with bootstrap confidence intervals. Free (mock
+  vendor), pre-registered plans, seeded.
 - [probes/](probes/) the September 2026 Braket device probes the campaign's
   mechanism numbers build on (hold-open latency, queue behavior, execution
   windows, priority semantics).
