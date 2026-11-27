@@ -1,0 +1,19 @@
+quantum-wrap: QUANTUM_SESSION_ID=YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvZTNkYjY2YjgtYWIwMC00YzYzLWFlYjgtYWExY2ZiNDIyOWZj -> exec python3 /opt/flux-quantum-experiments/forte/qemcmc.py run --path braket --arm classical --device arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q --steps 1 --qubits 6 --seed 99 --max-usd 5 --yes --out /opt/flux-quantum-experiments/forte/runs-flux-cell-canary.jsonl
+estimated cost, fillers at their worst: $0.40
+credential from the scout: yes
+  79b6420c-88e QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  79b6420c-88e COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   0 110011 -> 000100 reject E=-4.071
+{
+  "steps": 1,
+  "accepted": 0,
+  "acceptance": 0.0,
+  "energy": -4.0711011935350605,
+  "state": "110011",
+  "mean_wait_s": null,
+  "mean_turnaround_s": 2.242000102996826,
+  "makespan_s": 8.175579071044922,
+  "steps_per_hour": 440.33578156560884,
+  "cost_usd": null
+}
+recorded to /opt/flux-quantum-experiments/forte/runs-flux-cell-canary.jsonl

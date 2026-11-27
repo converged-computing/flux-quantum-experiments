@@ -465,6 +465,26 @@ unchanged (~$150); the baseline arm still executes most fillers.
 Attempt 3 is the user's call: the quantitative speedup table is the
 only thing it buys.
 
+### C2f/C3f attempt 3 (2026-11-27 21:03 UTC): the gate REFUSED, $5 not $150
+
+The depth-probe gate (new in this attempt) burst 10 fillers
+concurrently and submitted a probe task: deepest observed position 4,
+finished in 2 s. The run refused before the cells, having spent the
+canary (~$1.50) and the probe (~$3.50). Conclusion, now measured three
+ways at three times of day: an idle Cepheus absorbs small-task bursts
+faster than any client-side mechanism can queue them, so the filler
+dose-response sweep is UNRUNNABLE against this device unless real
+external load exists. The sweep stays armed and gated: it is safe to
+attempt for ~$5 whenever the device looks busy, and it will only
+proceed when the premise actually holds.
+
+For the paper this replaces the dose-response table with a finding:
+hold-based coscheduling is free at zero contention (C4, C5, the 0-filler
+floors), the hold mechanism works through flux (attempt 1's task
+records), the queue-jump is real under genuine load (September priority
+race), and contention could not be manufactured to order on an idle
+108-qubit device in November 2026. Evidence: fluxcells-20261127-210338.
+
 ### C2f/C3f - the mechanism cells repeated THROUGH FLUX
 
 C2/C3 ran standalone (deviation note above): the mechanism numbers are
