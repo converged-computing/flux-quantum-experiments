@@ -1,0 +1,12 @@
+1795810357.015529 submit userid=1000 urgency=16 flags=0 version=1
+1795810357.026733 jobspec-update attributes.system.protected="quantum"
+1795810357.026775 validate
+1795810357.037767 depend
+1795810357.037793 priority priority=1000
+1795810368.311663 memo quantum_session="mock-session-1795810358-7446" released=1
+1795810368.314244 alloc annotations={"sched":{"selection_type":"reserved"},"user":{"quantum_session":"mock-session-1795810358-7446","released":1}}
+1795810368.316347 start
+1795810378.422799 finish status=0
+1795810378.423952 release ranks="all" final=true
+1795810378.423979 free
+1795810378.423989 clean

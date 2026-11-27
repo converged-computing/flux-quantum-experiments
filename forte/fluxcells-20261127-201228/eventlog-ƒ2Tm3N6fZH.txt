@@ -1,0 +1,11 @@
+1795812177.489356 submit userid=1000 urgency=16 flags=0 version=1
+1795812177.500650 jobspec-update attributes.system.protected="quantum"
+1795812177.500697 validate
+1795812177.511725 depend
+1795812177.511751 priority priority=1001
+1795812177.514420 alloc annotations={"sched":{"selection_type":"immediate"}}
+1795812177.516585 start
+1795812528.601662 finish status=0
+1795812528.602971 release ranks="all" final=true
+1795812528.602995 free
+1795812528.603004 clean

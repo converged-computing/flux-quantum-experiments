@@ -1,0 +1,76 @@
+quantum-wrap: QUANTUM_SESSION_ID=YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvNTRhMmI2MmItN2U2YS00NDM2LTg1YTUtNDEwOWU2NGFlMmNi -> exec python3 /opt/flux-quantum-experiments/forte/qemcmc.py run --path braket --arm classical --device arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q --steps 20 --qubits 6 --seed 1 --fillers 0 --filler-shots 10 --max-usd 120 --yes --out /opt/flux-quantum-experiments/forte/runs-flux-cell-co-0.jsonl
+estimated cost, fillers at their worst: $6.91
+credential from the scout: yes
+  18b3e4db-9ef QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  18b3e4db-9ef COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   0 100010 -> 111001 accept E=-0.593
+  12c3318d-853 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  12c3318d-853 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   1 111001 -> 001001 reject E=-0.593
+  206fe642-7d8 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  206fe642-7d8 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   2 111001 -> 001111 reject E=-0.593
+  e0b9c269-a9c QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  e0b9c269-a9c COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   3 111001 -> 000001 accept E=-5.747
+  8c4edb1e-96d QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  8c4edb1e-96d COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   4 000001 -> 101001 reject E=-5.747
+  3c8f03f2-ff1 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  3c8f03f2-ff1 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   5 000001 -> 010111 reject E=-5.747
+  9d3dd09b-6f9 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  9d3dd09b-6f9 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   6 000001 -> 000010 accept E=-8.059
+  7f7257a0-13d QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  7f7257a0-13d COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   7 000010 -> 010011 reject E=-8.059
+  148becda-90c QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  148becda-90c COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   8 000010 -> 011001 reject E=-8.059
+  670ab32b-4f3 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  670ab32b-4f3 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   9 000010 -> 101011 reject E=-8.059
+  d1beb3b3-fd4 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  d1beb3b3-fd4 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  10 000010 -> 110001 reject E=-8.059
+  c1b4c842-941 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  c1b4c842-941 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  11 000010 -> 101000 reject E=-8.059
+  7377df89-3a1 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  7377df89-3a1 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  12 000010 -> 001010 reject E=-8.059
+  3438562d-0c0 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  3438562d-0c0 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  13 000010 -> 010000 reject E=-8.059
+  b2aa5319-e80 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  b2aa5319-e80 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  14 000010 -> 011100 reject E=-8.059
+  48dcac4f-98d QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  48dcac4f-98d COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  15 000010 -> 101010 reject E=-8.059
+  c4d4055c-c6b QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  c4d4055c-c6b COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  16 000010 -> 001111 reject E=-8.059
+  7c5af77e-18a QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  7c5af77e-18a COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  17 000010 -> 001011 reject E=-8.059
+  376bb863-d14 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  376bb863-d14 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  18 000010 -> 010010 reject E=-8.059
+  3803302a-aed QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  3803302a-aed COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  19 000010 -> 000011 reject E=-8.059
+{
+  "steps": 20,
+  "accepted": 3,
+  "acceptance": 0.15,
+  "energy": -8.058975676319033,
+  "state": "000010",
+  "mean_wait_s": null,
+  "mean_turnaround_s": 3.4221500396728515,
+  "makespan_s": 130.45681262016296,
+  "steps_per_hour": 551.9067847352261,
+  "cost_usd": null
+}
+recorded to /opt/flux-quantum-experiments/forte/runs-flux-cell-co-0.jsonl

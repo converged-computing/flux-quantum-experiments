@@ -176,12 +176,29 @@ class FillerPool(object):
 
     def top_up(self):
         need = self.target - self.alive()
-        for _ in range(max(0, need)):
-            self.submitted += 1
-            self.ids.append(
-                self.path.submit(self.shots, None, "filler-{}".format(self.submitted))
-            )
-        return max(0, need)
+        if need <= 0:
+            return 0
+        # Submit the batch CONCURRENTLY. An idle device executes a 10-shot
+        # task in about a second - faster than tasks can be submitted one at
+        # a time - so serial submission can never build standing depth:
+        # in C2f/C3f attempt 2 the baseline's chain tasks entered the queue
+        # at position 2-3 behind 10 nominally queued fillers. A concurrent
+        # burst is in the queue all at once, which is what this class's
+        # docstring promises.
+        import concurrent.futures
+
+        first = self.submitted
+        self.submitted += need
+        labels = ["filler-{}".format(first + k + 1) for k in range(need)]
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=min(need, 16)
+        ) as pool:
+            futures = [
+                pool.submit(self.path.submit, self.shots, None, label)
+                for label in labels
+            ]
+            self.ids.extend(f.result() for f in futures)
+        return need
 
     def drain(self):
         out = list(self.done)

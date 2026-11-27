@@ -1,0 +1,35 @@
+flux quantum: mock: candidate (Signals(available=True, queue_depth=0, cost=0.0))
+flux quantum: selected: mock (policy=any)
+flux quantum: held classical job 156604758491136 (vendor=mock); this submit launches its scout
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+flux quantum: braket: candidate (Signals(available=True, queue_depth=None, cost=None))
+flux quantum: selected: braket (policy=any)
+flux quantum: held classical job 160439929405440 (vendor=braket); this submit launches its scout
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+flux quantum: braket: candidate (Signals(available=True, queue_depth=None, cost=None))
+flux quantum: selected: braket (policy=any)
+flux quantum: held classical job 166814885609472 (vendor=braket); this submit launches its scout
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+flux quantum: braket: candidate (Signals(available=True, queue_depth=None, cost=None))
+flux quantum: selected: braket (policy=any)
+flux quantum: held classical job 176366943207424 (vendor=braket); this submit launches its scout
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+botocore.credentials: INFO: Found credentials from IAM Role: flux-ec2-role
+flux quantum: braket: candidate (Signals(available=True, queue_depth=None, cost=None))
+flux quantum: selected: braket (policy=any)
+flux quantum: held classical job 187146824581120 (vendor=braket); this submit launches its scout

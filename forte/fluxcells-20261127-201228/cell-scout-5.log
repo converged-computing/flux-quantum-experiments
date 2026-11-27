@@ -1,0 +1,25 @@
+quantum-scout: opening a braket session
+braket: queued (5s)
+braket: starting the container (10s)
+braket: starting the container (17s)
+braket: starting the container (22s)
+braket: starting the container (27s)
+braket: starting the container (32s)
+braket: starting the container (37s)
+braket: starting the container (43s)
+braket: starting the container (48s)
+braket: starting the container (53s)
+braket: starting the container (58s)
+braket: starting the container (63s)
+braket: starting the container (69s)
+braket: starting the container (74s)
+braket: starting the container (79s)
+braket: starting the container (84s)
+braket: starting the container (89s)
+braket: starting the container (95s)
+quantum-scout: holding the device after 100s
+quantum-scout: vendor=braket session=YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvODZmNDQxNDEtMTIzZi00ZTdlLWE1NzgtZjNkOWJmMzg5MjM2 unheld job=176366943207424
+quantum-scout: classical job 176366943207424 finished
+braket: delete_object on flux-quantum/flux-quantum-hold-1795811536-243e8c/token.json failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-083d6a246cf922c63 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795811536-243e8c/token.json" because no identity-based policy allows the s3:DeleteObject action
+braket: delete_object on flux-quantum/flux-quantum-hold-1795811536-243e8c/release failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-083d6a246cf922c63 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795811536-243e8c/release" because no identity-based policy allows the s3:DeleteObject action
+quantum-scout: closed braket session arn:aws:braket:us-west-1:633731392008:job/86f44141-123f-4e7e-a578-f3d9bf389236

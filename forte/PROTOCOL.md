@@ -430,6 +430,41 @@ cluster. Same budget (~$150, baseline fillers dominate). Expected:
 baseline steps/hr falls with filler depth (real waits, ~3 s of device
 time per queued filler), coschedule stays near the 0-filler floor.
 
+### C2f/C3f attempt 2 (2026-11-27 20:12 UTC): 6/6 ran, floor measured, NO queue effect - and why
+
+With the fixed pool, 6/6 chains ran and the bookkeeping fell to
+submission time alone (non-task time 172 s vs attempt 1's ~500 s at 10
+fillers). The speedups are still ~1.0x at every level (0.99/0.98/0.97),
+and this time the reason is physical, proven by the task records: the
+baseline's chain tasks entered the queue at POSITION 2-3 behind 10
+nominally queued fillers, with 0.7-1.0 s turnarounds. An idle Cepheus
+executes a 10-shot task in about a second - faster than tasks can be
+submitted one at a time - so serial submission cannot build standing
+queue depth, with any pool. There was no queue for the hold to skip, in
+either arm.
+
+Floor numbers (valid, consistent with C4/C5): baseline 556.6 steps/hr,
+coschedule 551.9 at 0 fillers - the hold costs nothing in steps/hr.
+Evidence: `fluxcells-20261127-201228`.
+
+Consequence for the record: the standalone C3 speedup table
+(2.65x/2.91x) does not reproduce and is now attributed to the two
+artifacts in the apparatus it was taken with - the pool's asymmetric
+bookkeeping (attempt 1's finding) and whatever external queue depth
+happened to exist that evening. Those columns must not be used in the
+paper. The defensible claims as of attempt 2: the hold works through
+flux (attempt 1's task records), it is free at zero contention (this
+attempt, C4, C5), and the queue-jump itself is demonstrated by the
+September priority race (probes/priority-race.jsonl).
+
+Fix for attempt 3, committed: FillerPool.top_up now submits each batch
+CONCURRENTLY, so a burst of N fillers is in the queue at the same time
+when the chain's task arrives - transient real depth (~N seconds' worth
+at ~1 s/task service) made to order, on any device state. Budget
+unchanged (~$150); the baseline arm still executes most fillers.
+Attempt 3 is the user's call: the quantitative speedup table is the
+only thing it buys.
+
 ### C2f/C3f - the mechanism cells repeated THROUGH FLUX
 
 C2/C3 ran standalone (deviation note above): the mechanism numbers are

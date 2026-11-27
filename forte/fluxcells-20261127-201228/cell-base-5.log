@@ -1,0 +1,96 @@
+estimated cost, fillers at their worst: $38.85
+5 fillers into the public queue
+topped the queue up with 2 fillers
+  c6cb8cac-fd8 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  c6cb8cac-fd8 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   0 100010 -> 010001 accept E=-7.783
+topped the queue up with 5 fillers
+  a3dabcbd-f37 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  a3dabcbd-f37 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   1 010001 -> 110001 reject E=-7.783
+topped the queue up with 5 fillers
+  0992536a-b46 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  0992536a-b46 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   2 010001 -> 010001 accept E=-7.783
+topped the queue up with 5 fillers
+  54277891-d7c QUEUED     QUANTUM_TASKS_QUEUE queue, position 3
+  54277891-d7c COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   3 010001 -> 010111 reject E=-7.783
+topped the queue up with 5 fillers
+  c32af49a-91b QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  c32af49a-91b COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   4 010001 -> 111001 reject E=-7.783
+topped the queue up with 5 fillers
+  e32f2801-52a QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  e32f2801-52a COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   5 010001 -> 100100 reject E=-7.783
+topped the queue up with 5 fillers
+  728921d1-e28 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  728921d1-e28 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   6 010001 -> 001001 reject E=-7.783
+topped the queue up with 5 fillers
+  f816a7b3-4c5 QUEUED     QUANTUM_TASKS_QUEUE queue, position 3
+  f816a7b3-4c5 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   7 010001 -> 010111 reject E=-7.783
+topped the queue up with 5 fillers
+  de7bb931-141 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  de7bb931-141 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   8 010001 -> 000011 reject E=-7.783
+topped the queue up with 5 fillers
+  2c10b4c1-2c4 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  2c10b4c1-2c4 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   9 010001 -> 000011 reject E=-7.783
+topped the queue up with 5 fillers
+  5deff8fe-cc7 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  5deff8fe-cc7 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  10 010001 -> 010110 reject E=-7.783
+topped the queue up with 5 fillers
+  f008b97c-21a QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  f008b97c-21a COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  11 010001 -> 011101 reject E=-7.783
+topped the queue up with 5 fillers
+  88945ff4-21d QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  88945ff4-21d COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  12 010001 -> 110100 reject E=-7.783
+topped the queue up with 5 fillers
+  89b426e7-a13 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  89b426e7-a13 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  13 010001 -> 001101 reject E=-7.783
+topped the queue up with 5 fillers
+  215c1413-2be QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  215c1413-2be COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  14 010001 -> 011011 reject E=-7.783
+topped the queue up with 5 fillers
+  96bf9d6e-eba QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  96bf9d6e-eba COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  15 010001 -> 001011 reject E=-7.783
+topped the queue up with 5 fillers
+  3c0d2723-b21 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  3c0d2723-b21 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  16 010001 -> 100100 reject E=-7.783
+topped the queue up with 5 fillers
+  55d0a326-5dc QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  55d0a326-5dc COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  17 010001 -> 100011 reject E=-7.783
+topped the queue up with 5 fillers
+  cec3143c-ef3 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  cec3143c-ef3 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  18 010001 -> 000001 reject E=-7.783
+topped the queue up with 5 fillers
+  2ba6cabe-aae QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  2ba6cabe-aae COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  19 010001 -> 010011 reject E=-7.783
+drained the fillers: 102 submitted, 102 executed
+{
+  "steps": 20,
+  "accepted": 2,
+  "acceptance": 0.1,
+  "energy": -7.783434012391661,
+  "state": "010001",
+  "mean_wait_s": null,
+  "mean_turnaround_s": 3.548199987411499,
+  "makespan_s": 173.44072198867798,
+  "steps_per_hour": 415.12742321667736,
+  "cost_usd": null
+}
+recorded to /opt/flux-quantum-experiments/forte/runs-flux-cell-base-5.jsonl

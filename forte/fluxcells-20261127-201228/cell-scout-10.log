@@ -1,0 +1,27 @@
+quantum-scout: opening a braket session
+braket: queued (5s)
+braket: queued (10s)
+braket: queued (15s)
+braket: queued (20s)
+braket: queued (25s)
+braket: queued (30s)
+braket: starting the container (36s)
+braket: starting the container (42s)
+braket: starting the container (47s)
+braket: starting the container (52s)
+braket: starting the container (57s)
+braket: starting the container (63s)
+braket: starting the container (68s)
+braket: starting the container (73s)
+braket: starting the container (78s)
+braket: starting the container (83s)
+braket: starting the container (89s)
+braket: starting the container (94s)
+braket: starting the container (99s)
+braket: starting the container (104s)
+quantum-scout: holding the device after 109s
+quantum-scout: vendor=braket session=YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvZjlkOTJlMTEtMWRmNi00NDhlLThkYTAtMDU4ZTdjOTViZjZk unheld job=187146824581120
+quantum-scout: classical job 187146824581120 finished
+braket: delete_object on flux-quantum/flux-quantum-hold-1795812178-a64470/token.json failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-083d6a246cf922c63 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795812178-a64470/token.json" because no identity-based policy allows the s3:DeleteObject action
+braket: delete_object on flux-quantum/flux-quantum-hold-1795812178-a64470/release failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-083d6a246cf922c63 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795812178-a64470/release" because no identity-based policy allows the s3:DeleteObject action
+quantum-scout: closed braket session arn:aws:braket:us-west-1:633731392008:job/f9d92e11-1df6-448e-8da0-058e7c95bf6d

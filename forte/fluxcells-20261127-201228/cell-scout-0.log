@@ -1,0 +1,30 @@
+quantum-scout: opening a braket session
+braket: queued (5s)
+braket: queued (10s)
+braket: queued (16s)
+braket: queued (21s)
+braket: queued (26s)
+braket: queued (31s)
+braket: queued (36s)
+braket: queued (41s)
+braket: starting the container (47s)
+braket: starting the container (53s)
+braket: starting the container (58s)
+braket: starting the container (63s)
+braket: starting the container (68s)
+braket: starting the container (74s)
+braket: starting the container (79s)
+braket: starting the container (84s)
+braket: starting the container (89s)
+braket: starting the container (94s)
+braket: starting the container (100s)
+braket: starting the container (105s)
+braket: starting the container (110s)
+braket: starting the container (115s)
+braket: starting the container (120s)
+quantum-scout: holding the device after 126s
+quantum-scout: vendor=braket session=YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvNTRhMmI2MmItN2U2YS00NDM2LTg1YTUtNDEwOWU2NGFlMmNi unheld job=166814885609472
+quantum-scout: classical job 166814885609472 finished
+braket: delete_object on flux-quantum/flux-quantum-hold-1795810966-bce973/token.json failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-096ebf685e5558851 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795810966-bce973/token.json" because no identity-based policy allows the s3:DeleteObject action
+braket: delete_object on flux-quantum/flux-quantum-hold-1795810966-bce973/release failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-096ebf685e5558851 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795810966-bce973/release" because no identity-based policy allows the s3:DeleteObject action
+quantum-scout: closed braket session arn:aws:braket:us-west-1:633731392008:job/54a2b62b-7e6a-4436-85a5-4109e64ae2cb

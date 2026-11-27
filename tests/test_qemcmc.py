@@ -207,7 +207,8 @@ def test_filler_pool_tops_up_and_drains(runner):
     assert pool.top_up() == 3
     assert pool.top_up() == 3  # all served already, refill the lot
     assert pool.submitted == 6
-    assert [s[3] for s in path.submitted][:2] == ["filler-1", "filler-2"]
+    # the batch is submitted concurrently, so arrival order is unordered
+    assert {s[3] for s in path.submitted} >= {"filler-1", "filler-2"}
     drained = pool.drain()
     assert len(drained) == 6
     assert all(f["status"] == "completed" for f in drained)
