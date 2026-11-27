@@ -1,0 +1,8 @@
+pair 1 classical node: i-096ebf685e5558851
+pair 2 classical node: i-083d6a246cf922c63
+pair 3 classical node: i-083d6a246cf922c63
+pair 4 classical node: i-096ebf685e5558851
+base 1 node: i-096ebf685e5558851
+base 2 node: i-096ebf685e5558851
+base 3 node: i-083d6a246cf922c63
+base 4 node: i-083d6a246cf922c63

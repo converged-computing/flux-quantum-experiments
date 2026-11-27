@@ -1,0 +1,27 @@
+quantum-scout: opening a braket session
+braket: queued (4s)
+braket: queued (9s)
+braket: queued (15s)
+braket: queued (20s)
+braket: queued (25s)
+braket: queued (30s)
+braket: queued (35s)
+braket: queued (40s)
+braket: queued (45s)
+braket: starting the container (51s)
+braket: starting the container (57s)
+braket: starting the container (62s)
+braket: starting the container (67s)
+braket: starting the container (72s)
+braket: starting the container (78s)
+braket: starting the container (83s)
+braket: starting the container (88s)
+braket: starting the container (93s)
+braket: starting the container (98s)
+braket: starting the container (104s)
+quantum-scout: holding the device after 109s
+quantum-scout: vendor=braket session=YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvMjg4NjU1Y2YtMjQ5MS00YzBhLTg4MzktM2I0OGEwNmFlM2Q0 unheld job=9474194538496
+quantum-scout: classical job 9474194538496 finished
+braket: delete_object on flux-quantum/flux-quantum-hold-1795762365-c01030/token.json failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-01c6460d44dc30cb5 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795762365-c01030/token.json" because no identity-based policy allows the s3:DeleteObject action
+braket: delete_object on flux-quantum/flux-quantum-hold-1795762365-c01030/release failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-01c6460d44dc30cb5 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795762365-c01030/release" because no identity-based policy allows the s3:DeleteObject action
+quantum-scout: closed braket session arn:aws:braket:us-west-1:633731392008:job/288655cf-2491-4c0a-8839-3b48a06ae3d4

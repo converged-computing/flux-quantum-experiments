@@ -1,0 +1,95 @@
+2026-11-27T06:43:17.716144Z broker.debug[0]: insmod config
+2026-11-27T06:43:17.716288Z broker.debug[0]: insmod connector-local
+2026-11-27T06:43:17.716397Z broker.debug[0]: insmod groups
+2026-11-27T06:43:17.716509Z broker.debug[0]: insmod rexec
+2026-11-27T06:43:17.716610Z broker.debug[0]: insmod overlay
+2026-11-27T06:43:17.716758Z connector-local.debug[0]: allow-guest-user=true
+2026-11-27T06:43:17.716766Z connector-local.debug[0]: allow-root-owner=true
+2026-11-27T06:43:17.720900Z overlay.debug[0]: listening on tcp://10.0.1.58:8050
+2026-11-27T06:43:17.721286Z broker.info[0]: builtins-success: load-builtins->join 5.28653ms
+2026-11-27T06:43:17.721358Z broker.info[0]: parent-none: join->config-sync 0.056166ms
+2026-11-27T06:43:17.721396Z broker.info[0]: sync-none: config-sync->init 0.032179ms
+2026-11-27T06:43:17.895918Z overlay.debug[0]: accepting connection from i-01c6460d44dc30cb5 (rank 1) status full
+2026-11-27T06:43:18.296913Z broker.debug[0]: insmod content
+2026-11-27T06:43:18.395988Z broker.debug[0]: insmod job-info
+2026-11-27T06:43:18.480912Z broker.debug[0]: insmod heartbeat
+2026-11-27T06:43:18.482796Z broker.debug[0]: insmod cron
+2026-11-27T06:43:18.483056Z cron.info[0]: synchronizing cron tasks to event heartbeat.pulse
+2026-11-27T06:43:18.485067Z broker.debug[0]: insmod content-sqlite
+2026-11-27T06:43:18.492049Z content-sqlite.debug[0]: epoch column already exists
+2026-11-27T06:43:18.492081Z content-sqlite.debug[0]: initialized current_epoch=0
+2026-11-27T06:43:18.492139Z content-sqlite.debug[0]: /var/lib/flux/content.sqlite (0 objects) journal_mode=WAL synchronous=NORMAL
+2026-11-27T06:43:18.492280Z content.debug[0]: content backing store: enabled content-sqlite
+2026-11-27T06:43:18.582583Z broker.debug[0]: insmod kvs
+2026-11-27T06:43:18.684716Z broker.debug[0]: insmod kvs-watch
+2026-11-27T06:43:18.688081Z broker.debug[0]: insmod resource
+2026-11-27T06:43:18.688152Z content-sqlite.debug[0]: checkpoint-put: advanced epoch to 1
+2026-11-27T06:43:18.906536Z broker.debug[0]: insmod job-manager
+2026-11-27T06:43:18.913539Z broker.debug[0]: insmod sched-fluxion-resource
+2026-11-27T06:43:18.913773Z sched-fluxion-resource.info[0]: version 0.60.0
+2026-11-27T06:43:18.913861Z sched-fluxion-resource.debug[0]: mod_main: resource module starting
+2026-11-27T06:43:18.914538Z broker.debug[0]: insmod sched-fluxion-feasibility
+2026-11-27T06:43:18.914786Z sched-fluxion-feasibility.info[0]: version 0.60.0
+2026-11-27T06:43:18.914885Z sched-fluxion-feasibility.debug[0]: service registered
+2026-11-27T06:43:18.914899Z sched-fluxion-feasibility.debug[0]: mod_main: feasibility module starting
+2026-11-27T06:43:18.915547Z sched-fluxion-resource.warning[0]: create_reader: allowlist unsupported
+2026-11-27T06:43:18.917040Z job-manager.debug[0]: jobtap plugin .history registered method job-manager.history.get
+2026-11-27T06:43:18.917055Z job-manager.debug[0]: jobtap plugin .post-event registered method job-manager.post-event.post
+2026-11-27T06:43:18.917184Z job-manager.info[0]: quantum: vendors=ibm,braket,mock,ionq total_cores=128 reserve_cores=0 protect_types=qpu preempt=0 settle=2.0 boost_priority=1000
+2026-11-27T06:43:18.917200Z job-manager.warning[0]: quantum: preemption is off. A pair that cannot be placed will hold an open vendor session until the machine frees up on its own
+2026-11-27T06:43:18.917202Z job-manager.info[0]: quantum: pairs run at priority 1000. A site with flux-accounting should load with boost_priority=0
+2026-11-27T06:43:18.917242Z job-manager.debug[0]: housekeeping is not configured
+2026-11-27T06:43:18.917396Z job-manager.info[0]: restart: 0 jobs
+2026-11-27T06:43:18.917406Z job-manager.info[0]: restart: 0 running jobs
+2026-11-27T06:43:18.917584Z job-manager.info[0]: restart: checkpoint.job-manager not found
+2026-11-27T06:43:18.917588Z job-manager.debug[0]: restart: max_jobid=ƒ1
+2026-11-27T06:43:18.918415Z broker.debug[0]: insmod sched-fluxion-qmanager
+2026-11-27T06:43:19.004574Z broker.debug[0]: insmod job-list
+2026-11-27T06:43:18.922566Z sched-fluxion-resource.debug[0]: resource graph datastore loaded with JGF reader
+2026-11-27T06:43:19.082871Z broker.debug[0]: insmod job-exec
+2026-11-27T06:43:18.922587Z sched-fluxion-resource.info[0]: populate_resource_db: loaded resources from core's resource.acquire
+2026-11-27T06:43:19.168468Z broker.debug[0]: insmod job-ingest
+2026-11-27T06:43:18.923095Z sched-fluxion-resource.debug[0]: resource status changed (rankset=[all] status=DOWN)
+2026-11-27T06:43:19.004671Z sched-fluxion-qmanager.info[0]: version 0.60.0
+2026-11-27T06:43:18.923107Z sched-fluxion-resource.debug[0]: mod_main: resource graph database loaded
+2026-11-27T06:43:19.168631Z sched-fluxion-qmanager.debug[0]: service_register
+2026-11-27T06:43:19.168697Z sched-fluxion-qmanager.debug[0]: enforced policy (queue=default): coschedule
+2026-11-27T06:43:19.168713Z sched-fluxion-qmanager.debug[0]: effective queue params (queue=default): default
+2026-11-27T06:43:19.168716Z sched-fluxion-qmanager.debug[0]: effective policy params (queue=default): default
+2026-11-27T06:43:19.168792Z job-ingest.debug[0]: configuring validator with plugins=(null), args=(null) (enabled)
+2026-11-27T06:43:19.169527Z sched-fluxion-feasibility.warning[0]: create_reader: allowlist unsupported
+2026-11-27T06:43:19.171418Z sched-fluxion-qmanager.debug[0]: handshaking with sched-fluxion-resource completed
+2026-11-27T06:43:19.171461Z job-manager.debug[0]: scheduler: hello +partial-ok
+2026-11-27T06:43:19.171538Z job-manager.debug[0]: scheduler: ready unlimited
+2026-11-27T06:43:19.171587Z sched-fluxion-qmanager.debug[0]: handshaking with job-manager completed
+2026-11-27T06:43:19.176417Z sched-fluxion-feasibility.debug[0]: resource graph datastore loaded with JGF reader
+2026-11-27T06:43:19.176734Z sched-fluxion-feasibility.info[0]: populate_resource_db: loaded resources from sched-fluxion-resource.notify
+2026-11-27T06:43:19.177205Z sched-fluxion-feasibility.debug[0]: mod_main: resource graph database loaded
+2026-11-27T06:43:19.177296Z sched-fluxion-feasibility.debug[0]: resource status changed (rankset=[0-1] status=DOWN)
+2026-11-27T06:43:19.246630Z job-ingest.debug[0]: fluid ts=1ms
+2026-11-27T06:43:19.798723Z broker.info[0]: rc1.0: tab: cron-1 created: scheduled in 73000.202s at Sat Nov 28 03:00:00 2026
+2026-11-27T06:43:19.886923Z broker.info[0]: rc1.0: running /etc/flux/rc1.d/01-sched-fluxion
+2026-11-27T06:43:19.907024Z broker.info[0]: rc1.0: flux modprobe rc1 Exited (rc=0) 2.2s
+2026-11-27T06:43:19.907076Z broker.info[0]: rc1-success: init->quorum 2.18567s
+2026-11-27T06:43:19.950361Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:43:20.007375Z broker.info[0]: online: i-0fc40135dc109bb85 (ranks 0)
+2026-11-27T06:43:20.007405Z broker.info[0]: quorum-full: quorum->run 0.100317s
+2026-11-27T06:43:20.007468Z broker.debug[0]: rc2-none: ignored in run
+2026-11-27T06:43:20.007464Z sched-fluxion-resource.debug[0]: resource status changed (rankset=[0] status=UP)
+2026-11-27T06:43:20.007583Z sched-fluxion-feasibility.debug[0]: resource status changed (rankset=[0] status=UP)
+2026-11-27T06:43:20.416847Z sched-fluxion-resource.debug[0]: resource status changed (rankset=[1] status=UP)
+2026-11-27T06:43:20.416988Z sched-fluxion-feasibility.debug[0]: resource status changed (rankset=[1] status=UP)
+2026-11-27T06:43:40.218092Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:43:41.382682Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:44:15.388072Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:46:02.192210Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:46:12.250740Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:46:18.603987Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:46:20.181199Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:46:21.769089Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:46:23.373489Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:48:25.444388Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:52:41.622435Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:52:43.947580Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:52:46.155190Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded
+2026-11-27T06:52:48.335642Z sched-fluxion-resource.debug[0]: find_request_cb: find succeeded

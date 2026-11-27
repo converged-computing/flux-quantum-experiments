@@ -1,0 +1,10 @@
+1795802494.944776 submit userid=1000 urgency=16 flags=0 version=1
+1795802494.955962 validate
+1795802494.966816 depend
+1795802494.966846 priority priority=16
+1795802494.969211 alloc annotations={"sched":{"selection_type":"immediate"}}
+1795802494.971134 start
+1795802498.516491 finish status=0
+1795802498.517571 release ranks="all" final=true
+1795802498.517594 free
+1795802498.517606 clean

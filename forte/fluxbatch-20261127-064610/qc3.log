@@ -1,0 +1,46 @@
+quantum-wrap: QUANTUM_SESSION_ID=YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvYWU5Yzc5ZTEtZDYwMy00NWE4LWE4MmEtODJkYmJkMzk0NTY2 -> exec python3 /opt/flux-quantum/experiments/forte/qemcmc.py run --path braket --arm classical --device arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q --steps 10 --qubits 6 --seed 3 --max-usd 60 --yes --out /opt/flux-quantum/experiments/forte/runs-flux-co-3.jsonl
+estimated cost, fillers at their worst: $3.48
+credential from the scout: yes
+  0d5a2f77-d14 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  0d5a2f77-d14 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   0 011110 -> 100000 reject E=-8.085
+  5049287e-934 QUEUED     QUANTUM_TASKS_QUEUE queue, position 3
+  5049287e-934 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   1 011110 -> 010010 reject E=-8.085
+  8af024f7-082 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  8af024f7-082 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   2 011110 -> 010100 reject E=-8.085
+  b83ef2c2-2a0 QUEUED     QUANTUM_TASKS_QUEUE queue, position 3
+  b83ef2c2-2a0 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   3 011110 -> 110110 reject E=-8.085
+  bcaa6161-319 QUEUED     QUANTUM_TASKS_QUEUE queue, position 3
+  bcaa6161-319 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   4 011110 -> 111101 reject E=-8.085
+  85aad4df-43c QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  85aad4df-43c COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   5 011110 -> 111010 reject E=-8.085
+  fbe4fa19-8a0 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  fbe4fa19-8a0 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   6 011110 -> 110010 reject E=-8.085
+  e7ad92b3-035 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  e7ad92b3-035 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   7 011110 -> 011110 accept E=-8.085
+  2fefaffc-d3a QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  2fefaffc-d3a COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   8 011110 -> 000011 reject E=-8.085
+  8146e130-c08 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  8146e130-c08 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   9 011110 -> 011000 reject E=-8.085
+{
+  "steps": 10,
+  "accepted": 1,
+  "acceptance": 0.1,
+  "energy": -8.08530644142587,
+  "state": "011110",
+  "mean_wait_s": null,
+  "mean_turnaround_s": 1.4688999652862549,
+  "makespan_s": 65.06194877624512,
+  "steps_per_hour": 553.3188088756423,
+  "cost_usd": null
+}
+recorded to /opt/flux-quantum/experiments/forte/runs-flux-co-3.jsonl

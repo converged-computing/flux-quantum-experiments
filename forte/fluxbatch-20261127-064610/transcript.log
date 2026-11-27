@@ -1,0 +1,35 @@
+[fluxbatch] evidence directory: /home/ubuntu/fluxbatch-20261127-064610
+[fluxbatch] === phase 0: cluster state ===
+[fluxbatch] feasibility: loaded and correct
+[fluxbatch] vendor probe: selected: braket (policy=any)
+[fluxbatch] device status: ONLINE
+[fluxbatch] active hybrid jobs in the account: 0 (quota: 3)
+[fluxbatch] state check: OK
+[fluxbatch] === phase 1: free mock rehearsal, 4 concurrent pairs ===
+[fluxbatch] mock rehearsal: OK (4/4 pairs handed a session over)
+[fluxbatch] === phase 1b: free app rehearsal on every node ===
+[fluxbatch] node rehearsal: OK (the app runs and /opt/flux-quantum/experiments/forte is writable on all 2 ranks)
+[fluxbatch] === phase 2: cost ===
+{
+  "per_task_usd": 0.34249999999999997,
+  "tasks_usd": 3.425,
+  "hold_usd": 0.115,
+  "fillers_worst_usd": 0.0,
+  "total_usd": 3.54
+}
+[fluxbatch] that is PER JOB; the batch is 8 jobs of 10 steps,
+[fluxbatch] plus a 1-step canary pair first (~$1.50)
+[fluxbatch] type yes to spend: [fluxbatch] === phase 2b: canary, ONE real pair, 1 step ===
+[fluxbatch] canary scout=ƒ3KzwBvoH classical=5138827706368 (hold open takes ~2 min)
+[fluxbatch] canary: OK (the pair ran its chain inside its hold, end to end)
+[fluxbatch] === phase 3: arm A, 4 plain jobs, public queue ===
+[fluxbatch] arm A done; 60 s for the public queue to clear
+[fluxbatch] === phase 4: arm B, 4 quantum pairs ===
+[fluxbatch] === phase 5: evidence ===
+/home/ubuntu/fluxbatch-20261127-064610/qc1.log:credential from the scout: yes
+/home/ubuntu/fluxbatch-20261127-064610/qc2.log:credential from the scout: yes
+/home/ubuntu/fluxbatch-20261127-064610/qc3.log:credential from the scout: yes
+/home/ubuntu/fluxbatch-20261127-064610/qc4.log:credential from the scout: yes
+[fluxbatch] BATCH VERDICT: OK (4/4 pairs ran inside their hold)
+[fluxbatch] evidence in /home/ubuntu/fluxbatch-20261127-064610, including the per-node records
+[fluxbatch] (runs-flux-rank*.tar); nothing needs fetching from the other node

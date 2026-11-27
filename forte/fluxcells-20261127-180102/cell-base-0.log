@@ -1,0 +1,75 @@
+estimated cost, fillers at their worst: $6.91
+  d3dba219-520 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  d3dba219-520 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   0 100010 -> 000010 accept E=-8.059
+  6017f256-471 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  6017f256-471 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   1 000010 -> 010101 reject E=-8.059
+  86f6eeec-7ed QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  86f6eeec-7ed COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   2 000010 -> 111000 reject E=-8.059
+  07523269-481 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  07523269-481 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   3 000010 -> 101110 reject E=-8.059
+  5d400a0f-6a9 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  5d400a0f-6a9 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   4 000010 -> 001011 reject E=-8.059
+  c587e911-2ff QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  c587e911-2ff COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   5 000010 -> 001011 reject E=-8.059
+  620ccc32-f05 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  620ccc32-f05 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   6 000010 -> 010010 reject E=-8.059
+  7f378855-f10 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  7f378855-f10 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   7 000010 -> 000011 reject E=-8.059
+  0b5da7cb-8ac QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  0b5da7cb-8ac COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   8 000010 -> 001010 reject E=-8.059
+  7acfb432-1d5 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  7acfb432-1d5 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  7acfb432-1d5 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   9 000010 -> 000000 reject E=-8.059
+  a3ec4016-05d QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  a3ec4016-05d COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  10 000010 -> 000110 accept E=-9.437
+  cf6463b1-895 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  cf6463b1-895 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  11 000110 -> 000000 reject E=-9.437
+  0c8fcae2-b69 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  0c8fcae2-b69 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  12 000110 -> 101110 reject E=-9.437
+  73c91644-e1e QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  73c91644-e1e COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  13 000110 -> 000110 accept E=-9.437
+  af50bba0-2f6 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  af50bba0-2f6 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  14 000110 -> 010001 reject E=-9.437
+  1ba242c6-8a6 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  1ba242c6-8a6 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  15 000110 -> 110000 reject E=-9.437
+  89782da1-cb3 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  89782da1-cb3 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  16 000110 -> 110101 reject E=-9.437
+  7f139ad6-ba4 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  7f139ad6-ba4 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  17 000110 -> 010110 reject E=-9.437
+  6eb47ddf-a91 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  6eb47ddf-a91 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  18 000110 -> 000001 reject E=-9.437
+  79c5fc9f-315 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  79c5fc9f-315 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  19 000110 -> 111010 reject E=-9.437
+{
+  "steps": 20,
+  "accepted": 3,
+  "acceptance": 0.15,
+  "energy": -9.437316922525637,
+  "state": "000110",
+  "mean_wait_s": null,
+  "mean_turnaround_s": 3.7391000032424926,
+  "makespan_s": 135.41710948944092,
+  "steps_per_hour": 531.6905690238069,
+  "cost_usd": null
+}
+recorded to /opt/flux-quantum/experiments/forte/runs-flux-cell-base-0.jsonl

@@ -1,0 +1,12 @@
+1795803684.245609 submit userid=1000 urgency=16 flags=0 version=1
+1795803684.257087 jobspec-update attributes.system.protected="quantum"
+1795803684.257130 validate
+1795803684.268123 depend
+1795803684.268151 priority priority=1000
+1795803791.025293 memo quantum_session="YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvNzEwODMyNjYtYzE2Ni00YTIyLWEzZTEtNGE4ZmM1ZDcxNzFm" released=1
+1795803791.028297 alloc annotations={"sched":{"selection_type":"reserved"},"user":{"quantum_session":"YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvNzEwODMyNjYtYzE2Ni00YTIyLWEzZTEtNGE4ZmM1ZDcxNzFm","released":1}}
+1795803791.030515 start
+1795804141.080054 finish status=0
+1795804141.081701 release ranks="all" final=true
+1795804141.081733 free
+1795804141.081742 clean

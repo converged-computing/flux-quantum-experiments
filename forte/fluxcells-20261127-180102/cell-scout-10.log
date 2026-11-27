@@ -1,0 +1,25 @@
+quantum-scout: opening a braket session
+braket: queued (4s)
+braket: starting the container (10s)
+braket: starting the container (16s)
+braket: starting the container (21s)
+braket: starting the container (26s)
+braket: starting the container (31s)
+braket: starting the container (36s)
+braket: starting the container (42s)
+braket: starting the container (47s)
+braket: starting the container (52s)
+braket: starting the container (57s)
+braket: starting the container (62s)
+braket: starting the container (68s)
+braket: starting the container (73s)
+braket: starting the container (78s)
+braket: starting the container (83s)
+braket: starting the container (88s)
+braket: starting the container (94s)
+quantum-scout: holding the device after 99s
+quantum-scout: vendor=braket session=YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvYmUyZWQwMzUtYjczZS00NzU2LWFiMmItNzkzNDY1YzgwZDVj unheld job=64445145415680
+quantum-scout: classical job 64445145415680 finished
+braket: delete_object on flux-quantum/flux-quantum-hold-1795804865-b610d0/token.json failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-083d6a246cf922c63 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795804865-b610d0/token.json" because no identity-based policy allows the s3:DeleteObject action
+braket: delete_object on flux-quantum/flux-quantum-hold-1795804865-b610d0/release failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-083d6a246cf922c63 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795804865-b610d0/release" because no identity-based policy allows the s3:DeleteObject action
+quantum-scout: closed braket session arn:aws:braket:us-west-1:633731392008:job/be2ed035-b73e-4756-ab2b-793465c80d5c

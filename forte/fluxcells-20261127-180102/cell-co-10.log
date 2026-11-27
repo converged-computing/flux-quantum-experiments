@@ -1,0 +1,105 @@
+quantum-wrap: QUANTUM_SESSION_ID=YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvYmUyZWQwMzUtYjczZS00NzU2LWFiMmItNzkzNDY1YzgwZDVj -> exec python3 /opt/flux-quantum/experiments/forte/qemcmc.py run --path braket --arm classical --device arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q --steps 20 --qubits 6 --seed 1 --fillers 10 --filler-shots 10 --max-usd 120 --yes --out /opt/flux-quantum/experiments/forte/runs-flux-cell-co-10.jsonl
+estimated cost, fillers at their worst: $70.80
+credential from the scout: yes
+10 fillers into the public queue
+topped the queue up with 10 fillers
+  0970676e-aa7 QUEUED     QUANTUM_TASKS_QUEUE queue, position 11
+  0970676e-aa7 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   0 100010 -> 110111 reject E=-2.030
+topped the queue up with 10 fillers
+  39a398a3-3ef QUEUED     QUANTUM_TASKS_QUEUE queue, position 11
+  39a398a3-3ef COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   1 100010 -> 110011 reject E=-2.030
+topped the queue up with 10 fillers
+  c0e07667-c01 QUEUED     QUANTUM_TASKS_QUEUE queue, position 11
+  c0e07667-c01 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   2 100010 -> 000001 accept E=-5.747
+topped the queue up with 10 fillers
+  3b2fd986-081 QUEUED     QUANTUM_TASKS_QUEUE queue, position 11
+  3b2fd986-081 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  3b2fd986-081 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   3 000001 -> 010111 reject E=-5.747
+topped the queue up with 10 fillers
+  23ac46a1-ea5 QUEUED     QUANTUM_TASKS_QUEUE queue, position 7
+  23ac46a1-ea5 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  23ac46a1-ea5 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   4 000001 -> 001101 reject E=-5.747
+topped the queue up with 10 fillers
+  ca5ee969-74f QUEUED     QUANTUM_TASKS_QUEUE queue, position 8
+  ca5ee969-74f COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   5 000001 -> 000001 accept E=-5.747
+topped the queue up with 10 fillers
+  841dd216-64a QUEUED     QUANTUM_TASKS_QUEUE queue, position 11
+  841dd216-64a COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   6 000001 -> 110110 reject E=-5.747
+topped the queue up with 10 fillers
+  d145f536-08e QUEUED     QUANTUM_TASKS_QUEUE queue, position 11
+  d145f536-08e COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   7 000001 -> 000011 accept E=-6.325
+topped the queue up with 10 fillers
+  92134a42-9cc QUEUED     QUANTUM_TASKS_QUEUE queue, position 8
+  92134a42-9cc COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   8 000011 -> 100000 reject E=-6.325
+topped the queue up with 10 fillers
+  0006022b-cbf QUEUED     QUANTUM_TASKS_QUEUE queue, position 4
+  0006022b-cbf COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   9 000011 -> 001000 reject E=-6.325
+topped the queue up with 10 fillers
+  6fd55a9f-7c0 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  6fd55a9f-7c0 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  10 000011 -> 011101 reject E=-6.325
+topped the queue up with 10 fillers
+  6911a61a-d8a QUEUED     QUANTUM_TASKS_QUEUE queue, position 11
+  6911a61a-d8a COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  11 000011 -> 010010 reject E=-6.325
+topped the queue up with 10 fillers
+  8d0136e7-eec QUEUED     QUANTUM_TASKS_QUEUE queue, position 7
+  8d0136e7-eec COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  12 000011 -> 011111 reject E=-6.325
+topped the queue up with 10 fillers
+  7616417e-df8 QUEUED     QUANTUM_TASKS_QUEUE queue, position 3
+  7616417e-df8 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  13 000011 -> 011011 reject E=-6.325
+topped the queue up with 10 fillers
+  d6d4fb11-6ef QUEUED     QUANTUM_TASKS_QUEUE queue, position 3
+  d6d4fb11-6ef COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  14 000011 -> 111100 reject E=-6.325
+topped the queue up with 10 fillers
+  225a6a44-dd0 QUEUED     QUANTUM_TASKS_QUEUE queue, position 11
+  225a6a44-dd0 QUEUED     QUANTUM_TASKS_QUEUE queue, position 5
+  225a6a44-dd0 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  15 000011 -> 001101 reject E=-6.325
+topped the queue up with 10 fillers
+  83320dc7-ea6 QUEUED     QUANTUM_TASKS_QUEUE queue, position 3
+  83320dc7-ea6 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  16 000011 -> 100010 reject E=-6.325
+topped the queue up with 10 fillers
+  bc93f89c-3d0 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  bc93f89c-3d0 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  17 000011 -> 110110 reject E=-6.325
+topped the queue up with 10 fillers
+  f5977622-3b6 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  f5977622-3b6 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  18 000011 -> 011011 reject E=-6.325
+topped the queue up with 10 fillers
+  30f09435-11c QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  30f09435-11c COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  19 000011 -> 101001 reject E=-6.325
+braket: could not cancel bb99aee13ce7: An error occurred (TooManyRequestsException) when calling the CancelQuantumTask operation (reached max retries: 2): Too Many Requests
+braket: could not cancel 88005bacc404: An error occurred (TooManyRequestsException) when calling the CancelQuantumTask operation (reached max retries: 2): Too Many Requests
+braket: could not cancel eb1643d4f5db: An error occurred (TooManyRequestsException) when calling the CancelQuantumTask operation (reached max retries: 2): Too Many Requests
+braket: could not cancel 7a3185cd6b6c: An error occurred (TooManyRequestsException) when calling the CancelQuantumTask operation (reached max retries: 2): Too Many Requests
+drained the fillers: 210 submitted, 210 executed
+{
+  "steps": 20,
+  "accepted": 3,
+  "acceptance": 0.15,
+  "energy": -6.3249512091964775,
+  "state": "000011",
+  "mean_wait_s": null,
+  "mean_turnaround_s": 6.721050024032593,
+  "makespan_s": 651.0028965473175,
+  "steps_per_hour": 110.59858624571687,
+  "cost_usd": null
+}
+recorded to /opt/flux-quantum/experiments/forte/runs-flux-cell-co-10.jsonl

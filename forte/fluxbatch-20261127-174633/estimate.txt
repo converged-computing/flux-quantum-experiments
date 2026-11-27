@@ -1,0 +1,7 @@
+{
+  "per_task_usd": 0.34249999999999997,
+  "tasks_usd": 3.425,
+  "hold_usd": 0.115,
+  "fillers_worst_usd": 0.0,
+  "total_usd": 3.54
+}

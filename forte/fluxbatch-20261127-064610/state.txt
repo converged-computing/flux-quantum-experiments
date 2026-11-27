@@ -1,0 +1,24 @@
+Fri Nov 27 06:46:10 UTC 2026
+6f3ec3adb640f1b58b096bb93ca181e881e0ba31
+Module                    Idle  S Sendq Recvq Service
+sched-fluxion-qmanager       4  R     0     0 sched
+groups                    idle  R     0     0 
+resource                     9  R     0     0 
+job-manager                  4  R     0     0 
+kvs-watch                    4  R     0     0 
+job-list                  idle  R     0     0 
+overlay                   idle  R     0     0 
+job-exec                     4  R     0     0 
+cron                      idle  R     0     0 
+config                       9  R     0     0 
+sched-fluxion-feasibility    8  R     0     0 feasibility
+sched-fluxion-resource       4  R     0     0 
+heartbeat                    1  R     0     0 
+connector-local              0  R     0     0 
+content-sqlite               4  R     0     0 content-backing
+content                      4  R     0     0 
+kvs                          4  R     0     0 
+job-info                     4  R     0     0 
+job-ingest                   4  R     0     0 
+rexec                        4  R     0     0 
+quantum.so

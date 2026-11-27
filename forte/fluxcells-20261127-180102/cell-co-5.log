@@ -1,0 +1,101 @@
+quantum-wrap: QUANTUM_SESSION_ID=YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvNzEwODMyNjYtYzE2Ni00YTIyLWEzZTEtNGE4ZmM1ZDcxNzFm -> exec python3 /opt/flux-quantum/experiments/forte/qemcmc.py run --path braket --arm classical --device arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q --steps 20 --qubits 6 --seed 1 --fillers 5 --filler-shots 10 --max-usd 120 --yes --out /opt/flux-quantum/experiments/forte/runs-flux-cell-co-5.jsonl
+estimated cost, fillers at their worst: $38.85
+credential from the scout: yes
+5 fillers into the public queue
+topped the queue up with 5 fillers
+  f48829d7-9cb QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  f48829d7-9cb COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   0 100010 -> 110110 accept E=-0.230
+topped the queue up with 5 fillers
+  63356cad-64e QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  63356cad-64e COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   1 110110 -> 010110 accept E=-0.840
+topped the queue up with 5 fillers
+  ed384bc3-480 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  ed384bc3-480 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   2 010110 -> 000111 accept E=-7.444
+topped the queue up with 5 fillers
+  18c2d772-09f QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  18c2d772-09f COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   3 000111 -> 101101 reject E=-7.444
+topped the queue up with 5 fillers
+  3b04b2e8-4c0 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  3b04b2e8-4c0 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   4 000111 -> 010000 reject E=-7.444
+topped the queue up with 5 fillers
+  93d9c460-c31 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  93d9c460-c31 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   5 000111 -> 010011 reject E=-7.444
+topped the queue up with 5 fillers
+  00af3723-9ab QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  00af3723-9ab COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   6 000111 -> 011011 reject E=-7.444
+topped the queue up with 5 fillers
+  f672cd4d-ffe QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  f672cd4d-ffe COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   7 000111 -> 011100 reject E=-7.444
+topped the queue up with 5 fillers
+  c41c5877-68c QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  c41c5877-68c COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   8 000111 -> 001010 reject E=-7.444
+topped the queue up with 5 fillers
+  d3222ecb-a93 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  d3222ecb-a93 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   9 000111 -> 000011 reject E=-7.444
+topped the queue up with 5 fillers
+  6d1799a2-5f3 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  6d1799a2-5f3 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  10 000111 -> 010110 reject E=-7.444
+topped the queue up with 5 fillers
+  decdd191-745 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  decdd191-745 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  11 000111 -> 101110 reject E=-7.444
+topped the queue up with 5 fillers
+  322ef54a-6a4 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  322ef54a-6a4 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  12 000111 -> 111001 reject E=-7.444
+topped the queue up with 5 fillers
+  72fc3fdf-98b QUEUED     QUANTUM_TASKS_QUEUE queue, position 3
+  72fc3fdf-98b COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  13 000111 -> 010011 reject E=-7.444
+topped the queue up with 5 fillers
+  abe304ab-64a QUEUED     QUANTUM_TASKS_QUEUE queue, position 5
+  abe304ab-64a COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  14 000111 -> 101100 reject E=-7.444
+topped the queue up with 5 fillers
+  508fd1c2-ef5 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  508fd1c2-ef5 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  15 000111 -> 001111 reject E=-7.444
+topped the queue up with 5 fillers
+  da77e322-416 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  da77e322-416 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  16 000111 -> 001010 reject E=-7.444
+topped the queue up with 5 fillers
+  3da7b67e-259 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  3da7b67e-259 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  17 000111 -> 010000 reject E=-7.444
+topped the queue up with 5 fillers
+  3551f5d9-9fd QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  3551f5d9-9fd COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  18 000111 -> 011101 reject E=-7.444
+topped the queue up with 5 fillers
+  00746669-fca QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  00746669-fca COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step  19 000111 -> 110000 reject E=-7.444
+braket: could not cancel 433239160085: An error occurred (TooManyRequestsException) when calling the CancelQuantumTask operation (reached max retries: 2): Too Many Requests
+braket: could not cancel 8e6cb9802d8b: An error occurred (TooManyRequestsException) when calling the CancelQuantumTask operation (reached max retries: 2): Too Many Requests
+braket: could not cancel 917e72275726: An error occurred (TooManyRequestsException) when calling the CancelQuantumTask operation (reached max retries: 2): Too Many Requests
+drained the fillers: 105 submitted, 105 executed
+{
+  "steps": 20,
+  "accepted": 3,
+  "acceptance": 0.15,
+  "energy": -7.444325413912331,
+  "state": "000111",
+  "mean_wait_s": null,
+  "mean_turnaround_s": 3.647499990463257,
+  "makespan_s": 339.95242714881897,
+  "steps_per_hour": 211.7943401783126,
+  "cost_usd": null
+}
+recorded to /opt/flux-quantum/experiments/forte/runs-flux-cell-co-5.jsonl

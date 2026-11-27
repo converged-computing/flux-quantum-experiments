@@ -1,0 +1,44 @@
+estimated cost, fillers at their worst: $3.48
+  acf26080-d8a QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  acf26080-d8a COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   0 011110 -> 011001 accept E=-1.923
+  47559355-ee0 QUEUED     QUANTUM_TASKS_QUEUE queue, position 4
+  47559355-ee0 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   1 011001 -> 010011 reject E=-1.923
+  518feea9-935 QUEUED     QUANTUM_TASKS_QUEUE queue, position 1
+  518feea9-935 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   2 011001 -> 001010 accept E=-6.589
+  aa8f9e62-2c7 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  aa8f9e62-2c7 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   3 001010 -> 001100 reject E=-6.589
+  e24dff59-004 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  e24dff59-004 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   4 001010 -> 101010 reject E=-6.589
+  8c533f80-5a3 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  8c533f80-5a3 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   5 001010 -> 000111 reject E=-6.589
+  ecfa6598-65f QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  ecfa6598-65f COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   6 001010 -> 101010 reject E=-6.589
+  35b06e65-b51 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  35b06e65-b51 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   7 001010 -> 110001 reject E=-6.589
+  87a01195-b5c QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  87a01195-b5c COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   8 001010 -> 010101 reject E=-6.589
+  0aadf578-c21 QUEUED     QUANTUM_TASKS_QUEUE queue, position 2
+  0aadf578-c21 COMPLETED  QUANTUM_TASKS_QUEUE queue, position None
+step   9 001010 -> 111110 reject E=-6.589
+{
+  "steps": 10,
+  "accepted": 2,
+  "acceptance": 0.2,
+  "energy": -6.589376880983188,
+  "state": "001010",
+  "mean_wait_s": null,
+  "mean_turnaround_s": 3.6484000205993654,
+  "makespan_s": 63.96922039985657,
+  "steps_per_hour": 562.7706539953506,
+  "cost_usd": null
+}
+recorded to /opt/flux-quantum/experiments/forte/runs-flux-base-4.jsonl

@@ -1,0 +1,390 @@
+
+=== 2026-09-29T01:00:45.765941+00:00  tests/probe_hold.py --survey
+/home/vanessa/Desktop/Code/mcpserver/env/lib/python3.12/site-packages/braket/aws/aws_device.py:686: UserWarning: AccessDeniedException: Unable to search region 'eu-west-2' for devices. Please check your settings or try again later. Continuing without devices in 'eu-west-2'.
+  warnings.warn(
+device                                                                 open   normal  priority
+arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q            yes    0       0
+arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald                      yes    0       0
+arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1           yes    0       0
+arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet                       yes    0       0
+arn:aws:braket:us-east-1::device/qpu/quera/Aquila                      no     61      0
+arn:aws:braket:eu-north-1::device/qpu/aqt/Ibex-Q1                      no     30      0
+
+  windows in PDT
+  arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q  (0 queued, open)
+      Everyday   17:00 (prev day) to 23:59 (prev day)
+      Everyday   02:00 to 12:00
+      Everyday   14:00 to 16:59
+  arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald  (0 queued, open)
+      Weekdays   17:00 (prev day) to 20:29 (prev day)
+      Weekdays   00:20 to 16:59
+  arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1  (0 queued, open)
+      Sunday     17:00 (prev day) to 16:59
+      Monday     17:00 (prev day) to 16:59
+      Tuesday    17:00 (prev day) to 16:59
+      Wednesday  17:00 (prev day) to 16:59
+      Thursday   17:00 (prev day) to 00:59
+      Thursday   07:00 to 16:59
+      Friday     17:00 (prev day) to 16:59
+      Saturday   17:00 (prev day) to 16:59
+  arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet  (0 queued, open)
+      Weekdays   17:00 (prev day) to 18:29 (prev day)
+      Weekdays   20:15 (prev day) to 08:29
+      Weekdays   10:15 to 16:59
+  arn:aws:braket:us-east-1::device/qpu/quera/Aquila  (61 queued, shut)
+      Friday     21:00 (prev day) to 04:59
+      Friday     06:00 to 16:59
+      Saturday   18:00 (prev day) to 04:59
+      Saturday   06:00 to 16:59
+      Sunday     18:00 (prev day) to 04:59
+      Sunday     06:00 to 16:59
+      Monday     18:00 (prev day) to 20:59 (prev day)
+  arn:aws:braket:eu-north-1::device/qpu/aqt/Ibex-Q1  (30 queued, shut)
+      Monday     04:00 to 08:00
+      Tuesday    01:00 to 08:00
+      Wednesday  01:00 to 08:00
+      Friday     01:00 to 08:00
+
+=== 2026-09-29T01:01:11.729228+00:00  tests/probe_hold.py --device arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q --shots 10 --make-queue 6 --filler-shots 500 --max-seconds 900
+braket: credentials present via shared-credentials-file
+device: arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q
+device queues: {'normal': 0, 'priority': 0, 'jobs': 0, 'jobs_note': '0'}
+this run costs about $3.71 if the hold runs its full time
+hybrid job: arn:aws:braket:us-west-1:633731392008:job/8efc5e47-de7a-4c00-a964-30c3e804e371
+braket: queued (7s)
+braket: starting the container (12s)
+braket: starting the container (18s)
+braket: starting the container (23s)
+braket: starting the container (28s)
+braket: starting the container (33s)
+braket: starting the container (38s)
+braket: starting the container (44s)
+braket: starting the container (49s)
+braket: starting the container (54s)
+braket: starting the container (59s)
+braket: starting the container (64s)
+braket: starting the container (70s)
+braket: starting the container (75s)
+braket: starting the container (80s)
+braket: starting the container (85s)
+braket: starting the container (90s)
+braket: starting the container (95s)
+braket: starting the container (100s)
+holding the device after 105s
+token: YXJuOmF3czpi ...
+job state at submit time: RUNNING
+queued 6 filler tasks
+
+control:     arn:aws:braket:us-west-1:633731392008:quantum-task/be37c55b-b9bd-46a6-af8a-e77c94f1a536
+with token:  arn:aws:braket:us-west-1:633731392008:quantum-task/100a76ab-2e59-423f-bd7b-af5267504a4e
+device queues after both (these lag): {'normal': 0, 'priority': 0, 'jobs': 0, 'jobs_note': '0 (1 prioritized hybrid job running)'}
+
+watching until the token task finishes, hold up for 863s
+  control COMPLETED  Normal queue
+  token   COMPLETED  Priority queue
+
+releasing the hold
+
+             with token                     control
+  status     COMPLETED                      COMPLETED
+  job        arn:aws:braket:us-west-1:633731392008:job/8efc5e47-de7a-4c00-a964-30c3e804e371 None
+  priority   Priority                       Normal
+  position   None                           None
+  created    2026-09-29 01:03:05.356000+00:00 2026-09-29 01:03:05.006000+00:00
+  ended      2026-09-29 01:03:05.810000+00:00 2026-09-29 01:03:05.458000+00:00
+
+ASSOCIATED. The token travels: the task belongs to the job.
+IN THE PRIORITY QUEUE. The token task waited as Priority, the control as Normal.
+SERVED IN ORDER. Submitted 0s after the control and finished 0s after it, so the token bought no place.
+recorded to probe-runs.jsonl
+
+cancelling 6 filler tasks
+job state: CANCELLING
+
+=== 2026-09-29T01:21:56.815902+00:00  tests/probe_hold.py --inspect arn:aws:braket:us-east-1:633731392008:quantum-task/6241ffcb-914a-4129-b741-dd860350b4b5 arn:aws:braket:us-east-1:633731392008:quantum-task/c528e8f5-c83a-4914-b8cd-b873eff6cdfe
+  task           status     queue     created                    ended                      took
+  6241ffcb-914   CANCELLED  Priority  2026-09-29 00:29:36.826000+00:00 2026-09-29 00:35:36.617000+00:00 360s
+  c528e8f5-c83   CANCELLED  Normal    2026-09-29 00:29:40.659000+00:00 2026-09-29 00:35:36.493000+00:00 356s
+
+=== 2026-09-29T01:22:39.698365+00:00  tests/probe_hold.py --survey
+/home/vanessa/Desktop/Code/mcpserver/env/lib/python3.12/site-packages/braket/aws/aws_device.py:686: UserWarning: AccessDeniedException: Unable to search region 'eu-west-2' for devices. Please check your settings or try again later. Continuing without devices in 'eu-west-2'.
+  warnings.warn(
+device                                                                 open   normal  priority
+arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q            yes    0       0
+arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald                      yes    0       0
+arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1           yes    0       0
+arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet                       yes    0       0
+arn:aws:braket:us-east-1::device/qpu/quera/Aquila                      no     61      0
+arn:aws:braket:eu-north-1::device/qpu/aqt/Ibex-Q1                      no     30      0
+
+  windows in PDT
+  arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q  (0 queued, open)
+      Everyday   17:00 (prev day) to 23:59 (prev day)
+      Everyday   02:00 to 12:00
+      Everyday   14:00 to 16:59
+  arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald  (0 queued, open)
+      Weekdays   17:00 (prev day) to 20:29 (prev day)
+      Weekdays   00:20 to 16:59
+  arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1  (0 queued, open)
+      Sunday     17:00 (prev day) to 16:59
+      Monday     17:00 (prev day) to 16:59
+      Tuesday    17:00 (prev day) to 16:59
+      Wednesday  17:00 (prev day) to 16:59
+      Thursday   17:00 (prev day) to 00:59
+      Thursday   07:00 to 16:59
+      Friday     17:00 (prev day) to 16:59
+      Saturday   17:00 (prev day) to 16:59
+  arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet  (0 queued, open)
+      Weekdays   17:00 (prev day) to 18:29 (prev day)
+      Weekdays   20:15 (prev day) to 08:29
+      Weekdays   10:15 to 16:59
+  arn:aws:braket:us-east-1::device/qpu/quera/Aquila  (61 queued, shut)
+      Friday     21:00 (prev day) to 04:59
+      Friday     06:00 to 16:59
+      Saturday   18:00 (prev day) to 04:59
+      Saturday   06:00 to 16:59
+      Sunday     18:00 (prev day) to 04:59
+      Sunday     06:00 to 16:59
+      Monday     18:00 (prev day) to 20:59 (prev day)
+  arn:aws:braket:eu-north-1::device/qpu/aqt/Ibex-Q1  (30 queued, shut)
+      Monday     04:00 to 08:00
+      Tuesday    01:00 to 08:00
+      Wednesday  01:00 to 08:00
+      Friday     01:00 to 08:00
+
+=== 2026-09-29T01:26:00.126610+00:00  tests/probe_hold.py --device arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1 --shots 1 --make-queue 3 --filler-shots 1 --max-seconds 1800
+braket: credentials present via shared-credentials-file
+device: arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1
+device queues: {'normal': 0, 'priority': 0, 'jobs': 0, 'jobs_note': '0'}
+this device takes 100 to 5000 shots and --shots is 1. Submitting would fail after the hold is up and billing.
+
+=== 2026-09-29T01:33:16.882092+00:00  tests/probe_hold.py --device arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet --pace 3 --filler-shots 100
+braket: credentials present via shared-credentials-file
+device: arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet
+device queues: {'normal': 1, 'priority': 0, 'jobs': 0, 'jobs_note': '0'}
+execution windows, PDT:
+  Weekdays   17:00 (prev day) to 18:29 (prev day)
+  Weekdays   20:15 (prev day) to 08:29
+  Weekdays   10:15 to 16:59
+the device is outside its execution window, so the job would just sit there. Wait for a window, or pass --force.
+
+=== 2026-09-29T01:36:13.338140+00:00  tests/probe_hold.py --device arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald --pace 3 --filler-shots 100
+braket: credentials present via shared-credentials-file
+device: arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald
+device queues: {'normal': 0, 'priority': 0, 'jobs': 0, 'jobs_note': '0'}
+this run costs about $0.63 if the hold runs its full time
+this costs about $1.38
+  4f990c40-676   COMPLETED  queued at 1     took 5.5s
+  8226757a-d8a   COMPLETED  queued at 2     took 5.5s
+  e3efe23e-865   COMPLETED  queued at 3     took 4.7s
+OVERLAPPING. 3 tasks finished within 0.0s of each other, so this device runs them together or in under a poll, and filler will not build a queue here.
+recorded to probe-runs.jsonl
+
+=== 2026-09-29T01:42:44.512027+00:00  tests/probe_hold.py --survey
+/home/vanessa/Desktop/Code/mcpserver/env/lib/python3.12/site-packages/braket/aws/aws_device.py:686: UserWarning: AccessDeniedException: Unable to search region 'eu-west-2' for devices. Please check your settings or try again later. Continuing without devices in 'eu-west-2'.
+  warnings.warn(
+device                                                                 open   normal  priority
+arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q            yes    0       0
+arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald                      yes    0       0
+arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1           yes    0       0
+arn:aws:braket:us-east-1::device/qpu/quera/Aquila                      no     61      0
+arn:aws:braket:eu-north-1::device/qpu/aqt/Ibex-Q1                      no     30      0
+arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet                       no     1       0
+
+  windows in PDT
+  arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q  (0 queued, open)
+      Everyday   17:00 (prev day) to 23:59 (prev day)
+      Everyday   02:00 to 12:00
+      Everyday   14:00 to 16:59
+  arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald  (0 queued, open)
+      Weekdays   17:00 (prev day) to 20:29 (prev day)
+      Weekdays   00:20 to 16:59
+  arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1  (0 queued, open)
+      Sunday     17:00 (prev day) to 16:59
+      Monday     17:00 (prev day) to 16:59
+      Tuesday    17:00 (prev day) to 16:59
+      Wednesday  17:00 (prev day) to 16:59
+      Thursday   17:00 (prev day) to 00:59
+      Thursday   07:00 to 16:59
+      Friday     17:00 (prev day) to 16:59
+      Saturday   17:00 (prev day) to 16:59
+  arn:aws:braket:us-east-1::device/qpu/quera/Aquila  (61 queued, shut)
+      Friday     21:00 (prev day) to 04:59
+      Friday     06:00 to 16:59
+      Saturday   18:00 (prev day) to 04:59
+      Saturday   06:00 to 16:59
+      Sunday     18:00 (prev day) to 04:59
+      Sunday     06:00 to 16:59
+      Monday     18:00 (prev day) to 20:59 (prev day)
+  arn:aws:braket:eu-north-1::device/qpu/aqt/Ibex-Q1  (30 queued, shut)
+      Monday     04:00 to 08:00
+      Tuesday    01:00 to 08:00
+      Wednesday  01:00 to 08:00
+      Friday     01:00 to 08:00
+  arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet  (1 queued, shut)
+      Weekdays   17:00 (prev day) to 18:29 (prev day)
+      Weekdays   20:15 (prev day) to 08:29
+      Weekdays   10:15 to 16:59
+
+=== 2026-09-29T01:43:11.435764+00:00  tests/probe_hold.py --device arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1 --shots 100 --make-queue 1 --filler-shots 100 --max-seconds 1800
+braket: credentials present via shared-credentials-file
+device: arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1
+device queues: {'normal': 0, 'priority': 0, 'jobs': 0, 'jobs_note': '0'}
+this run costs about $24.96 if the hold runs its full time
+hybrid job: arn:aws:braket:us-east-1:633731392008:job/bf607bb3-3f46-4a6b-b4c0-6774e049aed3
+braket: queued (7s)
+braket: queued (12s)
+braket: queued (17s)
+braket: queued (22s)
+braket: queued (27s)
+braket: starting the container (33s)
+braket: starting the container (39s)
+braket: starting the container (44s)
+braket: starting the container (49s)
+braket: starting the container (55s)
+braket: starting the container (60s)
+braket: starting the container (65s)
+braket: starting the container (71s)
+braket: starting the container (76s)
+braket: starting the container (81s)
+braket: starting the container (86s)
+braket: starting the container (92s)
+braket: starting the container (97s)
+braket: starting the container (102s)
+braket: starting the container (107s)
+braket: starting the container (113s)
+braket: starting the container (118s)
+braket: starting the container (123s)
+braket: starting the container (128s)
+braket: starting the container (134s)
+braket: starting the container (139s)
+holding the device after 144s
+token: YXJuOmF3czpi ...
+job state at submit time: RUNNING
+queued 1 filler tasks
+
+control:     arn:aws:braket:us-east-1:633731392008:quantum-task/ad88602e-0a0b-41fa-8331-c56d379ea6ac
+with token:  arn:aws:braket:us-east-1:633731392008:quantum-task/cedc75b7-27cd-4302-8c8d-9cc18e132546
+device queues after both (these lag): {'normal': 1, 'priority': 0, 'jobs': 0, 'jobs_note': '0 (1 prioritized hybrid job running)'}
+
+watching until the token task finishes, hold up for 1766s
+  control QUEUED     Normal queue position 3
+  token   QUEUED     Priority queue position 1
+
+=== 2026-09-29T01:49:09.283015+00:00  tests/probe_hold.py --survey
+/home/vanessa/Desktop/Code/mcpserver/env/lib/python3.12/site-packages/braket/aws/aws_device.py:686: UserWarning: AccessDeniedException: Unable to search region 'eu-west-2' for devices. Please check your settings or try again later. Continuing without devices in 'eu-west-2'.
+  warnings.warn(
+device                                                                 open   normal  priority
+arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q            yes    4       0
+arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1           yes    3       1
+arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald                      yes    0       0
+arn:aws:braket:us-east-1::device/qpu/quera/Aquila                      no     61      0
+arn:aws:braket:eu-north-1::device/qpu/aqt/Ibex-Q1                      no     30      0
+arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet                       no     1       0
+
+  windows in PDT
+  arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q  (4 queued, open)
+      Everyday   17:00 (prev day) to 23:59 (prev day)
+      Everyday   02:00 to 12:00
+      Everyday   14:00 to 16:59
+  arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1  (3 queued, open)
+      Sunday     17:00 (prev day) to 16:59
+      Monday     17:00 (prev day) to 16:59
+      Tuesday    17:00 (prev day) to 16:59
+      Wednesday  17:00 (prev day) to 16:59
+      Thursday   17:00 (prev day) to 00:59
+      Thursday   07:00 to 16:59
+      Friday     17:00 (prev day) to 16:59
+      Saturday   17:00 (prev day) to 16:59
+  arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald  (0 queued, open)
+      Weekdays   17:00 (prev day) to 20:29 (prev day)
+      Weekdays   00:20 to 16:59
+  arn:aws:braket:us-east-1::device/qpu/quera/Aquila  (61 queued, shut)
+      Friday     21:00 (prev day) to 04:59
+      Friday     06:00 to 16:59
+      Saturday   18:00 (prev day) to 04:59
+      Saturday   06:00 to 16:59
+      Sunday     18:00 (prev day) to 04:59
+      Sunday     06:00 to 16:59
+      Monday     18:00 (prev day) to 20:59 (prev day)
+  arn:aws:braket:eu-north-1::device/qpu/aqt/Ibex-Q1  (30 queued, shut)
+      Monday     04:00 to 08:00
+      Tuesday    01:00 to 08:00
+      Wednesday  01:00 to 08:00
+      Friday     01:00 to 08:00
+  arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet  (1 queued, shut)
+      Weekdays   17:00 (prev day) to 18:29 (prev day)
+      Weekdays   20:15 (prev day) to 08:29
+      Weekdays   10:15 to 16:59
+
+busiest queue:  arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q
+
+=== 2026-09-29T01:49:49.173359+00:00  tests/probe_hold.py --survey
+/home/vanessa/Desktop/Code/mcpserver/env/lib/python3.12/site-packages/braket/aws/aws_device.py:686: UserWarning: AccessDeniedException: Unable to search region 'eu-west-2' for devices. Please check your settings or try again later. Continuing without devices in 'eu-west-2'.
+  warnings.warn(
+device                                                                 open   normal  priority
+arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1           yes    3       1
+arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q            yes    0       0
+arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald                      yes    0       0
+arn:aws:braket:us-east-1::device/qpu/quera/Aquila                      no     61      0
+arn:aws:braket:eu-north-1::device/qpu/aqt/Ibex-Q1                      no     30      0
+arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet                       no     1       0
+
+  windows in PDT
+  arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1  (3 queued, open)
+      Sunday     17:00 (prev day) to 16:59
+      Monday     17:00 (prev day) to 16:59
+      Tuesday    17:00 (prev day) to 16:59
+      Wednesday  17:00 (prev day) to 16:59
+      Thursday   17:00 (prev day) to 00:59
+      Thursday   07:00 to 16:59
+      Friday     17:00 (prev day) to 16:59
+      Saturday   17:00 (prev day) to 16:59
+  arn:aws:braket:us-west-1::device/qpu/rigetti/Cepheus-1-108Q  (0 queued, open)
+      Everyday   17:00 (prev day) to 23:59 (prev day)
+      Everyday   02:00 to 12:00
+      Everyday   14:00 to 16:59
+  arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald  (0 queued, open)
+      Weekdays   17:00 (prev day) to 20:29 (prev day)
+      Weekdays   00:20 to 16:59
+  arn:aws:braket:us-east-1::device/qpu/quera/Aquila  (61 queued, shut)
+      Friday     21:00 (prev day) to 04:59
+      Friday     06:00 to 16:59
+      Saturday   18:00 (prev day) to 04:59
+      Saturday   06:00 to 16:59
+      Sunday     18:00 (prev day) to 04:59
+      Sunday     06:00 to 16:59
+      Monday     18:00 (prev day) to 20:59 (prev day)
+  arn:aws:braket:eu-north-1::device/qpu/aqt/Ibex-Q1  (30 queued, shut)
+      Monday     04:00 to 08:00
+      Tuesday    01:00 to 08:00
+      Wednesday  01:00 to 08:00
+      Friday     01:00 to 08:00
+  arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet  (1 queued, shut)
+      Weekdays   17:00 (prev day) to 18:29 (prev day)
+      Weekdays   20:15 (prev day) to 08:29
+      Weekdays   10:15 to 16:59
+
+busiest queue:  arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1
+  control QUEUED     Normal queue position 1
+  token   COMPLETED  Priority queue
+
+releasing the hold
+watching the control for up to 1800s more
+  control COMPLETED  Normal queue
+
+             with token                     control
+  status     COMPLETED                      COMPLETED
+  job        arn:aws:braket:us-east-1:633731392008:job/bf607bb3-3f46-4a6b-b4c0-6774e049aed3 None
+  priority   Priority                       Normal
+  position   1                              3
+  created    2026-09-29 01:45:41.156000+00:00 2026-09-29 01:45:40.816000+00:00
+  ended      2026-09-29 01:56:22.193000+00:00 2026-09-29 01:56:22.763000+00:00
+
+ASSOCIATED. The token travels: the task belongs to the job.
+IN THE PRIORITY QUEUE. The token task waited as Priority at position 1, the control as Normal at position 3.
+SERVED FIRST. Submitted 0s after the control and finished 1s before it.
+recorded to probe-runs.jsonl
+
+cancelling 1 filler tasks
+job state: CANCELLING

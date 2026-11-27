@@ -1,0 +1,26 @@
+quantum-scout: opening a braket session
+braket: queued (5s)
+braket: starting the container (11s)
+braket: starting the container (17s)
+braket: starting the container (22s)
+braket: starting the container (27s)
+braket: starting the container (32s)
+braket: starting the container (38s)
+braket: starting the container (43s)
+braket: starting the container (48s)
+braket: starting the container (53s)
+braket: starting the container (58s)
+braket: starting the container (64s)
+braket: starting the container (69s)
+braket: starting the container (74s)
+braket: starting the container (79s)
+braket: starting the container (84s)
+braket: starting the container (90s)
+braket: starting the container (95s)
+braket: starting the container (100s)
+quantum-scout: holding the device after 105s
+quantum-scout: vendor=braket session=YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvNzEwODMyNjYtYzE2Ni00YTIyLWEzZTEtNGE4ZmM1ZDcxNzFm unheld job=44654254882816
+quantum-scout: classical job 44654254882816 finished
+braket: delete_object on flux-quantum/flux-quantum-hold-1795803685-c2b8ac/token.json failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-083d6a246cf922c63 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795803685-c2b8ac/token.json" because no identity-based policy allows the s3:DeleteObject action
+braket: delete_object on flux-quantum/flux-quantum-hold-1795803685-c2b8ac/release failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-083d6a246cf922c63 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795803685-c2b8ac/release" because no identity-based policy allows the s3:DeleteObject action
+quantum-scout: closed braket session arn:aws:braket:us-west-1:633731392008:job/71083266-c166-4a22-a3e1-4a8fc5d7171f

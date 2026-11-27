@@ -1,0 +1,35 @@
+quantum-scout: opening a braket session
+braket: the hybrid-job quota is full, waiting for a slot (2s)
+braket: the hybrid-job quota is full, waiting for a slot (24s)
+braket: the hybrid-job quota is full, waiting for a slot (46s)
+braket: the hybrid-job quota is full, waiting for a slot (68s)
+braket: the hybrid-job quota is full, waiting for a slot (90s)
+braket: the hybrid-job quota is full, waiting for a slot (111s)
+braket: the hybrid-job quota is full, waiting for a slot (134s)
+braket: the hybrid-job quota is full, waiting for a slot (155s)
+braket: the hybrid-job quota is full, waiting for a slot (177s)
+braket: queued (200s)
+braket: starting the container (205s)
+braket: starting the container (211s)
+braket: starting the container (216s)
+braket: starting the container (222s)
+braket: starting the container (227s)
+braket: starting the container (232s)
+braket: starting the container (237s)
+braket: starting the container (242s)
+braket: starting the container (248s)
+braket: starting the container (253s)
+braket: starting the container (258s)
+braket: starting the container (263s)
+braket: starting the container (268s)
+braket: starting the container (274s)
+braket: starting the container (279s)
+braket: starting the container (284s)
+braket: starting the container (289s)
+braket: starting the container (294s)
+quantum-scout: holding the device after 300s
+quantum-scout: vendor=braket session=YXJuOmF3czpicmFrZXQ6dXMtd2VzdC0xOjYzMzczMTM5MjAwODpqb2IvNWZkZThkMWUtMTA4OC00ZGQwLWJmNDQtMGE4M2M1NGEwZDM1 unheld job=9547930402816
+quantum-scout: classical job 9547930402816 finished
+braket: delete_object on flux-quantum/flux-quantum-hold-1795762369-016578/token.json failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-01c6460d44dc30cb5 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795762369-016578/token.json" because no identity-based policy allows the s3:DeleteObject action
+braket: delete_object on flux-quantum/flux-quantum-hold-1795762369-016578/release failed: An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::633731392008:assumed-role/flux-ec2-role/i-01c6460d44dc30cb5 is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::amazon-braket-us-west-1-633731392008/flux-quantum/flux-quantum-hold-1795762369-016578/release" because no identity-based policy allows the s3:DeleteObject action
+quantum-scout: closed braket session arn:aws:braket:us-west-1:633731392008:job/5fde8d1e-1088-4dd0-bf44-0a83c54a0d35

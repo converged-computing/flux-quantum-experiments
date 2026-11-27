@@ -1,0 +1,14 @@
+{
+  "paths": ["braket", "ionq"],
+  "arms": ["baseline", "coschedule"],
+  "fillers": [0, 3],
+  "trials": 2,
+  "tasks": 3,
+  "shots": 100,
+  "filler_shots": 100,
+  "max_seconds": 1800,
+  "pause_s": 120,
+  "max_usd_per_trial": 40,
+  "hold": {"braket": "session", "ionq": "probe"},
+  "device": {"braket": null, "ionq": null}
+}
