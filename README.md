@@ -18,6 +18,9 @@ quantum and classical coscheduling for Flux. One directory per vendor.
   future-scaled versions of them), both arms replay the same draw, and the
   paired contrast comes with bootstrap confidence intervals. Free (mock
   vendor), pre-registered plans, seeded.
+- [vendors/](vendors/) one coscheduled pair per vendor backend (Braket,
+  IonQ, IBM through QRMI, mock): the mechanism-verification table, with the
+  optional two-doors comparison of Forte-1 direct and through Braket.
 - [probes/](probes/) the September 2026 Braket device probes the campaign's
   mechanism numbers build on (hold-open latency, queue behavior, execution
   windows, priority semantics).
