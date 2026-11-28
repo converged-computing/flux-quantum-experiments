@@ -1,0 +1,11 @@
+paired busy-ness sweep: median [95% bootstrap CI] (mean), n pairs
+
+    idle: n=20  censored=0  vendor wait s: med     2.00 | held core-s baseline    72.10 cosched    49.70 | SAVED    22.38 [   22.29 ..    22.46] (mean 22.37) | release lat s med     0.00
+      x5: n=20  censored=0  vendor wait s: med     8.38 | held core-s baseline   123.34 cosched    56.12 | SAVED    67.23 [   22.46 ..   312.45] (mean 171.94) | release lat s med     0.01
+     x10: n=19  censored=1  vendor wait s: med     2.00 | held core-s baseline    72.22 cosched    49.73 | SAVED    22.52 [   22.38 ..   523.52] (mean 256.97) | release lat s med     0.01
+      x2: n=20  censored=0  vendor wait s: med     2.20 | held core-s baseline    73.70 cosched    49.94 | SAVED    23.75 [   22.51 ..    85.44] (mean 75.65) | release lat s med     0.01
+   today: n=20  censored=0  vendor wait s: med     8.55 | held core-s baseline   124.47 cosched    56.26 | SAVED    68.21 [   27.46 ..   101.06] (mean 65.90) | release lat s med     0.01
+
+saved core-s per trial = size*(baseline span) - [size*(cosched
+span) + scout span]. Positive means coscheduling returned cores
+to the cluster while the vendor queue was waited out.
