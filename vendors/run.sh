@@ -10,12 +10,12 @@
 # row records what the paper's table needs: vendor, device, vendor wait,
 # release latency, session id, and the scout's own account of the queue.
 #
-# On braket and ionq the released classical does real work: one QeMCMC step
-# (STEPS to raise it) through forte/qemcmc.py with the scout's credential,
-# so the row shows a circuit executing, not a sleep. Cost per step at
-# SHOTS=100: braket->Forte-1 $8.30, ionq direct $25.79, braket->SV1 pennies.
-# Raise MAX_USD along with STEPS or SHOTS, or qemcmc refuses the run.
-# mock and ibm have no qemcmc path; their classical stays the sleep probe.
+# On braket, ionq and ibm the released classical does real work: one QeMCMC
+# step (STEPS to raise it) through forte/qemcmc.py with the scout's
+# credential, so the row shows a circuit executing, not a sleep. Cost per
+# step at SHOTS=100: braket->Forte-1 $8.30, ionq direct $25.79, ibm ~$3.30,
+# braket->SV1 pennies. Raise MAX_USD along with STEPS or SHOTS, or qemcmc
+# refuses the run. mock has no qemcmc path; its classical stays the sleep.
 #
 # Paid vendors run only when named in VENDORS. Defaults are the cheapest
 # device per vendor (braket: SV1 simulator; ionq/ibm: backend default).
@@ -58,9 +58,11 @@ HDR="vendor,device,t0,submit,scout_start,priority,alloc,start,finish,scout_finis
 payload_for() { # vendor device-or-empty -> the classical job's sh -c payload
     local v="$1" dev="$2" qdev
     case "$v" in
-    braket|ionq)
+    braket|ionq|ibm)
         qdev="$dev"
         [ "$v" = braket ] && [ -z "$qdev" ] && qdev="$BRAKET_SV1"
+        # ibm with no device: the wrap's QRMI_JOB_QPU_RESOURCES names the
+        # resource the scout holds, and the path reads it
         # one real QeMCMC step with the scout's credential. qemcmc is rank
         # aware: rank 0 drives the chain, every other task of -n$SIZE exits,
         # so the vendor is billed once.
@@ -69,7 +71,7 @@ exec python3 '$FORTE/qemcmc.py' run --path $v --arm classical \
 --steps $STEPS --shots $SHOTS --qubits $QUBITS --max-usd $MAX_USD \
 ${qdev:+--device '$qdev'} --out '$PWD/results/qemcmc-$v.jsonl'"
         ;;
-    *)  # no qemcmc path for mock or ibm; the handoff itself is the row
+    *)  # no qemcmc path for mock; the handoff itself is the row
         echo "sleep $WORK; echo got \${QUANTUM_SESSION_ID:-nothing}"
         ;;
     esac

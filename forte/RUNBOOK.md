@@ -6,11 +6,12 @@ here asks for loose commands to be composed by hand. Steps marked GATE
 refuse to continue on failure; do not override a gate.
 
 Remaining cells: C2f/C3f attempt 2 (`fluxcells.sh run` with the
-FillerPool fix pulled onto the cluster, ~$150), C6 (optional). COMPLETE:
-C4 (attempt 4, 06:46 UTC, OK 4/4), C5 (17:46 UTC, OK 4/4, replicates
-C4). C2f/C3f attempt 1 ran 6/6 but measured pool bookkeeping, not
-contention - see PROTOCOL.md. C5a needs the step 9 output from a boot
-pasted into PROTOCOL.md if not yet done.
+FillerPool fix pulled onto the cluster, ~$150), the vendor verification
+table (step 5a below, ~$37), C6 (optional). COMPLETE: C4 (attempt 4,
+06:46 UTC, OK 4/4), C5 (17:46 UTC, OK 4/4, replicates C4). C2f/C3f
+attempt 1 ran 6/6 but measured pool bookkeeping, not contention - see
+PROTOCOL.md. C5a needs the step 9 output from a boot pasted into
+PROTOCOL.md if not yet done.
 
 C2f/C3f and C5 can share one boot: run `fluxcells.sh run` after C5's
 `fluxbatch.sh run`, inside a device window (the cells take ~1.5-2 h and
@@ -124,6 +125,33 @@ spending arm B's money.
 During arm B, scouts beyond the hybrid-jobs quota print
 `braket: the hybrid-job quota is full, waiting for a slot` and wait
 (up to 1 h). That is normal serialization, not a failure.
+
+## 5a. The vendor verification table, on the lead (~$37, one boot only)
+
+The three-doors row set: one coscheduled pair per vendor, each classical
+running one real QeMCMC step inside the scout's hold. Piggybacks on any
+boot that has passed steps 2-4; an idle device is fine, this is mechanism
+not performance. See `../vendors/README.md` for the row format.
+
+```bash
+# credentials as the submitting user: AWS (already there for braket),
+# IONQ_API_KEY, and the four <resource>_QRMI_IBM_QRS_* variables for ibm.
+# The ibm step also needs: pip install 'qrmi[ibm]'   (python 3.11+)
+cd /opt/flux-quantum-experiments/vendors
+bash run.sh                                        # free mock rehearsal first
+VENDORS="braket ionq ibm" \
+  BRAKET_DEVICE="arn:aws:braket:us-east-1::device/qpu/ionq/Forte-1" \
+  IONQ_DEVICE="qpu.forte-1" \
+  IBM_DEVICE="<your QRMI resource id, e.g. ibm_kingston>" bash run.sh
+```
+
+Costs one step per vendor: braket->Forte-1 $8.30 + ionq direct $25.79 +
+ibm ~$3.30. Forte must be inside an execution window for the first two
+rows (`fluxbatch.sh check` knows how to ask); the ibm row is independent
+and can run any time. Copy `results/` off with the boot's evidence. The
+braket and ionq rows are also the two-doors comparison: same physical
+Forte-1, so `vendor_wait_s` and the step's task cost differ only by the
+door.
 
 ## 6. Evidence, then destroy
 

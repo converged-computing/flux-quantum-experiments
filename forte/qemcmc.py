@@ -18,6 +18,7 @@ Arms, as in trial.py:
     qemcmc.py estimate --path braket --steps 20
     qemcmc.py run --path ionq --arm coschedule --steps 20 --qubits 6
     qemcmc.py run --path braket --arm baseline --steps 20 --yes
+    qemcmc.py run --path ibm --arm classical --steps 1  # inside a flux pair
 
 local runs the chain on the built-in simulator and writes the same record,
 so mock and real runs read the same. Every run appends one JSON line to
@@ -109,6 +110,9 @@ class VendorSampler(object):
     def program(self, n, ops):
         if self.path.name == "ionq":
             return Q.to_ionq(n, ops)
+        if self.path.name == "ibm":
+            # IBM takes only ISA circuits; the path transpiles to its target
+            return self.path.program_from_ops(n, Q.lower(ops))
         return Q.to_qasm3(n, ops)
 
     def __call__(self, n, ops, meta):
@@ -399,7 +403,7 @@ def common(sub):
 
 
 def vendor(sub):
-    sub.add_argument("--path", required=True, choices=("braket", "ionq"))
+    sub.add_argument("--path", required=True, choices=("braket", "ionq", "ibm"))
     sub.add_argument("--device", default=None)
     sub.add_argument("--hold", default=None, choices=(None, "session", "probe"))
     sub.add_argument("--allow-ionq-session", action="store_true")

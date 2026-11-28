@@ -1,4 +1,4 @@
-"""The two ways to reach IonQ Forte, behind one interface.
+"""The ways to reach a quantum device, behind one interface.
 
 A path knows how to submit a task to the device, with or without the hold's
 credential, how to read the task back with its timestamps and queue, how to
@@ -15,8 +15,13 @@ makes, so what is measured is what the pipeline does.
              trial refuses unless told otherwise since a session that runs a
              job bills an hour of device time, or a probe job. IonQ gives a
              job's submitted, started and completed times.
+    ibm      An IBM device through QRMI, the third vendor door. The hold is
+             a qiskit-runtime-service session (batch mode: billed for
+             hardware time only). Tasks are SamplerV2 jobs; QRMI exposes
+             status but no service timestamps and no queue position.
 
-Both submit the same one qubit circuit, a Hadamard, measured.
+The default task is the same one qubit circuit everywhere: a Hadamard,
+measured (measure only on ibm, where an untranspiled h is not ISA).
 """
 
 import datetime
@@ -39,6 +44,13 @@ BRAKET_MIN_SHOTS = 100
 # cost a small job never gets above
 IONQ_JOB_MINIMUM = 25.79
 
+# what IBM bills a qiskit-runtime-service job: the pay-as-you-go rate per
+# QPU second (ibm.com/quantum pricing, November 2026) times roughly what
+# one small 100 shot sampler task uses. IBM has no estimate endpoint, so
+# unlike the other two vendors this is never refreshed from the service.
+IBM_PER_SECOND = 1.60
+IBM_TASK_SECONDS = 2.05
+
 BRAKET_FORTE = "arn:aws:braket:us-east-1::device/qpu/ionq/Forte-1"
 IONQ_FORTE = "qpu.forte-1"
 
@@ -55,6 +67,14 @@ ONE_QUBIT_IONQ = {
     "gateset": "qis",
     "circuit": [{"gate": "h", "target": 0}],
 }
+# measure only, so it is ISA valid on any IBM backend without transpiling,
+# the same dodge the scout's warmup task uses
+ONE_QUBIT_MEASURE_QASM = """OPENQASM 3.0;
+include "stdgates.inc";
+bit[1] c;
+qubit[1] q;
+c[0] = measure q[0];
+"""
 
 
 def now_iso():
@@ -432,9 +452,269 @@ class IonQPath:
         return sid
 
 
+class IBMPath:
+    """An IBM device through QRMI, the same calls the ibm backend's scout
+    makes. Needs qrmi[ibm] (python 3.11+), which brings qiskit and the
+    runtime result decoder.
+
+    QRMI differs from the other two services in three ways this class has
+    to absorb. The credential travels in the environment, not in the task:
+    QRMI reads <resource>_QRMI_JOB_ACQUISITION_TOKEN when the resource
+    handle is made, so submit rebuilds the handle when the credential
+    changes. The service reports status only - no created/started/ended
+    timestamps and no queue position - so created and ended are stamped
+    here by the polls that first saw them, the same stand-in trial.follow
+    already uses for started. And IBM requires ISA circuits: program_from_ops
+    transpiles against the backend target before submitting.
+    """
+
+    name = "ibm"
+
+    def __init__(self, device=None, hold="session"):
+        from qrmi import Payload, QuantumResource, TaskStatus
+        from flux_quantum.backends.qrmi import (
+            missing_env,
+            resource_type,
+            resources_in_environment,
+        )
+        from flux_quantum.keys import ACQUISITION_TOKEN
+
+        self.rtype = os.environ.get("QRMI_JOB_QPU_TYPES") or "qiskit-runtime-service"
+        if not device:
+            # inside a flux pair the wrap says which resource the scout
+            # holds; otherwise the one resource with credentials configured
+            device = (
+                (os.environ.get("QRMI_JOB_QPU_RESOURCES") or "")
+                .split(",")[0]
+                .strip()
+            )
+        if not device:
+            found = resources_in_environment(self.rtype)
+            if len(found) == 1:
+                device = found[0]
+            else:
+                raise RuntimeError(
+                    "ibm: pass --device (the QRMI resource id, e.g. "
+                    "ibm_kingston); credentials found for: {}".format(
+                        ", ".join(found) or "none"
+                    )
+                )
+        missing = missing_env(device, self.rtype)
+        if missing:
+            raise RuntimeError(
+                "ibm: {} is missing {}".format(
+                    device, ", ".join(device + s for s in missing)
+                )
+            )
+        self.device = device
+        self.hold_mode = hold
+        self._Payload = Payload
+        self._TaskStatus = TaskStatus
+        self._QuantumResource = QuantumResource
+        self._rtype_attr = resource_type(self.rtype)
+        self._token_var = device + ACQUISITION_TOKEN
+        self._handle = None
+        self._handle_token = None
+        self._backend = None
+        self._tasks = {}  # id -> what QRMI will not tell us later
+
+    def _qr(self, credential=None):
+        """The QRMI resource handle, rebuilt when the credential changed."""
+        if credential and os.environ.get(self._token_var) != str(credential):
+            os.environ[self._token_var] = str(credential)
+        token = os.environ.get(self._token_var)
+        if self._handle is None or token != self._handle_token:
+            self._handle = self._QuantumResource(self.device, self._rtype_attr)
+            self._handle_token = token
+            self._backend = None
+        return self._handle
+
+    def _status_name(self, status):
+        for name in ("Queued", "Running", "Completed", "Failed", "Cancelled"):
+            if status == getattr(self._TaskStatus, name, None):
+                return name
+        return str(status).rsplit(".", 1)[-1] or "UNKNOWN"
+
+    # ---- the device --------------------------------------------------------
+    def backend(self):
+        """Qiskit BackendV2 for the resource, carrying the ISA target."""
+        if self._backend is None:
+            from qrmi.primitives.ibm import get_backend
+
+            self._backend = get_backend(self._qr())
+        return self._backend
+
+    def device_state(self):
+        out = {"resource": self.device, "type": self.rtype}
+        try:
+            out["open"] = bool(self._qr().is_accessible())
+        except Exception as e:
+            out["status_error"] = str(e)
+        try:
+            m = self._qr().metadata()
+            out["metadata"] = m if isinstance(m, dict) else str(m)
+        except Exception:
+            pass
+        return out
+
+    def task_cost(self, shots):
+        return IBM_PER_SECOND * IBM_TASK_SECONDS
+
+    def hold_cost(self, seconds):
+        # a batch session bills hardware time only, which the tasks already
+        # count. A dedicated session would bill the wall clock instead; this
+        # path assumes batch, the backend's default
+        return 0.0
+
+    # ---- tasks -------------------------------------------------------------
+    def program_from_ops(self, n, ops):
+        """Lowered app ops -> ISA OpenQASM 3 for this backend.
+
+        IBM rejects circuits outside the device basis, so unlike the other
+        paths the circuit is transpiled client side, against the target QRMI
+        hands over. The classical register keeps qiskit's default name c and
+        clbit i stays qubit i through the layout, which result() relies on.
+        """
+        from qiskit import QuantumCircuit, qasm3
+        from qiskit.transpiler.preset_passmanagers import (
+            generate_preset_pass_manager,
+        )
+
+        qc = QuantumCircuit(n, n)
+        for op in ops:
+            if op[0] == "x":
+                qc.x(op[1])
+            elif op[0] == "h":
+                qc.h(op[1])
+            elif op[0] == "rx":
+                qc.rx(op[2], op[1])
+            elif op[0] == "rz":
+                qc.rz(op[2], op[1])
+            elif op[0] == "cnot":
+                qc.cx(op[1], op[2])
+            else:
+                raise ValueError("no ibm gate for {}".format(op[0]))
+        qc.measure(range(n), range(n))
+        pm = generate_preset_pass_manager(
+            optimization_level=1, backend=self.backend()
+        )
+        return qasm3.dumps(
+            pm.run(qc), disable_constants=True, allow_aliasing=True
+        )
+
+    def submit(self, shots, credential=None, label="task", program=None):
+        """One SamplerV2 task. program is ISA OpenQASM 3 from
+        program_from_ops; without one the task runs the measure-only one
+        qubit circuit. The credential is not in the request: QRMI submits
+        into the session whose token is in the environment."""
+        qr = self._qr(credential)
+        input_json = {
+            "pubs": [[program or ONE_QUBIT_MEASURE_QASM, None, shots]],
+            "shots": shots,
+            "options": {},
+            "version": 2,
+            "support_qiskit": True,
+        }
+        payload = self._Payload.QiskitPrimitive(
+            input=json.dumps(input_json), program_id="sampler"
+        )
+        task = str(qr.task_start(payload))
+        self._tasks[task] = {
+            "created": time.time(),
+            "in_hold": bool(os.environ.get(self._token_var)),
+            "ended": None,
+        }
+        return task
+
+    def describe(self, task_id):
+        rec = self._tasks.setdefault(
+            task_id, {"created": None, "in_hold": False, "ended": None}
+        )
+        try:
+            name = self._status_name(self._qr().task_status(task_id))
+        except Exception as e:
+            name = "UNKNOWN ({})".format(e)
+        terminal = name in ("Completed", "Failed", "Cancelled")
+        if terminal and rec.get("ended") is None:
+            # QRMI gives no end time; the poll that saw it terminal stands
+            # in, as follow's first-running sighting does for started
+            rec["ended"] = time.time()
+        return {
+            "status": name.upper(),
+            "in_hold": rec.get("in_hold", False),
+            "hold_id": (
+                os.environ.get(self._token_var) if rec.get("in_hold") else None
+            ),
+            "queue": "session" if rec.get("in_hold") else "fair-share",
+            "position": None,
+            "priority": None,
+            "created": rec.get("created"),
+            "started": None,
+            "ended": rec.get("ended"),
+            "terminal": terminal,
+            "cost": None,
+        }
+
+    def result(self, task_id, qubits=None):
+        """Measured weights for a finished task, {state: count}. Character
+        i of a state is qubit i: the runtime decoder returns qiskit's order,
+        clbit n-1 leftmost, so the keys are reversed here. Retrieval
+        consumes the result on the QRMI side, so it is kept."""
+        rec = self._tasks.setdefault(task_id, {})
+        if "weights" in rec:
+            return rec["weights"]
+        try:
+            from qiskit_ibm_runtime.decoders.result_decoder import ResultDecoder
+        except ImportError:  # qiskit-ibm-runtime < 0.48
+            from qiskit_ibm_runtime.utils.result_decoder import ResultDecoder
+
+        raw = self._qr().task_result(task_id).value
+        data = ResultDecoder.decode(raw)[0].data
+        bits = getattr(data, "c", None)
+        if bits is None:  # a register not named c: take the one there is
+            bits = next(iter(data.values()))
+        rec["weights"] = {
+            str(k)[::-1]: float(v) for k, v in bits.get_counts().items()
+        }
+        return rec["weights"]
+
+    def cancel(self, task_id):
+        try:
+            if self.describe(task_id)["terminal"]:
+                return False
+            self._qr().task_stop(task_id)
+            return True
+        except Exception as e:
+            print("ibm: could not cancel {}: {}".format(task_id, e))
+            return False
+
+    # ---- the hold ----------------------------------------------------------
+    def hold(self, max_seconds, wait_seconds):
+        from flux_quantum.backends import get_backend
+
+        backend = get_backend("ibm")
+        options = backend.scout_options(
+            {
+                "hold": self.hold_mode,
+                "device": self.device,
+                "hold_max": max_seconds,
+                "wait": wait_seconds,
+            }
+        )
+        return Hold(backend, options)
+
+    def credential_from_environment(self):
+        sid = os.environ.get("QUANTUM_SESSION_ID")
+        if not sid or sid.startswith("job:"):
+            return None
+        return sid
+
+
 def make_path(name, device=None, hold=None, allow_ionq_session=False):
     if name == "braket":
         return BraketPath(device or BRAKET_FORTE, hold or "session")
     if name == "ionq":
         return IonQPath(device or IONQ_FORTE, hold or "probe", allow_ionq_session)
-    raise ValueError("path is braket or ionq, not {}".format(name))
+    if name == "ibm":
+        return IBMPath(device, hold or "session")
+    raise ValueError("path is braket, ionq or ibm, not {}".format(name))
