@@ -1,10 +1,10 @@
 paired busy-ness sweep: median [95% bootstrap CI] (mean), n pairs
 
-    idle: n=20  censored=0  vendor wait s: med     2.00 | held core-s baseline    72.10 cosched    49.70 | SAVED    22.38 [   22.29 ..    22.46] (mean 22.37) | release lat s med     0.00
-      x5: n=20  censored=0  vendor wait s: med     8.38 | held core-s baseline   123.34 cosched    56.12 | SAVED    67.23 [   22.46 ..   312.45] (mean 171.94) | release lat s med     0.01
-     x10: n=19  censored=1  vendor wait s: med     2.00 | held core-s baseline    72.22 cosched    49.73 | SAVED    22.52 [   22.38 ..   523.52] (mean 256.97) | release lat s med     0.01
-      x2: n=20  censored=0  vendor wait s: med     2.20 | held core-s baseline    73.70 cosched    49.94 | SAVED    23.75 [   22.51 ..    85.44] (mean 75.65) | release lat s med     0.01
-   today: n=20  censored=0  vendor wait s: med     8.55 | held core-s baseline   124.47 cosched    56.26 | SAVED    68.21 [   27.46 ..   101.06] (mean 65.90) | release lat s med     0.01
+    idle: n=20  censored=0  vendor wait s: med     2.00 | held core-s baseline    72.15 cosched    49.73 | SAVED    22.43 [   22.38 ..    22.51] (mean 22.46) | release lat s med     0.00
+     x10: n=20  censored=0  vendor wait s: med     3.50 | held core-s baseline    84.09 cosched    51.23 | SAVED    32.87 [   22.51 ..   481.41] (mean 264.88) | release lat s med     0.01
+      x2: n=20  censored=0  vendor wait s: med     2.05 | held core-s baseline    72.60 cosched    49.78 | SAVED    22.82 [   22.50 ..    52.84] (mean 63.31) | release lat s med     0.01
+   today: n=20  censored=0  vendor wait s: med     2.17 | held core-s baseline    73.49 cosched    49.90 | SAVED    23.59 [   22.56 ..    68.64] (mean 47.90) | release lat s med     0.00
+      x5: n=20  censored=0  vendor wait s: med     2.00 | held core-s baseline    72.30 cosched    49.75 | SAVED    22.56 [   22.39 ..    25.10] (mean 116.60) | release lat s med     0.01
 
 saved core-s per trial = size*(baseline span) - [size*(cosched
 span) + scout span]. Positive means coscheduling returned cores
