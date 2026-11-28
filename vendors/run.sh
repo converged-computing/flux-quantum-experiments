@@ -10,6 +10,13 @@
 # row records what the paper's table needs: vendor, device, vendor wait,
 # release latency, session id, and the scout's own account of the queue.
 #
+# On braket and ionq the released classical does real work: one QeMCMC step
+# (STEPS to raise it) through forte/qemcmc.py with the scout's credential,
+# so the row shows a circuit executing, not a sleep. Cost per step at
+# SHOTS=100: braket->Forte-1 $8.30, ionq direct $25.79, braket->SV1 pennies.
+# Raise MAX_USD along with STEPS or SHOTS, or qemcmc refuses the run.
+# mock and ibm have no qemcmc path; their classical stays the sleep probe.
+#
 # Paid vendors run only when named in VENDORS. Defaults are the cheapest
 # device per vendor (braket: SV1 simulator; ionq/ibm: backend default).
 # Override with BRAKET_DEVICE / IONQ_DEVICE / IBM_DEVICE, e.g. the two-doors
@@ -25,6 +32,14 @@ SIZE="${SIZE:-2}"
 WORK="${WORK:-2}"
 TIMEOUT="${TIMEOUT:-1800}"
 OUT="${OUT:-results/pairs.csv}"
+STEPS="${STEPS:-1}"
+SHOTS="${SHOTS:-100}"
+QUBITS="${QUBITS:-6}"
+MAX_USD="${MAX_USD:-30}"
+FORTE="$(cd ../forte && pwd)"
+# the scout's braket backend defaults to SV1; qemcmc's path defaults to
+# Forte-1, so the payload always names the device the scout actually used
+BRAKET_SV1="arn:aws:braket:::device/quantum-simulator/amazon/sv1"
 mkdir -p results
 
 say() { echo "[$(date +%H:%M:%S)] $*" >&2; }
@@ -40,19 +55,40 @@ flux submit --help 2>&1 | grep -q -- --quantum-vendor \
 HDR="vendor,device,t0,submit,scout_start,priority,alloc,start,finish,scout_finish,vendor_wait_s,release_lat_s,timedout,session"
 [ -s "$OUT" ] || echo "$HDR" > "$OUT"
 
+payload_for() { # vendor device-or-empty -> the classical job's sh -c payload
+    local v="$1" dev="$2" qdev
+    case "$v" in
+    braket|ionq)
+        qdev="$dev"
+        [ "$v" = braket ] && [ -z "$qdev" ] && qdev="$BRAKET_SV1"
+        # one real QeMCMC step with the scout's credential. qemcmc is rank
+        # aware: rank 0 drives the chain, every other task of -n$SIZE exits,
+        # so the vendor is billed once.
+        echo "echo got \${QUANTUM_SESSION_ID:-nothing}; \
+exec python3 '$FORTE/qemcmc.py' run --path $v --arm classical \
+--steps $STEPS --shots $SHOTS --qubits $QUBITS --max-usd $MAX_USD \
+${qdev:+--device '$qdev'} --out '$PWD/results/qemcmc-$v.jsonl'"
+        ;;
+    *)  # no qemcmc path for mock or ibm; the handoff itself is the row
+        echo "sleep $WORK; echo got \${QUANTUM_SESSION_ID:-nothing}"
+        ;;
+    esac
+}
+
 one_pair() { # vendor device-or-empty
     local v="$1" dev="$2" devargs=() to=0
     [ -n "$dev" ] && devargs=(--quantum-device "$dev")
-    local err t0 scout main
+    local err t0 scout main payload
     err=$(mktemp)
     t0=$(date +%s.%N)
+    payload=$(payload_for "$v" "$dev")
     say "$v: submitting one pair (device: ${dev:-backend default})"
     if [ "$v" = mock ]; then
         export FLUX_QUANTUM_MOCK=1 FLUX_QUANTUM_MOCK_QUEUE=20 \
                FLUX_QUANTUM_MOCK_SERVICE_TIME=0.1 FLUX_QUANTUM_MOCK_BASE_OVERHEAD=2
     fi
     scout=$(flux submit --quantum-vendor "$v" "${devargs[@]}" -n"$SIZE" \
-        -- sh -c "sleep $WORK; echo got \$QUANTUM_SESSION_ID" 2>"$err")
+        -- sh -c "$payload" 2>"$err")
     main=$(grep -oE 'held classical job [0-9]+' "$err" | awk '{print $NF}')
     [ -z "$main" ] && { say "$v: no held classical job"; cat "$err" >&2; rm -f "$err"; return 1; }
     rm -f "$err"
@@ -77,6 +113,8 @@ one_pair() { # vendor device-or-empty
     # the scout's own log is the queue-position evidence, keep it whole
     flux job attach "$scout" > "results/scout-$v.log" 2>&1
     flux job eventlog "$main" > "results/classical-$v.eventlog" 2>&1
+    # and the classical's own log: on braket/ionq this is the QeMCMC step
+    flux job attach "$main" > "results/classical-$v.log" 2>&1
     [ "$to" = 0 ]
 }
 

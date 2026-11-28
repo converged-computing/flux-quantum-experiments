@@ -441,6 +441,16 @@ def main(argv=None):
     run.set_defaults(fn=cmd_run)
 
     args = ap.parse_args(argv)
+    # The chain is serial. Launched with more than one task (flux submit -nN,
+    # as in the vendors/run.sh pair), rank 0 drives it; any other rank would
+    # run a second chain against the same vendor bill.
+    try:
+        rank = int(os.environ.get("FLUX_TASK_RANK") or 0)
+    except ValueError:
+        rank = 0
+    if rank:
+        T.say("task rank {}: rank 0 drives the chain, nothing to do".format(rank))
+        return 0
     return args.fn(args) or 0
 
 
