@@ -66,14 +66,17 @@ def main(paths):
             b, c = arms.get("baseline"), arms.get("coscheduled")
             if not b or not c:
                 continue
-            if b["timedout"] == "1" or c["timedout"] == "1":
+            vals = (f(b["finish"]), f(b["alloc"]), f(c["finish"]), f(c["alloc"]))
+            if b["timedout"] == "1" or c["timedout"] == "1" or None in vals:
+                # a timeout, or a job that never ran (e.g. cancelled by the
+                # scout-death backstop): censored either way, never dropped
                 censored += 1
                 continue
             size = float(b["size"])
             wait = float(b["overhead"]) + float(depth) * float(b["service"])
-            bh = size * (f(b["finish"]) - f(b["alloc"]))
+            bh = size * (vals[0] - vals[1])
             span = (f(c["scout_finish"]) or 0) - (f(c["scout_start"]) or 0)
-            ch = size * (f(c["finish"]) - f(c["alloc"])) + max(span, 0)
+            ch = size * (vals[2] - vals[3]) + max(span, 0)
             waits.append(wait)
             base_held.append(bh)
             co_held.append(ch)
